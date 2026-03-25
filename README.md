@@ -179,6 +179,42 @@ html2canvas(document.querySelector('.stat-grid')).then(c => { const img = c.toDa
 
 ---
 
+## SLIDE ARCHIVE
+
+公開スライド一覧ページ。作成したスライドを格納・検索できるアーカイブ。
+
+**URL: https://slide-archive.vercel.app**
+**GitHub: https://github.com/signal-arc-coder-masashi/slide-tools**
+
+### ディレクトリ構成
+
+```
+outputs/
+├── index.html          ← ギャラリー＋検索ページ（slide-archive.vercel.app）
+├── genspark-manus/     → slide-archive.vercel.app/genspark-manus/
+│   └── index.html
+└── ai-tools/           → slide-archive.vercel.app/ai-tools/
+    └── index.html
+```
+
+### 新しいスライドを追加する手順
+
+1. `outputs/スライド名/index.html` を作成
+2. `outputs/index.html` の `SLIDES` 配列に1エントリ追加：
+```js
+{
+  id: 'スライド名',
+  title: 'タイトル',
+  description: '説明文',
+  tags: ['タグ1', 'タグ2'],
+  date: 'YYYY-MM-DD',
+  url: './スライド名/',
+},
+```
+3. `git push` → Vercel自動デプロイ（URL固定）
+
+---
+
 ## skills/slide-dataviz/
 
 データビジュアライゼーション付きスライドを作るための**オーケストレーター型スキル**。

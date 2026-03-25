@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI導入効果 — KPI比較インフォグラフィック</title>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0F172A;
+      --surface:  #1E293B;
+      --surface2: #273347;
+      --accent:   #F97316;
+      --accent2:  #10B981;
+      --danger:   #EF4444;
+      --muted:    #94A3B8;
+      --text:     #F1F5F9;
+      --before-bg: #1a2035;
+      --after-bg:  #1a2a1e;
+      --chart-radius: 16px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Slide canvas: 1920×1080 ── */
+    .slide {
+      width: 1920px;
+      min-height: 1080px;
+      padding: 56px 80px 48px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 40px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle grid lines */
+    .slide::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(249,115,22,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(249,115,22,.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+
+    /* ── Header ── */
+    .slide-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(249,115,22,.25);
+      padding-bottom: 20px;
+    }
+    .kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .slide-title {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+    }
+    .slide-title em {
+      color: var(--accent);
+      font-style: normal;
+    }
+    .header-badge {
+      background: rgba(249,115,22,.12);
+      border: 1px solid rgba(249,115,22,.35);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: .05em;
+    }
+
+    /* ── Main grid ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 220px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ── Before / After columns ── */
+    .col-panel {
+      border-radius: var(--chart-radius);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .col-panel.before {
+      background: var(--before-bg);
+      border: 1px solid rgba(239,68,68,.2);
+    }
+    .col-panel.after {
+      background: var(--after-bg);
+      border: 1.5px solid rgba(16,185,129,.35);
+    }
+
+    .panel-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      align-self: flex-start;
+    }
+    .before .panel-tag { background: rgba(239,68,68,.15); color: var(--danger); }
+    .after  .panel-tag { background: rgba(16,185,129,.15); color: var(--accent2); }
+    .panel-tag .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* KPI rows inside panels */
+    .kpi-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .kpi-row-label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .kpi-row-value {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
+    .before .kpi-row-value { color: #F87171; }
+    .after  .kpi-row-value { color: var(--accent2); }
+    .kpi-row-unit {
+      font-size: 20px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .kpi-divider {
+      height: 1px;
+      background: rgba(255,255,255,.07);
+    }
+
+    /* ── Center column — arrow + reduction stats ── */
+    .center-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding-top: 48px;
+    }
+    .arrow-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 0 40px rgba(249,115,22,.5);
+      flex-shrink: 0;
+    }
+    .reduction-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+      width: 100%;
+      border: 1px solid rgba(249,115,22,.2);
+    }
+    .reduction-pct {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .reduction-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: .05em;
+    }
+    .ai-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* ── Bottom: Big Number stat cards ── */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--chart-radius);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border: 1px solid rgba(255,255,255,.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--chart-radius);
+      background: linear-gradient(135deg, rgba(249,115,22,.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .stat-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .stat-icon.time  { background: rgba(249,115,22,.15); }
+    .stat-icon.error { background: rgba(16,185,129,.15); }
+    .stat-icon.cost  { background: rgba(59,130,246,.15); }
+    .stat-body { flex: 1; }
+    .stat-metric {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .stat-values {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .stat-before {
+      font-size: 22px;
+      font-weight: 700;
+      color: #F87171;
+      text-decoration: line-through;
+      text-decoration-color: rgba(239,68,68,.5);
+    }
+    .stat-arrow { color: var(--muted); font-size: 16px; }
+    .stat-after {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--accent2);
+    }
+    .stat-after small { font-size: 15px; font-weight: 600; margin-left: 2px; }
+    .stat-delta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(16,185,129,.3);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-top: 8px;
+    }
+
+    /* ── Progress bars section ── */
+    .progress-section {
+      grid-column: 1 / -1;
+    }
+    .progress-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .progress-list { display: flex; flex-direction: column; gap: 12px; }
+    .progress-item {}
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .progress-header span:last-child { color: var(--accent); font-weight: 700; }
+    .progress-track {
+      height: 8px;
+      background: rgba(255,255,255,.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: var(--pct);
+      background: var(--color);
+      border-radius: 4px;
+      transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Export button ── */
+    .export-btn {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(249,115,22,.4);
+      transition: opacity .2s;
+      z-index: 100;
+      letter-spacing: .05em;
+    }
+    .export-btn:hover { opacity: .88; }
+
+    /* ── Source note ── */
+    .source-note {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .04em;
+      opacity: .7;
+    }
+
+    /* ── Viewport scale (for smaller screens) ── */
+    @media (max-width: 1920px) {
+      body { display: flex; justify-content: center; background: #080f1e; }
+      .slide {
+        transform-origin: top center;
+        transform: scale(calc(min(100vw, 1920px) / 1920));
+        margin-bottom: calc((1080px - min(100vw, 1920px) / 1920 * 1080px) * -1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide" id="main-slide">
+
+  <!-- Header -->
+  <header class="slide-header">
+    <div>
+      <div class="kicker">Impact Report — AI Integration</div>
+      <h1 class="slide-title">AI導入前後 <em>KPI比較</em></h1>
+    </div>
+    <div class="header-badge">導入効果レポート 2025</div>
+  </header>
+
+  <!-- Main content -->
+  <main>
+    <div class="main-grid">
+
+      <!-- BEFORE column -->
+      <div class="col-panel before">
+        <div class="panel-tag"><span class="dot"></span>BEFORE — AI導入前</div>
+
+        <div class="kpi-row">
+          <div class="kpi-row-label">処理時間</div>
+          <div class="kpi-row-value">4<span class="kpi-row-unit">時間</span></div>
+        </div>
+        <div class="kpi-divider"></div>
+
+        <div class="kpi-row">
+          <div class="kpi-row-label">エラー率</div>
+          <div class="kpi-row-value">12<span class="kpi-row-unit">%</span></div>
+        </div>
+        <div class="kpi-divider"></div>
+
+        <div class="kpi-row">
+          <div class="kpi-row-label">月間コスト</div>
+          <div class="kpi-row-value">80<span class="kpi-row-unit">万円</span></div>
+        </div>
+      </div>
+
+      <!-- Center — arrow + reductions -->
+      <div class="center-col">
+        <div class="ai-label">AI</div>
+        <div class="arrow-circle">→</div>
+        <div class="ai-label">Automation</div>
+
+        <div class="reduction-card">
+          <div class="reduction-pct">-92%</div>
+          <div class="reduction-label">処理時間削減</div>
+        </div>
+        <div class="reduction-card">
+          <div class="reduction-pct">-87%</div>
+          <div class="reduction-label">エラー率削減</div>
+        </div>
+        <div class="reduction-card">
+          <div class="reduction-pct">-56%</div>
+          <div class="reduction-label">コスト削減</div>
+        </div>
+      </div>
+
+      <!-- AFTER column -->
+      <div class="col-panel after">
+        <div class="panel-tag"><span class="dot"></span>AFTER — AI導入後</div>
+
+        <div class="kpi-row">
+          <div class="kpi-row-label">処理時間</div>
+          <div class="kpi-row-value">20<span class="kpi-row-unit">分</span></div>
+        </div>
+        <div class="kpi-divider"></div>
+
+        <div class="kpi-row">
+          <div class="kpi-row-label">エラー率</div>
+          <div class="kpi-row-value">1.5<span class="kpi-row-unit">%</span></div>
+        </div>
+        <div class="kpi-divider"></div>
+
+        <div class="kpi-row">
+          <div class="kpi-row-label">月間コスト</div>
+          <div class="kpi-row-value">35<span class="kpi-row-unit">万円</span></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Bottom stat cards -->
+  <footer>
+    <div class="stat-bar">
+
+      <!-- Time -->
+      <div class="stat-card">
+        <div class="stat-icon time">⏱️</div>
+        <div class="stat-body">
+          <div class="stat-metric">処理時間 Processing Time</div>
+          <div class="stat-values">
+            <span class="stat-before">4時間</span>
+            <span class="stat-arrow">→</span>
+            <span class="stat-after">20<small>分</small></span>
+          </div>
+          <div class="stat-delta-badge">▼ 92% 削減 — 12倍高速化</div>
+        </div>
+      </div>
+
+      <!-- Error Rate -->
+      <div class="stat-card">
+        <div class="stat-icon error">✅</div>
+        <div class="stat-body">
+          <div class="stat-metric">エラー率 Error Rate</div>
+          <div class="stat-values">
+            <span class="stat-before">12%</span>
+            <span class="stat-arrow">→</span>
+            <span class="stat-after">1.5<small>%</small></span>
+          </div>
+          <div class="stat-delta-badge">▼ 87.5% 削減 — 品質8倍向上</div>
+        </div>
+      </div>
+
+      <!-- Cost -->
+      <div class="stat-card">
+        <div class="stat-icon cost">💰</div>
+        <div class="stat-body">
+          <div class="stat-metric">月間コスト Monthly Cost</div>
+          <div class="stat-values">
+            <span class="stat-before">80万</span>
+            <span class="stat-arrow">→</span>
+            <span class="stat-after">35<small>万円</small></span>
+          </div>
+          <div class="stat-delta-badge">▼ 56% 削減 — 年間540万円節約</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="source-note" style="margin-top:16px;">
+      * 処理時間削減率: (240分 - 20分) / 240分 = 91.7% &nbsp;|&nbsp;
+      エラー率削減率: (12% - 1.5%) / 12% = 87.5% &nbsp;|&nbsp;
+      コスト削減率: (80万 - 35万) / 80万 = 56.3% &nbsp;|&nbsp;
+      年間コスト節約: 45万 × 12ヶ月 = 540万円
+    </div>
+  </footer>
+
+</div>
+
+<!-- Export button -->
+<button class="export-btn" onclick="exportPPTX()">PPTX に書き出す</button>
+
+<script>
+// ── Inline PPTX export logic (no external pptx-exporter.js required) ──
+async function exportPPTX() {
+  const btn = document.querySelector('.export-btn');
+  btn.textContent = 'キャプチャ中...';
+  btn.disabled = true;
+
+  try {
+    // Capture the full slide as PNG via html2canvas
+    const slideEl = document.getElementById('main-slide');
+    const canvas = await html2canvas(slideEl, {
+      backgroundColor: '#0F172A',
+      scale: 1,
+      useCORS: true,
+      allowTaint: true,
+      width: 1920,
+      height: 1080,
+      windowWidth: 1920,
+      windowHeight: 1080
+    });
+    const imgData = canvas.toDataURL('image/png');
+
+    btn.textContent = 'PPTX生成中...';
+
+    // Build PPTX
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE'; // 16:9, 13.33 × 7.5 inches
+
+    // Slide 1: Full infographic image
+    const slide = pptx.addSlide();
+    slide.background = { color: '0F172A' };
+    slide.addImage({
+      data: imgData,
+      x: 0, y: 0,
+      w: '100%', h: '100%'
+    });
+
+    // Slide 2: Data summary table
+    const slide2 = pptx.addSlide();
+    slide2.background = { color: '0F172A' };
+
+    slide2.addText('AI導入 KPI比較 — データサマリー', {
+      x: 0.5, y: 0.3, w: '90%', h: 0.6,
+      fontSize: 28, bold: true, color: 'F1F5F9',
+      fontFace: 'Arial'
+    });
+
+    const tableRows = [
+      [
+        { text: 'KPI指標', options: { bold: true, color: 'F97316', fill: '1E293B' } },
+        { text: 'AI導入前 (BEFORE)', options: { bold: true, color: 'F87171', fill: '1E293B' } },
+        { text: 'AI導入後 (AFTER)',  options: { bold: true, color: '10B981', fill: '1E293B' } },
+        { text: '改善率',            options: { bold: true, color: 'F97316', fill: '1E293B' } }
+      ],
+      [
+        { text: '処理時間', options: { color: 'F1F5F9', fill: '273347' } },
+        { text: '4時間 (240分)', options: { color: 'F87171', fill: '273347' } },
+        { text: '20分', options: { color: '10B981', fill: '273347' } },
+        { text: '▼ 91.7%', options: { color: '10B981', bold: true, fill: '273347' } }
+      ],
+      [
+        { text: 'エラー率', options: { color: 'F1F5F9', fill: '1E293B' } },
+        { text: '12%', options: { color: 'F87171', fill: '1E293B' } },
+        { text: '1.5%', options: { color: '10B981', fill: '1E293B' } },
+        { text: '▼ 87.5%', options: { color: '10B981', bold: true, fill: '1E293B' } }
+      ],
+      [
+        { text: '月間コスト', options: { color: 'F1F5F9', fill: '273347' } },
+        { text: '80万円', options: { color: 'F87171', fill: '273347' } },
+        { text: '35万円', options: { color: '10B981', fill: '273347' } },
+        { text: '▼ 56.3%', options: { color: '10B981', bold: true, fill: '273347' } }
+      ],
+      [
+        { text: '年間コスト節約', options: { color: 'F97316', bold: true, fill: '1a2035' } },
+        { text: '960万円/年', options: { color: 'F87171', fill: '1a2035' } },
+        { text: '420万円/年', options: { color: '10B981', fill: '1a2035' } },
+        { text: '540万円 節約', options: { color: 'F97316', bold: true, fill: '1a2035' } }
+      ]
+    ];
+
+    slide2.addTable(tableRows, {
+      x: 0.5, y: 1.2, w: 12, h: 4,
+      border: { type: 'solid', color: '334155', pt: 1 },
+      fontSize: 16,
+      fontFace: 'Arial',
+      align: 'center',
+      valign: 'middle',
+      rowH: 0.75
+    });
+
+    slide2.addText('* 処理時間削減率 = (240-20)/240 | エラー率削減率 = (12-1.5)/12 | コスト削減率 = (80-35)/80', {
+      x: 0.5, y: 6.8, w: '90%', h: 0.4,
+      fontSize: 11, color: '64748B', italic: true, fontFace: 'Arial'
+    });
+
+    await pptx.writeFile({ fileName: 'AI導入効果_KPI比較.pptx' });
+    btn.textContent = 'ダウンロード完了!';
+    setTimeout(() => {
+      btn.textContent = 'PPTX に書き出す';
+      btn.disabled = false;
+    }, 3000);
+  } catch (err) {
+    console.error(err);
+    btn.textContent = 'エラー — 再試行';
+    btn.disabled = false;
+  }
+}
+</script>
+
+</body>
+</html>

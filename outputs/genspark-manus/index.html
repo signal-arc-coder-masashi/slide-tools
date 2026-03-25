@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GenSpark & Manus — AIスライド機能 完全解説</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --bg:       #faf9f6;
+  --surface:  #ffffff;
+  --border:   rgba(0,0,0,0.08);
+  --text:     #1c1917;
+  --muted:    #78716c;
+  --faint:    #f5f4f1;
+
+  --gs:       #f97316;
+  --gs-dim:   rgba(249,115,22,0.09);
+  --gs-mid:   rgba(249,115,22,0.18);
+  --gs-deep:  #ea580c;
+
+  --mn:       #0d9488;
+  --mn-dim:   rgba(13,148,136,0.09);
+  --mn-mid:   rgba(13,148,136,0.18);
+  --mn-deep:  #0f766e;
+
+  --ink:      #44403c;
+  --accent:   #6366f1;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'DM Sans','Noto Sans JP',sans-serif; }
+
+/* subtle dot pattern */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─── PROGRESS ─── */
+#prog-wrap { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 200; background: rgba(0,0,0,0.06); }
+#prog-bar  { height: 100%; background: linear-gradient(90deg, var(--gs), var(--mn)); transition: width .4s ease; }
+
+/* ─── DECK ─── */
+#deck { position: fixed; inset: 0; z-index: 1; }
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 4vw 6vw;
+  opacity: 0; transform: translateY(32px);
+  transition: opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.slide.active  { opacity: 1; transform: translateY(0); pointer-events: all; }
+.slide.out-up  { opacity: 0; transform: translateY(-32px); }
+
+/* ─── NAV ─── */
+#nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; z-index: 200; }
+.nbtn {
+  width: 38px; height: 38px; border-radius: 50%; background: var(--surface);
+  border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all .18s;
+}
+.nbtn:hover { border-color: var(--gs); color: var(--gs); }
+#ctr { font-family: 'DM Mono',monospace; font-size: 11px; color: var(--muted); min-width: 48px; text-align: center; }
+#hint { position: fixed; bottom: 26px; right: 28px; font-family: 'DM Mono',monospace; font-size: 10px; color: rgba(120,113,108,0.45); z-index: 200; }
+
+/* ─── TYPOGRAPHY ─── */
+.kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'DM Mono',monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 18px;
+}
+.kicker::before { content: ''; display: block; width: 20px; height: 1px; background: currentColor; }
+
+h1.hero { font-family: 'Playfair Display',serif; font-size: clamp(3rem,6.5vw,6.5rem); font-weight: 900; line-height: 1.0; letter-spacing: -.02em; color: var(--text); }
+h2.title { font-family: 'Playfair Display',serif; font-size: clamp(1.8rem,3.2vw,3rem); font-weight: 700; line-height: 1.1; color: var(--text); margin-bottom: 8px; }
+.sub { font-size: 14px; color: var(--muted); line-height: 1.9; }
+
+.rule { height: 3px; width: 44px; border-radius: 2px; margin: 18px 0 28px; }
+.rule.gs { background: var(--gs); }
+.rule.mn { background: var(--mn); }
+.rule.both { background: linear-gradient(90deg, var(--gs), var(--mn)); }
+.rule.neu  { background: var(--accent); }
+
+/* ─── LAYOUT ─── */
+.wrap      { width: 100%; max-width: 1100px; }
+.two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 1100px; align-items: start; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; max-width: 1100px; }
+
+/* ─── CARD ─── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px 26px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+.card.gs-card { border-color: rgba(249,115,22,.22); }
+.card.mn-card { border-color: rgba(13,148,136,.22); }
+
+/* ─── TAG ─── */
+.tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'DM Mono',monospace; font-size: 10px; font-weight: 500; letter-spacing: .06em; }
+.tag.gs { background: var(--gs-dim); color: var(--gs-deep); border: 1px solid rgba(249,115,22,.25); }
+.tag.mn { background: var(--mn-dim); color: var(--mn-deep); border: 1px solid rgba(13,148,136,.25); }
+.tag.neu{ background: rgba(99,102,241,.08); color: #4338ca; border: 1px solid rgba(99,102,241,.2); }
+
+/* ─── LIST ─── */
+.flist { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.flist li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.75; color: var(--ink); }
+.flist li .bul { flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; margin-top: 2px; font-weight: 700; }
+.flist li .bul.gs { background: var(--gs-dim); color: var(--gs); }
+.flist li .bul.mn { background: var(--mn-dim); color: var(--mn); }
+.flist li .bul.neu{ background: rgba(99,102,241,.1); color: var(--accent); }
+
+/* ─── STAT ─── */
+.stats { display: flex; gap: 28px; flex-wrap: wrap; margin: 20px 0; }
+.stat  { display: flex; flex-direction: column; gap: 3px; }
+.stat-n { font-family: 'Playfair Display',serif; font-size: 2.2rem; font-weight: 900; line-height: 1; }
+.stat-l { font-size: 11px; color: var(--muted); }
+
+/* ─── STEP FLOW ─── */
+.steps { display: flex; gap: 0; width: 100%; }
+.step  { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+.step:not(:last-child)::after {
+  content: ''; position: absolute; top: 20px; left: 50%; width: 100%;
+  height: 2px; background: var(--border); z-index: 0;
+}
+.step-num {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono',monospace; font-size: 13px; font-weight: 500;
+  position: relative; z-index: 1; margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.step-num.gs { background: var(--gs); color: #fff; }
+.step-num.mn { background: var(--mn); color: #fff; }
+.step-lbl { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.step-sub { font-size: 11px; color: var(--muted); line-height: 1.5; padding: 0 8px; }
+
+/* ─── COMPARISON TABLE ─── */
+.ctbl { width: 100%; border-collapse: collapse; }
+.ctbl th, .ctbl td { padding: 11px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+.ctbl th { font-family: 'DM Mono',monospace; font-size: 10px; letter-spacing: .12em; color: var(--muted); background: var(--faint); font-weight: 400; }
+.ctbl td { color: var(--ink); }
+.ctbl tr:last-child td { border-bottom: none; }
+.ctbl .rl  { font-family: 'DM Mono',monospace; font-size: 10px; color: var(--muted); font-weight: 500; }
+.ctbl .cgs { color: var(--gs-deep); font-weight: 600; }
+.ctbl .cmn { color: var(--mn-deep); font-weight: 600; }
+
+/* ─── CHIP ─── */
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 30px; font-size: 13px; font-weight: 700; border: 1px solid; }
+.chip.gs { color: var(--gs-deep); border-color: rgba(249,115,22,.35); background: var(--gs-dim); }
+.chip.mn { color: var(--mn-deep); border-color: rgba(13,148,136,.35); background: var(--mn-dim); }
+
+/* ─── TOOL HEADER ─── */
+.tool-hd { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.t-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.t-icon.gs { background: var(--gs-dim); border: 1px solid rgba(249,115,22,.25); }
+.t-icon.mn { background: var(--mn-dim); border: 1px solid rgba(13,148,136,.25); }
+
+/* ─── FEATURE GRID ─── */
+.fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fg-item { background: var(--faint); border-radius: 12px; padding: 16px 18px; border: 1px solid var(--border); }
+.fg-lbl { font-family: 'DM Mono',monospace; font-size: 9px; letter-spacing: .15em; margin-bottom: 6px; font-weight: 500; }
+.fg-lbl.gs { color: var(--gs); }
+.fg-lbl.mn { color: var(--mn); }
+.fg-val { font-size: 13px; color: var(--ink); line-height: 1.65; }
+
+/* ─── USECASE ─── */
+.uc-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1100px; }
+.uc { border-radius: 18px; padding: 28px; }
+.uc.gs { background: var(--gs-dim); border: 1px solid rgba(249,115,22,.2); }
+.uc.mn { background: var(--mn-dim); border: 1px solid rgba(13,148,136,.2); }
+.uc-title { font-family: 'Playfair Display',serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; }
+.uc-title.gs { color: var(--gs-deep); }
+.uc-title.mn { color: var(--mn-deep); }
+.uc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.uc-list li { font-size: 13px; color: var(--ink); line-height: 1.7; display: flex; gap: 8px; }
+.uc-list li::before { content: '◆'; font-size: 6px; margin-top: 6px; flex-shrink: 0; }
+.uc-list.gs li::before { color: var(--gs); }
+.uc-list.mn li::before { color: var(--mn); }
+
+/* ─── SUMMARY ITEMS ─── */
+.sum-list { display: flex; flex-direction: column; gap: 12px; max-width: 680px; }
+.sum-item { display: flex; gap: 16px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
+.sum-ico { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.sum-txt { font-size: 13px; line-height: 1.8; color: var(--ink); }
+.sum-txt strong { color: var(--text); font-weight: 700; }
+
+/* ─── HERO DECORATIONS ─── */
+.hero-chips { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+.hero-meta { margin-top: 20px; font-size: 13px; color: var(--muted); line-height: 1.9; max-width: 480px; }
+.hero-year { display: inline-flex; align-items: center; gap: 6px; font-family: 'DM Mono',monospace; font-size: 10px; color: var(--muted); background: var(--faint); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; }
+.hero-deco {
+  position: absolute; right: 6vw; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px; opacity: .18; pointer-events: none;
+}
+.deco-box { border-radius: 12px; padding: 14px 18px; font-family: 'DM Mono',monospace; font-size: 11px; line-height: 1.8; color: var(--text); border: 1px solid var(--border); background: var(--surface); }
+.deco-slide-stack { display: flex; flex-direction: column; gap: 6px; }
+.deco-slide { height: 28px; border-radius: 6px; background: linear-gradient(90deg, var(--gs-dim), var(--mn-dim)); border: 1px solid var(--border); }
+
+/* WIDE STEP */
+.wide-steps { display: flex; gap: 16px; width: 100%; }
+.ws { flex: 1; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.ws.gs { background: var(--gs-dim); border: 1px solid rgba(249,115,22,.2); }
+.ws.mn { background: var(--mn-dim); border: 1px solid rgba(13,148,136,.2); }
+.ws-num { font-family: 'DM Mono',monospace; font-size: 11px; font-weight: 500; }
+.ws-num.gs { color: var(--gs); }
+.ws-num.mn { color: var(--mn); }
+.ws-lbl { font-weight: 700; font-size: 14px; color: var(--text); }
+.ws-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+.export-btn {
+  position: fixed; top: 20px; right: 24px; z-index: 200;
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Mono',monospace;
+  font-size: 11px; letter-spacing: .06em; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: all .18s;
+}
+.export-btn:hover { border-color: var(--gs); color: var(--gs); }
+.export-btn:disabled { opacity: .5; cursor: default; }
+.export-btn svg { flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+
+<div id="deck">
+
+  <!-- ─── 01: TITLE ─── -->
+  <section class="slide active" id="s1">
+    <div class="wrap" style="position:relative;">
+      <div class="hero-year">2025 — AI Slide Generation</div>
+      <h1 class="hero" style="margin-top:16px;">
+        GenSpark<br>
+        <span style="color:var(--muted); font-style:italic; font-size:0.6em;">& </span>Manus
+      </h1>
+      <div class="rule both"></div>
+      <p style="font-size:15px; color:var(--muted); line-height:1.9; max-width:480px;">
+        プロンプト一つでスライドを自動生成する<br>
+        AIツール最前線。機能・操作感・使い分けを解説。
+      </p>
+      <div class="hero-chips">
+        <div class="chip gs">✦ GenSpark</div>
+        <div class="chip mn">✦ Manus</div>
+      </div>
+    </div>
+    <div class="hero-deco" aria-hidden="true">
+      <div class="deco-box">✦ Generating slides from prompt...<br>▓▓▓▓▓▓▓░░░ 72%<br>── 8 slides created</div>
+      <div class="deco-slide-stack">
+        <div class="deco-slide"></div>
+        <div class="deco-slide" style="opacity:.7;"></div>
+        <div class="deco-slide" style="opacity:.4;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 02: GenSpark とは ─── -->
+  <section class="slide" id="s2">
+    <div class="two-col">
+      <div>
+        <div class="kicker">Tool 01</div>
+        <div class="tool-hd">
+          <div class="t-icon gs">✦</div>
+          <div>
+            <div class="tag gs" style="margin-bottom:6px;">GenSpark</div>
+            <h2 class="title">AIが検索結果を<br>スライドに変換する</h2>
+          </div>
+        </div>
+        <div class="rule gs"></div>
+        <ul class="flist">
+          <li><span class="bul gs">→</span><span><strong>2024年</strong>設立。元Google・Baiduエンジニアが創業したAI検索スタートアップ</span></li>
+          <li><span class="bul gs">→</span><span>検索エンジンとプレゼンツールを融合した「<strong>Sparkpage</strong>」を提供</span></li>
+          <li><span class="bul gs">→</span><span>テーマやキーワードを入力するだけで<strong>自動的にスライドを生成</strong></span></li>
+          <li><span class="bul gs">→</span><span>生成されたスライドはそのまま<strong>PowerPoint（PPTX）に書き出し</strong>可能</span></li>
+          <li><span class="bul gs">→</span><span>日本語を含む<strong>多言語対応</strong>。無料プランあり</span></li>
+        </ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="stats">
+          <div class="stat"><div class="stat-n" style="color:var(--gs);">2024</div><div class="stat-l">設立年</div></div>
+          <div class="stat"><div class="stat-n" style="color:var(--gs);">∞</div><div class="stat-l">スライド枚数制限なし</div></div>
+          <div class="stat"><div class="stat-n" style="color:var(--gs);">Free</div><div class="stat-l">無料プランあり</div></div>
+        </div>
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:10px;">CORE CONCEPT</div>
+          <p style="font-size:13px; color:var(--ink); line-height:1.8;">
+            検索→整理→スライド化という流れをAIが完全自動化。
+            ユーザーはテーマを与えるだけで、情報収集からデザイン済みスライド生成まで一気に完了する。
+          </p>
+        </div>
+        <div class="card gs-card" style="padding:16px 20px;">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:.15em; margin-bottom:10px;">CATEGORY</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag gs">AI検索</span>
+            <span class="tag gs">スライド生成</span>
+            <span class="tag gs">Sparkpage</span>
+            <span class="tag gs">PPTX出力</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 03: GenSpark スライド機能 ─── -->
+  <section class="slide" id="s3">
+    <div class="wrap">
+      <div class="kicker">GenSpark — Slide Features</div>
+      <h2 class="title">スライド機能 詳細</h2>
+      <div class="rule gs"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:8px;">01 / AUTO GENERATE</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">テーマ入力→即生成</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">キーワードやテーマを入力するだけでAIがWeb情報を収集し、アウトライン→スライドを自動作成。</div>
+        </div>
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:8px;">02 / SPARKPAGE</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">インタラクティブ公開</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">生成されたスライドはURLで即共有可能なSparkpageとして公開。閲覧者がインタラクティブに操作できる。</div>
+        </div>
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:8px;">03 / EXPORT</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">PPTX書き出し</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">生成したスライドをPowerPoint形式でエクスポート。既存のワークフローにそのまま組み込める。</div>
+        </div>
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:8px;">04 / TEMPLATE</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">テンプレート選択</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">複数のデザインテンプレートから選択可能。生成後にスタイルを変更することもできる。</div>
+        </div>
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:8px;">05 / EDIT</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">インライン編集</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">生成後のスライドをブラウザ上で直接編集。テキスト・画像・レイアウトをGUIで調整できる。</div>
+        </div>
+        <div class="card gs-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); letter-spacing:.15em; margin-bottom:8px;">06 / MULTI-LANG</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">日本語対応</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">日本語でのプロンプト入力に対応。日本語テキストのスライドも自然な品質で生成される。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 04: GenSpark 操作フロー ─── -->
+  <section class="slide" id="s4">
+    <div class="wrap">
+      <div class="kicker">GenSpark — How to Use</div>
+      <h2 class="title">操作フロー — 5ステップ</h2>
+      <div class="rule gs"></div>
+
+      <div style="display:flex; gap:0; width:100%; margin-bottom:28px;">
+        <div class="step" style="--c:var(--gs);">
+          <div class="step-num gs">01</div>
+          <div class="step-lbl">テーマ入力</div>
+          <div class="step-sub">日本語でトピックを入力。「〇〇について10枚」のように枚数指定も可</div>
+        </div>
+        <div style="flex-shrink:0; display:flex; align-items:flex-start; padding-top:18px; color:rgba(0,0,0,.15); font-size:18px;">→</div>
+        <div class="step">
+          <div class="step-num gs">02</div>
+          <div class="step-lbl">AI情報収集</div>
+          <div class="step-sub">Web検索・情報整理をAIが自動実行。ソース付きで構造化</div>
+        </div>
+        <div style="flex-shrink:0; display:flex; align-items:flex-start; padding-top:18px; color:rgba(0,0,0,.15); font-size:18px;">→</div>
+        <div class="step">
+          <div class="step-num gs">03</div>
+          <div class="step-lbl">スライド生成</div>
+          <div class="step-sub">アウトライン確認後、デザイン済みスライドを自動生成</div>
+        </div>
+        <div style="flex-shrink:0; display:flex; align-items:flex-start; padding-top:18px; color:rgba(0,0,0,.15); font-size:18px;">→</div>
+        <div class="step">
+          <div class="step-num gs">04</div>
+          <div class="step-lbl">編集・調整</div>
+          <div class="step-sub">ブラウザ上で直接テキスト・レイアウトを編集</div>
+        </div>
+        <div style="flex-shrink:0; display:flex; align-items:flex-start; padding-top:18px; color:rgba(0,0,0,.15); font-size:18px;">→</div>
+        <div class="step">
+          <div class="step-num gs">05</div>
+          <div class="step-lbl">公開・書き出し</div>
+          <div class="step-sub">SparkpageとしてURL共有 or PPTX書き出し</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div class="card gs-card" style="padding:18px 22px;">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--gs); margin-bottom:8px; letter-spacing:.15em;">STRENGTH</div>
+          <ul class="flist">
+            <li><span class="bul gs">✓</span><span>検索〜スライド化まで完全自動。操作ステップが少ない</span></li>
+            <li><span class="bul gs">✓</span><span>URLで即共有できるSparkpageが便利</span></li>
+            <li><span class="bul gs">✓</span><span>無料プランで十分な機能が使える</span></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:18px 22px;">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); margin-bottom:8px; letter-spacing:.15em;">LIMITATION</div>
+          <ul class="flist">
+            <li><span class="bul neu">!</span><span>デザインの細かいカスタマイズには限界がある</span></li>
+            <li><span class="bul neu">!</span><span>生成内容はWeb情報依存のため、専門的な社内情報には不向き</span></li>
+            <li><span class="bul neu">!</span><span>複雑なアニメーションはPPTX出力時に再現されない場合あり</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 05: Manus とは ─── -->
+  <section class="slide" id="s5">
+    <div class="two-col">
+      <div>
+        <div class="kicker">Tool 02</div>
+        <div class="tool-hd">
+          <div class="t-icon mn">✦</div>
+          <div>
+            <div class="tag mn" style="margin-bottom:6px;">Manus</div>
+            <h2 class="title">自律AIエージェントが<br>スライドを丸ごと作る</h2>
+          </div>
+        </div>
+        <div class="rule mn"></div>
+        <ul class="flist">
+          <li><span class="bul mn">→</span><span><strong>2025年2月</strong>登場。Monica（中国AI企業）が開発した自律型AIエージェント</span></li>
+          <li><span class="bul mn">→</span><span>「何を作るか」を伝えるだけで、調査・構成・デザイン・ファイル生成まで<strong>完全自律実行</strong></span></li>
+          <li><span class="bul mn">→</span><span>Webブラウジング・コード実行・ファイル操作を組み合わせて<strong>複雑なタスクを達成</strong></span></li>
+          <li><span class="bul mn">→</span><span>スライド出力形式は<strong>HTMLプレゼン・PDF・PPTX</strong>に対応</span></li>
+          <li><span class="bul mn">→</span><span>招待制から一般公開へ。2025年に大きな話題を集めた</span></li>
+        </ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="stats">
+          <div class="stat"><div class="stat-n" style="color:var(--mn);">2025</div><div class="stat-l">リリース年</div></div>
+          <div class="stat"><div class="stat-n" style="color:var(--mn);">Agent</div><div class="stat-l">完全自律型</div></div>
+          <div class="stat"><div class="stat-n" style="color:var(--mn);">Multi</div><div class="stat-l">マルチタスク実行</div></div>
+        </div>
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:10px;">CORE CONCEPT</div>
+          <p style="font-size:13px; color:var(--ink); line-height:1.8;">
+            「〇〇についてのプレゼン資料を作って」という一言で、
+            Webリサーチ→アウトライン作成→スライドデザイン→ファイル生成まで
+            AIが自律的に完遂する次世代エージェント。
+          </p>
+        </div>
+        <div class="card mn-card" style="padding:16px 20px;">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:.15em; margin-bottom:10px;">CAN DO</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag mn">スライド生成</span>
+            <span class="tag mn">コーディング</span>
+            <span class="tag mn">データ分析</span>
+            <span class="tag mn">Webリサーチ</span>
+            <span class="tag mn">ファイル操作</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 06: Manus スライド機能 ─── -->
+  <section class="slide" id="s6">
+    <div class="wrap">
+      <div class="kicker">Manus — Slide Features</div>
+      <h2 class="title">スライド機能 詳細</h2>
+      <div class="rule mn"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:8px;">01 / AGENT CREATION</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">完全自律生成</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">「〜を作って」の一言でエージェントが動き出し、情報収集からスライド完成まで自律的に実行。途中経過を確認できる。</div>
+        </div>
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:8px;">02 / WEB RESEARCH</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">自動Webリサーチ</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">プレゼンのテーマに沿ってWebを自律的にブラウジング。最新情報を収集してスライドのコンテンツに反映。</div>
+        </div>
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:8px;">03 / HTML SLIDES</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">HTMLプレゼン出力</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">高品質なHTML形式のプレゼンテーションを生成。アニメーション・グラフ・インタラクションも実装可能。</div>
+        </div>
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:8px;">04 / MULTI FORMAT</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">マルチフォーマット出力</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">HTML / PDF / PPTX の複数形式で出力。用途に応じて使い分けが可能。</div>
+        </div>
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:8px;">05 / DATA VIZ</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">データ可視化</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">データや数値があればグラフ・チャートを自動生成してスライドに組み込む。</div>
+        </div>
+        <div class="card mn-card">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); letter-spacing:.15em; margin-bottom:8px;">06 / REVISION</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:6px;">自然言語で修正指示</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">「3枚目をもっとシンプルにして」のように自然言語で追加指示。エージェントが修正を実行する。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 07: Manus 操作フロー ─── -->
+  <section class="slide" id="s7">
+    <div class="wrap">
+      <div class="kicker">Manus — How to Use</div>
+      <h2 class="title">操作フロー — エージェント実行</h2>
+      <div class="rule mn"></div>
+
+      <div class="wide-steps" style="margin-bottom:24px;">
+        <div class="ws mn">
+          <div class="ws-num mn">STEP 01</div>
+          <div class="ws-lbl">タスク指示</div>
+          <div class="ws-sub">「AIの市場動向についての10枚のプレゼン資料を作成して」と入力するだけ</div>
+        </div>
+        <div class="ws mn">
+          <div class="ws-num mn">STEP 02</div>
+          <div class="ws-lbl">自律リサーチ</div>
+          <div class="ws-sub">エージェントがWebを自律的にブラウジングし、関連情報を収集・整理</div>
+        </div>
+        <div class="ws mn">
+          <div class="ws-num mn">STEP 03</div>
+          <div class="ws-lbl">構成・執筆</div>
+          <div class="ws-sub">アウトライン作成→各スライドのコンテンツ作成をAIが自律実行</div>
+        </div>
+        <div class="ws mn">
+          <div class="ws-num mn">STEP 04</div>
+          <div class="ws-lbl">デザイン生成</div>
+          <div class="ws-sub">HTML/CSSでスライドをコーディング。アニメーションや図表も自動作成</div>
+        </div>
+        <div class="ws mn">
+          <div class="ws-num mn">STEP 05</div>
+          <div class="ws-lbl">ファイル出力</div>
+          <div class="ws-sub">完成したプレゼンをHTML・PDF・PPTXでダウンロード可能な状態で提供</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div class="card mn-card" style="padding:18px 22px;">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--mn); margin-bottom:8px; letter-spacing:.15em;">STRENGTH</div>
+          <ul class="flist">
+            <li><span class="bul mn">✓</span><span>完全自律実行。ユーザーの操作はほぼ不要</span></li>
+            <li><span class="bul mn">✓</span><span>HTMLスライドはデザイン品質・アニメーションが高水準</span></li>
+            <li><span class="bul mn">✓</span><span>スライド以外（リサーチ・コード・分析）も同一エージェントで完結</span></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:18px 22px;">
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); margin-bottom:8px; letter-spacing:.15em;">LIMITATION</div>
+          <ul class="flist">
+            <li><span class="bul neu">!</span><span>タスク完了まで時間がかかる場合がある（数分〜十数分）</span></li>
+            <li><span class="bul neu">!</span><span>細かいデザイン指定はプロンプトで伝える必要がある</span></li>
+            <li><span class="bul neu">!</span><span>利用コストが高め（クレジット制）</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 08: 比較表 ─── -->
+  <section class="slide" id="s8">
+    <div class="wrap">
+      <div class="kicker">Comparison</div>
+      <h2 class="title">GenSpark vs Manus — 比較</h2>
+      <div class="rule both"></div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <table class="ctbl">
+          <thead>
+            <tr>
+              <th style="width:160px;">項目</th>
+              <th><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gs);margin-right:6px;"></span>GenSpark</th>
+              <th><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mn);margin-right:6px;"></span>Manus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rl">タイプ</td>
+              <td class="cgs">AI検索 × スライド生成</td>
+              <td class="cmn">自律AIエージェント</td>
+            </tr>
+            <tr>
+              <td class="rl">操作方法</td>
+              <td>テーマ入力→テンプレ選択→生成</td>
+              <td class="cmn">指示一つで完全自律実行</td>
+            </tr>
+            <tr>
+              <td class="rl">情報収集</td>
+              <td class="cgs">AI検索エンジンで自動収集</td>
+              <td class="cmn">Webブラウジングで自律収集</td>
+            </tr>
+            <tr>
+              <td class="rl">出力形式</td>
+              <td>Sparkpage（URL） / PPTX</td>
+              <td class="cmn">HTML / PDF / PPTX</td>
+            </tr>
+            <tr>
+              <td class="rl">スライドの質</td>
+              <td>テンプレベースで安定</td>
+              <td class="cmn">HTMLで高品質・自由度高い</td>
+            </tr>
+            <tr>
+              <td class="rl">生成時間</td>
+              <td class="cgs">速い（数十秒〜数分）</td>
+              <td>やや遅い（数分〜十数分）</td>
+            </tr>
+            <tr>
+              <td class="rl">編集のしやすさ</td>
+              <td class="cgs">GUIで直感的に編集可</td>
+              <td>自然言語で追加指示</td>
+            </tr>
+            <tr>
+              <td class="rl">スライド以外の用途</td>
+              <td>検索・情報収集メイン</td>
+              <td class="cmn">コード・分析・調査など多岐</td>
+            </tr>
+            <tr>
+              <td class="rl">価格感</td>
+              <td class="cgs">無料プランあり・手軽</td>
+              <td>クレジット制・コスト高め</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 09: 使い分け ─── -->
+  <section class="slide" id="s9">
+    <div class="wrap">
+      <div class="kicker">Decision Guide</div>
+      <h2 class="title">どちらを使うか</h2>
+      <div class="rule both"></div>
+
+      <div class="uc-wrap">
+        <div class="uc gs">
+          <div class="chip gs" style="margin-bottom:16px;">✦ GenSpark を選ぶ</div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">こんな場面・人に最適</div>
+          <ul class="uc-list gs">
+            <li>今すぐ・手軽にスライドが必要なとき</li>
+            <li>テーマについての情報収集と資料作成を同時にやりたい</li>
+            <li>URLで即共有できるインタラクティブなページが欲しい</li>
+            <li>無料でまず試したい</li>
+            <li>PowerPoint形式での書き出しが必要</li>
+            <li>デザインはテンプレに任せてコンテンツに集中したい</li>
+          </ul>
+        </div>
+        <div class="uc mn">
+          <div class="chip mn" style="margin-bottom:16px;">✦ Manus を選ぶ</div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">こんな場面・人に最適</div>
+          <ul class="uc-list mn">
+            <li>スライドの品質・デザイン自由度にこだわりたい</li>
+            <li>調査→分析→スライド化を一気通貫でやりたい</li>
+            <li>HTMLベースのリッチなプレゼンが欲しい</li>
+            <li>スライド以外のタスク（コード・分析・調査）も同時に依頼したい</li>
+            <li>「完全自律」でお任せしたい</li>
+            <li>データや図表を含む複雑な資料を作りたい</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 10: まとめ ─── -->
+  <section class="slide" id="s10">
+    <div class="two-col">
+      <div>
+        <div class="kicker">Summary</div>
+        <h2 class="title">まとめ</h2>
+        <div class="rule both"></div>
+        <div class="sum-list">
+          <div class="sum-item">
+            <div class="sum-ico">✦</div>
+            <div class="sum-txt"><strong>GenSpark</strong> は「検索×スライド化」の速さが強み。テーマ入力→即完成のスピード重視な場面に最適。URLで共有できるSparkpageも便利。</div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-ico">✦</div>
+            <div class="sum-txt"><strong>Manus</strong> は「完全自律エージェント」としての深さが強み。品質・自由度の高いHTMLスライドを作りたい時、複合タスクをまとめて任せたい時に力を発揮。</div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-ico" style="color:var(--accent);">◎</div>
+            <div class="sum-txt"><strong>スピード重視ならGenSpark、品質・自由度重視ならManus。</strong>両者は補完関係にあり、用途で使い分けるのが最適解。</div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-ico" style="color:var(--muted);">→</div>
+            <div class="sum-txt">AIスライド生成は「叩き台を即作る」用途で特に効果的。手直しを前提にAIと協働するスタイルが現実的な活用法。</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px; justify-content:center;">
+        <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:.15em; margin-bottom:4px;">QUICK PICK</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="padding:14px 18px; border-radius:12px; background:var(--gs-dim); border:1px solid rgba(249,115,22,.2); display:flex; align-items:center; gap:12px;">
+            <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--gs); min-width:100px;">すぐに・無料で</span>
+            <span style="font-size:13px; color:var(--ink);">→ GenSpark</span>
+          </div>
+          <div style="padding:14px 18px; border-radius:12px; background:var(--gs-dim); border:1px solid rgba(249,115,22,.2); display:flex; align-items:center; gap:12px;">
+            <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--gs); min-width:100px;">URL共有したい</span>
+            <span style="font-size:13px; color:var(--ink);">→ GenSpark（Sparkpage）</span>
+          </div>
+          <div style="padding:14px 18px; border-radius:12px; background:var(--mn-dim); border:1px solid rgba(13,148,136,.2); display:flex; align-items:center; gap:12px;">
+            <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--mn); min-width:100px;">品質・完全自律</span>
+            <span style="font-size:13px; color:var(--ink);">→ Manus</span>
+          </div>
+          <div style="padding:14px 18px; border-radius:12px; background:var(--mn-dim); border:1px solid rgba(13,148,136,.2); display:flex; align-items:center; gap:12px;">
+            <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--mn); min-width:100px;">調査も同時に</span>
+            <span style="font-size:13px; color:var(--ink);">→ Manus（エージェント）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /deck -->
+
+<button class="export-btn" id="export-btn" onclick="generatePPTX()">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  PPTXを書き出す
+</button>
+<div id="nav">
+  <button class="nbtn" id="bp">&#8592;</button>
+  <div id="ctr">1 / 10</div>
+  <button class="nbtn" id="bn">&#8594;</button>
+</div>
+<div id="hint">← → で移動</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total  = slides.length;
+let cur = 0, anim = false;
+
+const ctr = document.getElementById('ctr');
+const bar = document.getElementById('prog-bar');
+
+function go(n) {
+  if (anim || n < 0 || n >= total || n === cur) return;
+  anim = true;
+  const prev = cur;
+  slides[prev].classList.add('out-up');
+  slides[prev].classList.remove('active');
+  cur = n;
+  slides[cur].classList.add('active');
+  ctr.textContent = `${cur + 1} / ${total}`;
+  bar.style.width = `${((cur + 1) / total) * 100}%`;
+  setTimeout(() => { slides[prev].classList.remove('out-up'); anim = false; }, 520);
+}
+
+document.getElementById('bn').onclick = () => go(cur + 1);
+document.getElementById('bp').onclick = () => go(cur - 1);
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+  if (['ArrowLeft','ArrowUp'].includes(e.key))         { e.preventDefault(); go(cur - 1); }
+});
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+document.addEventListener('touchend',   e => { const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 50) go(d < 0 ? cur+1 : cur-1); });
+
+bar.style.width = `${(1/total)*100}%`;
+
+// ─── PPTX EXPORT ───
+async function generatePPTX() {
+  const btn = document.getElementById('export-btn');
+  btn.disabled = true; btn.textContent = '生成中...';
+
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE';
+  pptx.title  = 'GenSpark & Manus — AIスライド機能';
+
+  const C = {
+    bg:'FAF9F6', dark:'1C1917', white:'FFFFFF',
+    text:'1C1917', muted:'78716C', faint:'F5F4F1',
+    gs:'F97316', gsDim:'FFF3E8', gsDeep:'EA580C',
+    mn:'0D9488', mnDim:'E6F7F5', mnDeep:'0F766E',
+    border:'E5E7EB', accent:'6366F1',
+  };
+  const F = { disp:'Georgia', body:'Calibri', mono:'Courier New' };
+
+  /* ── helpers ── */
+  function newSlide(bg) {
+    const s = pptx.addSlide();
+    s.background = { color: bg || C.bg };
+    return s;
+  }
+  function hd(s, kicker, title, accent) {
+    s.addText(kicker.toUpperCase(), {x:.5,y:.55,w:12,h:.3,fontSize:9,color:C.muted,fontFace:F.mono,charSpacing:3,bold:true});
+    s.addShape(pptx.ShapeType.rect,{x:.5,y:.92,w:.42,h:.05,fill:{color:accent},line:{type:'none'}});
+    s.addText(title,{x:.5,y:.95,w:12,h:.85,fontSize:30,color:C.text,bold:true,fontFace:F.disp});
+  }
+  function card(s,x,y,w,h,lbl,body,accent,lsize=9) {
+    s.addShape(pptx.ShapeType.roundRect,{x,y,w,h,rectRadius:.07,fill:{color:C.white},line:{color:accent,pt:1.2}});
+    if(lbl)  s.addText(lbl,{x:x+.15,y:y+.14,w:w-.3,h:.22,fontSize:lsize,color:accent,fontFace:F.mono,bold:true});
+    if(body) s.addText(body,{x:x+.15,y:y+(lbl?.38:.15),w:w-.3,h:h-(lbl?.52:.3),fontSize:11.5,color:C.text,fontFace:F.body,lineSpacingMultiple:1.4,valign:'top'});
+  }
+  function buls(s,x,y,w,items,accent) {
+    items.forEach((txt,i)=>{
+      s.addText([{text:'→ ',options:{color:accent,bold:true,fontSize:12}},{text:txt,options:{color:C.text,fontSize:12}}],
+        {x,y:y+i*.42,w,h:.42,fontFace:F.body,lineSpacingMultiple:1.3,valign:'middle'});
+    });
+  }
+  function statBox(s,x,y,val,lbl,color){
+    s.addText(val,{x,y,w:1.8,h:.65,fontSize:30,color,bold:true,fontFace:F.disp,align:'left'});
+    s.addText(lbl,{x,y:y+.68,w:1.8,h:.22,fontSize:10,color:C.muted,fontFace:F.body});
+  }
+
+  /* ══ SLIDE 1: TITLE ══ */
+  {
+    const s=newSlide(C.dark);
+    s.addText('2025 — AI Slide Generation',{x:.6,y:.48,w:11,h:.28,fontSize:10,color:'888888',fontFace:F.mono});
+    s.addText('GenSpark',{x:.6,y:.85,w:10,h:1.5,fontSize:58,color:C.white,bold:true,fontFace:F.disp});
+    s.addText('& Manus', {x:.6,y:2.2,w:10,h:1.3,fontSize:52,color:'AAAAAA', bold:true,fontFace:F.disp,italic:true});
+    s.addShape(pptx.ShapeType.rect,{x:.6,y:3.65,w:3.4,h:.05,fill:{color:C.gs},line:{type:'none'}});
+    s.addText('AIスライド機能 完全解説',{x:.6,y:3.85,w:11,h:.5,fontSize:17,color:'CCCCCC',fontFace:F.disp,italic:true});
+    s.addText('プロンプト一つでスライドを自動生成するAIツール最前線\n機能・操作感・使い分けを解説',{x:.6,y:4.5,w:9,h:.8,fontSize:13,color:'888888',fontFace:F.body,lineSpacingMultiple:1.7});
+  }
+
+  /* ══ SLIDE 2: GenSpark とは ══ */
+  {
+    const s=newSlide();
+    hd(s,'Tool 01','GenSpark — AIが検索結果をスライドに変換する',C.gs);
+    buls(s,.5,2.1,6,[
+      '2024年設立。元Google・Baiduエンジニアが創業したAI検索スタートアップ',
+      '検索エンジンとプレゼンツールを融合した「Sparkpage」を提供',
+      'テーマやキーワードを入力するだけで自動的にスライドを生成',
+      '生成されたスライドはそのままPowerPoint（PPTX）に書き出し可能',
+      '日本語を含む多言語対応。無料プランあり',
+    ],C.gs);
+    statBox(s,7.1,2.0,'2024','設立年',C.gs);
+    statBox(s,9.2,2.0,'∞','枚数制限なし',C.gs);
+    statBox(s,11.1,2.0,'Free','無料プランあり',C.gs);
+    card(s,7.1,3.1,5.7,1.6,'CORE CONCEPT',
+      '検索→整理→スライド化という流れをAIが完全自動化。ユーザーはテーマを与えるだけで、情報収集からデザイン済みスライド生成まで一気に完了する。',C.gs);
+    const tags=['AI検索','スライド生成','Sparkpage','PPTX出力'];
+    tags.forEach((t,i)=>{
+      s.addShape(pptx.ShapeType.roundRect,{x:7.2+(i%2)*2.9,y:4.9+Math.floor(i/2)*.5,w:2.6,h:.38,rectRadius:.12,fill:{color:C.gsDim},line:{color:C.gs,pt:1}});
+      s.addText(t,{x:7.2+(i%2)*2.9,y:4.9+Math.floor(i/2)*.5,w:2.6,h:.38,fontSize:11,color:C.gsDeep,align:'center',valign:'middle',bold:true,fontFace:F.mono});
+    });
+  }
+
+  /* ══ SLIDE 3: GenSpark 機能6つ ══ */
+  {
+    const s=newSlide();
+    hd(s,'GenSpark — Features','スライド機能 詳細',C.gs);
+    const feats=[
+      ['01 / AUTO GENERATE','テーマ入力→即生成\nキーワードやテーマを入力するだけでAIがWeb情報を収集し、アウトライン→スライドを自動作成。'],
+      ['02 / SPARKPAGE','インタラクティブ公開\n生成されたスライドはURLで即共有可能なSparkpageとして公開。閲覧者がインタラクティブに操作できる。'],
+      ['03 / EXPORT','PPTX書き出し\n生成したスライドをPowerPoint形式でエクスポート。既存のワークフローにそのまま組み込める。'],
+      ['04 / TEMPLATE','テンプレート選択\n複数のデザインテンプレートから選択可能。生成後にスタイルを変更することもできる。'],
+      ['05 / EDIT','インライン編集\n生成後のスライドをブラウザ上で直接編集。テキスト・画像・レイアウトをGUIで調整できる。'],
+      ['06 / MULTI-LANG','日本語対応\n日本語でのプロンプト入力に対応。日本語テキストのスライドも自然な品質で生成される。'],
+    ];
+    feats.forEach(([lbl,body],i)=>{ card(s,.5+(i%3)*4.27,2.0+Math.floor(i/3)*2.42,4.1,2.28,lbl,body,C.gs); });
+  }
+
+  /* ══ SLIDE 4: GenSpark 操作フロー ══ */
+  {
+    const s=newSlide();
+    hd(s,'GenSpark — How to Use','操作フロー — 5ステップ',C.gs);
+    const steps=[
+      ['01','テーマ入力','日本語でトピックを入力。枚数指定も可'],
+      ['02','AI情報収集','Web検索・情報整理をAIが自動実行'],
+      ['03','スライド生成','デザイン済みスライドを自動生成'],
+      ['04','編集・調整','ブラウザ上でテキスト・レイアウトを編集'],
+      ['05','公開・書き出し','SparkpageとしてURL共有 or PPTX書き出し'],
+    ];
+    steps.forEach(([num,lbl,sub],i)=>{
+      const x=.5+i*2.56;
+      s.addShape(pptx.ShapeType.ellipse,{x:x+.7,y:2.1,w:.6,h:.6,fill:{color:C.gs},line:{type:'none'}});
+      s.addText(num,{x:x+.7,y:2.1,w:.6,h:.6,fontSize:11,color:C.white,bold:true,align:'center',valign:'middle',fontFace:F.mono});
+      s.addText(lbl,{x,y:2.82,w:2.1,h:.3,fontSize:12,color:C.text,bold:true,align:'center'});
+      s.addText(sub,{x,y:3.16,w:2.1,h:.65,fontSize:10,color:C.muted,align:'center',lineSpacingMultiple:1.4});
+      if(i<4) s.addText('→',{x:x+2.1,y:2.2,w:.45,h:.4,fontSize:18,color:'CCCCCC',align:'center'});
+    });
+    card(s,.5,4.2,6.1,2.65,'STRENGTH',
+      '・検索〜スライド化まで完全自動。操作ステップが少ない\n・URLで即共有できるSparkpageが便利\n・無料プランで十分な機能が使える',C.gs);
+    card(s,7.0,4.2,5.8,2.65,'LIMITATION',
+      '・デザインの細かいカスタマイズには限界がある\n・生成内容はWeb情報依存のため、専門的な社内情報には不向き\n・複雑なアニメーションはPPTX出力時に再現されない場合あり','AAAAAA');
+  }
+
+  /* ══ SLIDE 5: Manus とは ══ */
+  {
+    const s=newSlide();
+    hd(s,'Tool 02','Manus — 自律AIエージェントがスライドを丸ごと作る',C.mn);
+    buls(s,.5,2.1,6,[
+      '2025年2月登場。Monica（中国AI企業）が開発した自律型AIエージェント',
+      '「何を作るか」を伝えるだけで、調査・構成・デザイン・ファイル生成まで完全自律実行',
+      'Webブラウジング・コード実行・ファイル操作を組み合わせて複雑なタスクを達成',
+      'スライド出力形式はHTMLプレゼン・PDF・PPTXに対応',
+      '招待制から一般公開へ。2025年に大きな話題を集めた',
+    ],C.mn);
+    statBox(s,7.1,2.0,'2025','リリース年',C.mn);
+    statBox(s,9.2,2.0,'Agent','完全自律型',C.mn);
+    statBox(s,11.1,2.0,'Multi','マルチタスク実行',C.mn);
+    card(s,7.1,3.1,5.7,1.6,'CORE CONCEPT',
+      '「〇〇についてのプレゼン資料を作って」という一言で、Webリサーチ→アウトライン作成→スライドデザイン→ファイル生成までAIが自律的に完遂する次世代エージェント。',C.mn);
+    const tags=['スライド生成','コーディング','データ分析','Webリサーチ'];
+    tags.forEach((t,i)=>{
+      s.addShape(pptx.ShapeType.roundRect,{x:7.2+(i%2)*2.9,y:4.9+Math.floor(i/2)*.5,w:2.6,h:.38,rectRadius:.12,fill:{color:C.mnDim},line:{color:C.mn,pt:1}});
+      s.addText(t,{x:7.2+(i%2)*2.9,y:4.9+Math.floor(i/2)*.5,w:2.6,h:.38,fontSize:11,color:C.mnDeep,align:'center',valign:'middle',bold:true,fontFace:F.mono});
+    });
+  }
+
+  /* ══ SLIDE 6: Manus 機能6つ ══ */
+  {
+    const s=newSlide();
+    hd(s,'Manus — Features','スライド機能 詳細',C.mn);
+    const feats=[
+      ['01 / AGENT CREATION','完全自律生成\n「〜を作って」の一言でエージェントが動き出し、情報収集からスライド完成まで自律的に実行。'],
+      ['02 / WEB RESEARCH','自動Webリサーチ\nプレゼンのテーマに沿ってWebを自律的にブラウジング。最新情報を収集してスライドに反映。'],
+      ['03 / HTML SLIDES','HTMLプレゼン出力\n高品質なHTML形式のプレゼンテーションを生成。アニメーション・グラフ・インタラクションも実装可能。'],
+      ['04 / MULTI FORMAT','マルチフォーマット出力\nHTML / PDF / PPTX の複数形式で出力。用途に応じて使い分けが可能。'],
+      ['05 / DATA VIZ','データ可視化\nデータや数値があればグラフ・チャートを自動生成してスライドに組み込む。'],
+      ['06 / REVISION','自然言語で修正指示\n「3枚目をもっとシンプルにして」のように自然言語で追加指示。エージェントが修正を実行する。'],
+    ];
+    feats.forEach(([lbl,body],i)=>{ card(s,.5+(i%3)*4.27,2.0+Math.floor(i/3)*2.42,4.1,2.28,lbl,body,C.mn); });
+  }
+
+  /* ══ SLIDE 7: Manus 操作フロー ══ */
+  {
+    const s=newSlide();
+    hd(s,'Manus — How to Use','操作フロー — エージェント実行',C.mn);
+    const steps=[
+      ['STEP 01','タスク指示','「〇〇についての10枚のプレゼン資料を作成して」と入力するだけ'],
+      ['STEP 02','自律リサーチ','エージェントがWebを自律的にブラウジングし、関連情報を収集・整理'],
+      ['STEP 03','構成・執筆','アウトライン作成→各スライドのコンテンツ作成をAIが自律実行'],
+      ['STEP 04','デザイン生成','HTML/CSSでスライドをコーディング。アニメーションや図表も自動作成'],
+      ['STEP 05','ファイル出力','完成したプレゼンをHTML・PDF・PPTXでダウンロード可能な状態で提供'],
+    ];
+    steps.forEach(([num,lbl,sub],i)=>{
+      const x=.5+i*2.56;
+      s.addShape(pptx.ShapeType.ellipse,{x:x+.7,y:2.1,w:.6,h:.6,fill:{color:C.mn},line:{type:'none'}});
+      s.addText(num,{x:x+.7,y:2.1,w:.6,h:.6,fontSize:8,color:C.white,bold:true,align:'center',valign:'middle',fontFace:F.mono});
+      s.addText(lbl,{x,y:2.82,w:2.1,h:.3,fontSize:12,color:C.text,bold:true,align:'center'});
+      s.addText(sub,{x,y:3.16,w:2.1,h:.65,fontSize:10,color:C.muted,align:'center',lineSpacingMultiple:1.4});
+      if(i<4) s.addText('→',{x:x+2.1,y:2.2,w:.45,h:.4,fontSize:18,color:'CCCCCC',align:'center'});
+    });
+    card(s,.5,4.2,6.1,2.65,'STRENGTH',
+      '・完全自律実行。ユーザーの操作はほぼ不要\n・HTMLスライドはデザイン品質・アニメーションが高水準\n・スライド以外（リサーチ・コード・分析）も同一エージェントで完結',C.mn);
+    card(s,7.0,4.2,5.8,2.65,'LIMITATION',
+      '・タスク完了まで時間がかかる場合がある（数分〜十数分）\n・細かいデザイン指定はプロンプトで伝える必要がある\n・利用コストが高め（クレジット制）','AAAAAA');
+  }
+
+  /* ══ SLIDE 8: 比較表 ══ */
+  {
+    const s=newSlide();
+    hd(s,'Comparison','GenSpark vs Manus — 比較',C.gs);
+    const TH={fill:{color:'F1F5F9'},color:C.muted,fontFace:F.mono,fontSize:10,bold:true,align:'left'};
+    const TD={color:C.text,fontFace:F.body,fontSize:12};
+    const TGS={color:C.gsDeep,fontFace:F.body,fontSize:12,bold:true};
+    const TMN={color:C.mnDeep,fontFace:F.body,fontSize:12,bold:true};
+    const rows=[
+      [{text:'項目',options:TH},{text:'✦ GenSpark',options:{...TH,color:C.gsDeep}},{text:'✦ Manus',options:{...TH,color:C.mnDeep}}],
+      [{text:'タイプ',options:TD},{text:'AI検索 × スライド生成',options:TGS},{text:'自律AIエージェント',options:TMN}],
+      [{text:'操作方法',options:TD},{text:'テーマ入力→テンプレ選択→生成',options:TGS},{text:'指示一つで完全自律実行',options:TMN}],
+      [{text:'情報収集',options:TD},{text:'AI検索エンジンで自動収集',options:TGS},{text:'Webブラウジングで自律収集',options:TMN}],
+      [{text:'出力形式',options:TD},{text:'Sparkpage（URL） / PPTX',options:TGS},{text:'HTML / PDF / PPTX',options:TMN}],
+      [{text:'生成時間',options:TD},{text:'速い（数十秒〜数分）',options:TGS},{text:'やや遅い（数分〜十数分）',options:TMN}],
+      [{text:'編集',options:TD},{text:'GUIで直感的に編集可',options:TGS},{text:'自然言語で追加指示',options:TMN}],
+      [{text:'スライド以外',options:TD},{text:'検索・情報収集メイン',options:TD},{text:'コード・分析・調査など多岐',options:TMN}],
+      [{text:'価格感',options:TD},{text:'無料プランあり・手軽',options:TGS},{text:'クレジット制・コスト高め',options:TMN}],
+    ];
+    s.addTable(rows,{x:.5,y:2.0,w:12.3,rowH:.45,colW:[2.5,4.9,4.9],border:{type:'solid',color:C.border,pt:.8},fontFace:F.body,fontSize:12});
+  }
+
+  /* ══ SLIDE 9: 使い分け ══ */
+  {
+    const s=newSlide();
+    hd(s,'Decision Guide','どちらを使うか',C.gs);
+    const gsItems=['今すぐ・手軽にスライドが必要なとき','テーマについての情報収集と資料作成を同時にやりたい','URLで即共有できるインタラクティブなページが欲しい','無料でまず試したい','PowerPoint形式での書き出しが必要'];
+    const mnItems=['スライドの品質・デザイン自由度にこだわりたい','調査→分析→スライド化を一気通貫でやりたい','HTMLベースのリッチなプレゼンが欲しい','スライド以外のタスクも同時に依頼したい','データや図表を含む複雑な資料を作りたい'];
+    s.addShape(pptx.ShapeType.roundRect,{x:.5,y:2.0,w:6.1,h:5.1,rectRadius:.1,fill:{color:C.gsDim},line:{color:C.gs,pt:1.2}});
+    s.addText('✦ GenSpark を選ぶ',{x:.7,y:2.18,w:5.7,h:.4,fontSize:15,color:C.gsDeep,bold:true,fontFace:F.disp});
+    gsItems.forEach((t,i)=>s.addText('◆ '+t,{x:.7,y:2.72+i*.5,w:5.6,h:.46,fontSize:12,color:C.text,fontFace:F.body,lineSpacingMultiple:1.3}));
+    s.addShape(pptx.ShapeType.roundRect,{x:6.9,y:2.0,w:6.1,h:5.1,rectRadius:.1,fill:{color:C.mnDim},line:{color:C.mn,pt:1.2}});
+    s.addText('✦ Manus を選ぶ',{x:7.1,y:2.18,w:5.7,h:.4,fontSize:15,color:C.mnDeep,bold:true,fontFace:F.disp});
+    mnItems.forEach((t,i)=>s.addText('◆ '+t,{x:7.1,y:2.72+i*.5,w:5.6,h:.46,fontSize:12,color:C.text,fontFace:F.body,lineSpacingMultiple:1.3}));
+  }
+
+  /* ══ SLIDE 10: まとめ ══ */
+  {
+    const s=newSlide();
+    hd(s,'Summary','まとめ',C.gs);
+    const sums=[
+      [C.gs,'✦','GenSpark は「検索×スライド化」の速さが強み。テーマ入力→即完成のスピード重視な場面に最適。URLで共有できるSparkpageも便利。'],
+      [C.mn,'✦','Manus は「完全自律エージェント」としての深さが強み。品質・自由度の高いHTMLスライドを作りたい時、複合タスクをまとめて任せたい時に力を発揮。'],
+      [C.accent,'◎','スピード重視ならGenSpark、品質・自由度重視ならManus。両者は補完関係にあり、用途で使い分けるのが最適解。'],
+      ['AAAAAA','→','AIスライド生成は「叩き台を即作る」用途で特に効果的。手直しを前提にAIと協働するスタイルが現実的な活用法。'],
+    ];
+    sums.forEach(([color,ico,txt],i)=>{
+      s.addShape(pptx.ShapeType.roundRect,{x:.5,y:2.0+i*1.15,w:7.8,h:1.0,rectRadius:.07,fill:{color:C.white},line:{color:C.border,pt:.8}});
+      s.addText(ico,{x:.65,y:2.0+i*1.15,w:.5,h:1.0,fontSize:18,color,align:'center',valign:'middle'});
+      s.addText(txt,{x:1.2,y:2.0+i*1.15,w:6.9,h:1.0,fontSize:12,color:C.text,fontFace:F.body,lineSpacingMultiple:1.5,valign:'middle'});
+    });
+    const picks=[['すぐに・無料で','→ GenSpark',C.gs],['URL共有したい','→ GenSpark（Sparkpage）',C.gs],['品質・完全自律','→ Manus',C.mn],['調査も同時に','→ Manus（エージェント）',C.mn]];
+    picks.forEach(([lbl,val,color],i)=>{
+      const px=8.6+(i%2===0?0:2.9), py=2.0+Math.floor(i/2)*1.05;
+      s.addShape(pptx.ShapeType.roundRect,{x:px,y:py,w:2.7,h:.88,rectRadius:.07,fill:{color:i<2?C.gsDim:C.mnDim},line:{color,pt:1}});
+      s.addText(lbl,{x:px+.1,y:py+.06,w:2.5,h:.3,fontSize:9,color,fontFace:F.mono,bold:true});
+      s.addText(val,{x:px+.1,y:py+.42,w:2.5,h:.35,fontSize:11,color:C.text,fontFace:F.body,bold:true});
+    });
+  }
+
+  await pptx.writeFile({fileName:'GenSpark_Manus_AISlides.pptx'});
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PPTXを書き出す';
+}
+</script>
+</body>
+</html>

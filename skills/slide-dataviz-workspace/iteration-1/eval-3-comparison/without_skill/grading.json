@@ -1,0 +1,27 @@
+{
+  "eval_id": 3,
+  "eval_name": "three-company-comparison-table",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "own_company_highlighted: Is the 自社 column visually differentiated?",
+      "passed": true,
+      "evidence": "`.col-header.ours` has blue gradient background, `border-top: 3px solid #58a6ff`, and 'RECOMMENDED' badge; `.cell.ours` has gradient background and larger bold text"
+    },
+    {
+      "text": "all_four_items: Are 価格, API連携, 日本語対応, サポート all present?",
+      "passed": true,
+      "evidence": "Row labels: '価格', 'API連携', '日本語対応', 'サポート' all present as `.cell.row-label` elements"
+    },
+    {
+      "text": "correct_values: Are the prices (¥5,000/¥8,000/¥3,500) and symbols correct?",
+      "passed": true,
+      "evidence": "自社: ¥5,000 with ◎ (日本語), ○ (API連携), 24h/365日 (サポート); A社: ¥8,000 with △ (日本語), ○ (API); B社: ¥3,500 with ○ (日本語), ✕ (API)"
+    },
+    {
+      "text": "has_pptx_export: Is PPTX export implemented?",
+      "passed": false,
+      "evidence": "No pptxgenjs library, no html2canvas library, no PPTX export button or function. Only a CTA '無料デモを申し込む' button is present"
+    }
+  ]
+}

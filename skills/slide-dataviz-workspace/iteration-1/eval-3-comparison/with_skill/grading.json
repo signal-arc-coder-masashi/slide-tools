@@ -1,0 +1,27 @@
+{
+  "eval_id": 3,
+  "eval_name": "three-company-comparison-table",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "own_company_highlighted: Is the 自社 column visually differentiated?",
+      "passed": true,
+      "evidence": "`.price-card.highlight` has accent border (var(--accent)) and accent-bg background with '推奨' badge; `thead th.th-highlight` has accent background; `td.cell-highlight` has accent-bg with accent-colored bold text"
+    },
+    {
+      "text": "all_four_items: Are 価格, API連携, 日本語対応, サポート all present?",
+      "passed": true,
+      "evidence": "Table rows: '月額価格', 'API 連携', '日本語対応', 'サポート体制' all present as tbody td:first-child row labels"
+    },
+    {
+      "text": "correct_values: Are the prices (¥5,000/¥8,000/¥3,500) and symbols correct?",
+      "passed": true,
+      "evidence": "自社: ¥5,000 with ◎ (日本語), ○ (API), 24時間対応 (サポート); A社: ¥8,000 with △ (日本語), ○ (API); B社: ¥3,500 with ○ (日本語), ✕ (API)"
+    },
+    {
+      "text": "has_pptx_export: Is PPTX export implemented?",
+      "passed": true,
+      "evidence": "`<button class='export-btn' id='exportBtn'>&#x2193; PPTX 書き出し</button>`; pptxgenjs@3.12.0 + html2canvas@1.4.1 loaded; full async export function with 2-slide generation"
+    }
+  ]
+}

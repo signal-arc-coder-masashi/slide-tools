@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>月別売上レポート</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #FFF8F0;
+      --surface:  #FFFFFF;
+      --ink:      #1A1208;
+      --muted:    #9B8C7A;
+      --accent1:  #FF6B35;  /* vivid orange */
+      --accent2:  #FFCB47;  /* amber */
+      --accent3:  #FF9B54;  /* mid orange */
+      --grid:     #EDE4D8;
+      --bar-peak: #FF6B35;
+      --bar-low:  #FFB085;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      font-family: 'Noto Sans JP', sans-serif;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    /* ── slide canvas ── */
+    .slide {
+      width: 100vw; height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 1fr;
+      padding: 48px 64px 40px;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative background blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 420px; height: 420px;
+      background: var(--accent1);
+      top: -120px; right: -80px;
+    }
+    .blob-2 {
+      width: 300px; height: 300px;
+      background: var(--accent2);
+      bottom: 20px; left: -60px;
+    }
+    .blob-3 {
+      width: 200px; height: 200px;
+      background: var(--accent3);
+      bottom: 160px; right: 200px;
+    }
+
+    /* noise grain overlay */
+    .grain {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px 128px;
+    }
+
+    /* ── header ── */
+    .header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--ink);
+      position: relative;
+      z-index: 2;
+
+      opacity: 0;
+      transform: translateY(-18px);
+      animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+    }
+
+    .header-left {}
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent1);
+      margin-bottom: 6px;
+    }
+    .title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5.5vw, 72px);
+      line-height: 0.92;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+    .title span {
+      color: var(--accent1);
+    }
+
+    .header-right {
+      text-align: right;
+    }
+    .period-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .period-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+    }
+
+    /* ── chart area ── */
+    .chart-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      padding-top: 32px;
+      gap: 0;
+    }
+
+    /* grid lines */
+    .grid-lines {
+      position: absolute;
+      left: 0; right: 0;
+      top: 32px; bottom: 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .grid-line {
+      position: relative;
+      width: 100%;
+      height: 1px;
+      background: var(--grid);
+    }
+    .grid-line::before {
+      content: attr(data-label);
+      position: absolute;
+      right: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    /* bars container */
+    .bars-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: clamp(12px, 2.5vw, 36px);
+      height: calc(100% - 56px);
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      max-width: 110px;
+      height: 100%;
+      justify-content: flex-end;
+
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .bar-group:nth-child(1) { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s forwards; }
+    .bar-group:nth-child(2) { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.45s forwards; }
+    .bar-group:nth-child(3) { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.55s forwards; }
+    .bar-group:nth-child(4) { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.65s forwards; }
+    .bar-group:nth-child(5) { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.75s forwards; }
+    .bar-group:nth-child(6) { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.85s forwards; }
+
+    .bar-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(16px, 1.8vw, 24px);
+      letter-spacing: 0.05em;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+    }
+
+    .bar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      transform-origin: bottom center;
+      transform: scaleY(0);
+      transition: transform 0.9s cubic-bezier(0.34,1.56,0.64,1);
+      /* height is set via inline style as a percentage of the track */
+    }
+    /* peak bar gets special treatment */
+    .bar.is-peak {
+      background: linear-gradient(180deg, #FF6B35 0%, #FF9B54 100%);
+      box-shadow: 0 -6px 24px rgba(255,107,53,0.35);
+    }
+    .bar.is-low {
+      background: linear-gradient(180deg, #FFCB47 0%, #FFE49A 100%);
+    }
+    .bar:not(.is-peak):not(.is-low) {
+      background: linear-gradient(180deg, #FF9B54 0%, #FFCB80 100%);
+    }
+
+    /* shine stripe inside bar */
+    .bar::after {
+      content: '';
+      position: absolute;
+      top: 8px; left: 6px;
+      width: 30%;
+      height: calc(100% - 16px);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.18);
+      pointer-events: none;
+    }
+
+    /* peak dot accent */
+    .bar.is-peak::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent1);
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.25);
+    }
+
+    .bar-label {
+      font-size: clamp(12px, 1.2vw, 15px);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* x-axis divider */
+    .x-axis {
+      height: 2px;
+      background: var(--ink);
+      margin: 0 24px;
+      position: relative;
+      z-index: 3;
+
+      opacity: 0;
+      animation: fadeIn 0.4s ease 0.3s forwards;
+    }
+
+    /* ── footer ── */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 20px;
+      border-top: 1px solid var(--grid);
+      position: relative;
+      z-index: 2;
+
+      opacity: 0;
+      animation: fadeUp 0.5s ease 1.1s forwards;
+    }
+    .footer-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .footer-stat-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .footer-stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+    }
+    .footer-stat-value.positive {
+      color: var(--accent1);
+    }
+    .footer-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--grid);
+    }
+    .footer-note {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── legend tag ── */
+    .legend-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ink);
+      color: #FFF8F0;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .legend-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent2);
+    }
+
+    /* ── keyframes ── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+<div class="slide">
+  <!-- background effects -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="grain"></div>
+
+  <!-- header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="eyebrow">Sales Report 2025</div>
+      <h1 class="title">月別<span>売上</span><br>推移</h1>
+    </div>
+    <div class="header-right">
+      <div class="period-label">対象期間</div>
+      <div class="period-value">Jan — Jun</div>
+    </div>
+  </header>
+
+  <!-- chart -->
+  <div class="chart-wrapper" id="chart">
+    <div class="bars-container" id="barsContainer">
+      <!-- bars injected by JS -->
+    </div>
+    <div class="x-axis"></div>
+  </div>
+
+  <!-- footer -->
+  <footer class="footer">
+    <div class="footer-stat">
+      <div class="footer-stat-label">合計売上</div>
+      <div class="footer-stat-value">920<span style="font-size:13px;letter-spacing:0.1em"> 万円</span></div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-stat">
+      <div class="footer-stat-label">月平均</div>
+      <div class="footer-stat-value">153<span style="font-size:13px;letter-spacing:0.1em"> 万円</span></div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-stat">
+      <div class="footer-stat-label">最高月</div>
+      <div class="footer-stat-value positive">5月 210<span style="font-size:13px"> 万円</span></div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-stat">
+      <div class="footer-stat-label">最低月</div>
+      <div class="footer-stat-value">3月 90<span style="font-size:13px"> 万円</span></div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="legend-tag">
+      <span class="legend-dot"></span>
+      単位: 万円
+    </div>
+  </footer>
+</div>
+
+<script>
+  const data = [
+    { month: '1月', value: 120 },
+    { month: '2月', value: 150 },
+    { month: '3月', value: 90  },
+    { month: '4月', value: 180 },
+    { month: '5月', value: 210 },
+    { month: '6月', value: 170 },
+  ];
+
+  const maxValue = Math.max(...data.map(d => d.value));
+  const minValue = Math.min(...data.map(d => d.value));
+  const container = document.getElementById('barsContainer');
+
+  data.forEach((d, i) => {
+    const pct = (d.value / maxValue) * 100;
+    const isPeak = d.value === maxValue;
+    const isLow  = d.value === minValue;
+
+    const group = document.createElement('div');
+    group.className = 'bar-group';
+
+    group.innerHTML = `
+      <div class="bar-value">${d.value}<span style="font-size:0.55em;opacity:0.6">万</span></div>
+      <div class="bar-track">
+        <div class="bar ${isPeak ? 'is-peak' : isLow ? 'is-low' : ''}"
+             style="height:${pct}%"></div>
+      </div>
+      <div class="bar-label">${d.month}</div>
+    `;
+    container.appendChild(group);
+  });
+
+  // trigger bar grow after a short delay
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.bar').forEach((bar, i) => {
+        setTimeout(() => {
+          bar.style.transform = 'scaleY(1)';
+        }, i * 120 + 400);
+      });
+    }, 200);
+  });
+</script>
+</body>
+</html>

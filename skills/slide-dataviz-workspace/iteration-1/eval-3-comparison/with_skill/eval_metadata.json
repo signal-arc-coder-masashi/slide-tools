@@ -1,0 +1,11 @@
+{
+  "eval_id": 3,
+  "eval_name": "three-company-comparison-table",
+  "prompt": "3社（自社・A社・B社）のAIツール機能比較スライドをWebで作ってください。比較項目: 価格・API連携・日本語対応・サポート。自社が優位に見えるビジュアルに。",
+  "assertions": [
+    { "id": "own_company_highlighted", "description": "自社列が他社と視覚的に差別化されている（色・枠・バッジなど）" },
+    { "id": "all_four_items", "description": "価格・API連携・日本語対応・サポートの4項目がすべて入っている" },
+    { "id": "correct_values", "description": "各社の価格・評価記号（◎○△✕など）が正しく入っている" },
+    { "id": "has_pptx_export", "description": "PPTX エクスポート機能が実装されている" }
+  ]
+}

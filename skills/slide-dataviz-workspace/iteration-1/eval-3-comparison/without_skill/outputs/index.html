@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIツール機能比較</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .slide {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .header .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #58a6ff;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .header h1 span {
+      background: linear-gradient(90deg, #58a6ff, #a371f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header .subtitle {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #8b949e;
+    }
+
+    /* Comparison grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 180px repeat(3, 1fr);
+      gap: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #21262d;
+    }
+
+    /* Column headers */
+    .col-header {
+      padding: 24px 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 15px;
+      background: #161b22;
+      border-bottom: 1px solid #21262d;
+      border-right: 1px solid #21262d;
+    }
+    .col-header:last-child { border-right: none; }
+    .col-header.row-label {
+      background: #0d1117;
+      border-right: 2px solid #21262d;
+    }
+
+    /* Our company column */
+    .col-header.ours {
+      background: linear-gradient(135deg, #1a2d4a 0%, #1e3a5f 100%);
+      border-top: 3px solid #58a6ff;
+      position: relative;
+    }
+    .col-header.ours::after {
+      content: 'RECOMMENDED';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #58a6ff;
+      color: #0d1117;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      padding: 3px 10px;
+      border-radius: 0 0 6px 6px;
+    }
+    .company-name {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .company-tag {
+      font-size: 11px;
+      font-weight: 400;
+      color: #8b949e;
+    }
+    .col-header.ours .company-tag {
+      color: #79c0ff;
+    }
+
+    /* Rows */
+    .row {
+      display: contents;
+    }
+    .cell {
+      padding: 20px 20px;
+      text-align: center;
+      border-bottom: 1px solid #21262d;
+      border-right: 1px solid #21262d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      background: #0d1117;
+      transition: background 0.2s;
+    }
+    .cell:last-child { border-right: none; }
+    .cell.row-label {
+      justify-content: flex-start;
+      font-size: 13px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #0d1117;
+      border-right: 2px solid #21262d;
+      padding-left: 20px;
+    }
+    .cell.ours {
+      background: linear-gradient(135deg, #0d1f35 0%, #0f2540 100%);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    /* Last row — no bottom border */
+    .last-row .cell {
+      border-bottom: none;
+    }
+
+    /* Value styles */
+    .value-highlight {
+      color: #58a6ff;
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .value-good { color: #3fb950; font-size: 20px; }
+    .value-great {
+      color: #58a6ff;
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .value-neutral { color: #8b949e; font-size: 20px; }
+    .value-bad { color: #f85149; font-size: 20px; }
+
+    .price-ours {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .price-ours .amount {
+      font-size: 26px;
+      font-weight: 800;
+      color: #58a6ff;
+    }
+    .price-ours .label {
+      font-size: 10px;
+      color: #388bfd;
+      background: rgba(88, 166, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .price-competitor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .price-competitor .amount {
+      font-size: 20px;
+      font-weight: 600;
+      color: #8b949e;
+    }
+
+    /* Support cell */
+    .support-ours {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .support-ours .main {
+      font-size: 18px;
+      font-weight: 800;
+      color: #3fb950;
+    }
+    .support-ours .sub {
+      font-size: 10px;
+      color: #238636;
+      background: rgba(63, 185, 80, 0.15);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* Footer banner */
+    .footer-banner {
+      margin-top: 32px;
+      background: linear-gradient(135deg, #1a2d4a 0%, #1e2a4a 100%);
+      border: 1px solid #388bfd;
+      border-radius: 12px;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .footer-banner .message {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e6edf3;
+      line-height: 1.5;
+    }
+    .footer-banner .message strong {
+      color: #58a6ff;
+    }
+    .cta-btn {
+      flex-shrink: 0;
+      background: linear-gradient(90deg, #388bfd, #6e40c9);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    /* Score badges */
+    .score-row {
+      display: contents;
+    }
+    .score-cell {
+      padding: 16px 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117;
+      border-right: 1px solid #21262d;
+    }
+    .score-cell:last-child { border-right: none; }
+    .score-cell.row-label {
+      justify-content: flex-start;
+      font-size: 13px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #0d1117;
+      border-right: 2px solid #21262d;
+      padding-left: 20px;
+      border-bottom: none;
+    }
+    .score-cell.ours {
+      background: linear-gradient(135deg, #0d1f35 0%, #0f2540 100%);
+      border-bottom: none;
+    }
+    .score-cell.competitor {
+      border-bottom: none;
+    }
+    .score-bar-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .score-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: #21262d;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .score-val {
+      font-size: 12px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="eyebrow">Feature Comparison 2026</div>
+      <h1>AIツール機能比較<br /><span>なぜ自社ツールが選ばれるのか</span></h1>
+      <p class="subtitle">価格・機能・サポート — 3社を正直に比較する</p>
+    </div>
+
+    <!-- Main comparison grid -->
+    <div class="grid">
+
+      <!-- Column headers -->
+      <div class="col-header row-label"></div>
+      <div class="col-header ours">
+        <div class="company-name">自社ツール</div>
+        <div class="company-tag">Best Value</div>
+      </div>
+      <div class="col-header">
+        <div class="company-name">A社</div>
+        <div class="company-tag">Competitor</div>
+      </div>
+      <div class="col-header">
+        <div class="company-name">B社</div>
+        <div class="company-tag">Competitor</div>
+      </div>
+
+      <!-- Row: Price -->
+      <div class="cell row-label">価格</div>
+      <div class="cell ours">
+        <div class="price-ours">
+          <div class="amount">¥5,000</div>
+          <div class="label">最適コスト</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="price-competitor">
+          <div class="amount">¥8,000</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="price-competitor">
+          <div class="amount">¥3,500</div>
+        </div>
+      </div>
+
+      <!-- Row: API -->
+      <div class="cell row-label">API連携</div>
+      <div class="cell ours"><span class="value-great">○</span></div>
+      <div class="cell"><span class="value-good">○</span></div>
+      <div class="cell"><span class="value-bad">✕</span></div>
+
+      <!-- Row: Japanese -->
+      <div class="cell row-label">日本語対応</div>
+      <div class="cell ours"><span class="value-great">◎</span></div>
+      <div class="cell"><span class="value-neutral">△</span></div>
+      <div class="cell"><span class="value-good">○</span></div>
+
+      <!-- Row: Support (last row) -->
+      <div class="cell row-label last-row">サポート</div>
+      <div class="cell ours last-row">
+        <div class="support-ours">
+          <div class="main">24h</div>
+          <div class="sub">365日対応</div>
+        </div>
+      </div>
+      <div class="cell last-row"><span style="color:#8b949e;font-size:13px;">営業時間のみ</span></div>
+      <div class="cell last-row"><span style="color:#8b949e;font-size:13px;">メールのみ</span></div>
+
+      <!-- Score summary row -->
+      <div class="score-cell row-label">総合スコア</div>
+      <div class="score-cell ours">
+        <div class="score-bar-wrap">
+          <div class="score-val" style="color:#58a6ff;">95 / 100</div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:95%;background:linear-gradient(90deg,#388bfd,#a371f7);"></div>
+          </div>
+        </div>
+      </div>
+      <div class="score-cell competitor">
+        <div class="score-bar-wrap">
+          <div class="score-val" style="color:#8b949e;">62 / 100</div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:62%;background:#30363d;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="score-cell competitor">
+        <div class="score-bar-wrap">
+          <div class="score-val" style="color:#8b949e;">54 / 100</div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:54%;background:#30363d;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- Footer banner -->
+    <div class="footer-banner">
+      <div class="message">
+        <strong>自社ツール</strong>は価格・API・日本語・サポートすべてで優位。<br />
+        A社より <strong>37.5% コスト削減</strong>、B社にない API連携と <strong>24時間サポート</strong>を両立。
+      </div>
+      <button class="cta-btn">無料デモを申し込む</button>
+    </div>
+
+  </div>
+</body>
+</html>

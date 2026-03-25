@@ -1,0 +1,33 @@
+{
+  "eval_id": 2,
+  "eval_name": "kpi-before-after-infographic",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "before_after_structure: Is there a clear Before/After visual structure?",
+      "passed": true,
+      "evidence": "3-column grid with `.col-panel.before` (red border), center arrow column, and `.col-panel.after` (green border)"
+    },
+    {
+      "text": "all_three_kpis: Are 処理時間, エラー率, 月間コスト all present?",
+      "passed": true,
+      "evidence": "処理時間 (4時間→20分), エラー率 (12%→1.5%), 月間コスト (80万円→35万円) in both before/after panels and stat-bar footer"
+    },
+    {
+      "text": "big_number_emphasis: Are numbers displayed in large/bold/colored text?",
+      "passed": true,
+      "evidence": "`.kpi-row-value { font-size: 52px; font-weight: 900 }` with red (#F87171) for before and green (#10B981) for after"
+    },
+    {
+      "text": "has_pptx_export: Is PPTX export implemented?",
+      "passed": true,
+      "evidence": "`<button class='export-btn' onclick='exportPPTX()'>PPTX に書き出す</button>`; html2canvas + pptxgenjs@3.12.0 loaded; full `exportPPTX()` async function implemented"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

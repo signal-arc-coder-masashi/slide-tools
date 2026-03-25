@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "bar-chart-monthly-sales",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "uses_chartjs: Does the HTML use Chart.js (not CSS-only bars)?",
+      "passed": false,
+      "evidence": "No Chart.js script included; bars are CSS-only div elements with `transform: scaleY()` animation"
+    },
+    {
+      "text": "all_six_months: Are all 6 months (1〜6月) present in the chart data?",
+      "passed": true,
+      "evidence": "data array contains { month: '1月' } through { month: '6月' } with values 120, 150, 90, 180, 210, 170"
+    },
+    {
+      "text": "has_pptx_export: Is there a PPTX export button or function?",
+      "passed": false,
+      "evidence": "No pptxgenjs library loaded and no export button or function present anywhere in the HTML"
+    },
+    {
+      "text": "animation_pptx_timing: Is initPPTXExport or canvas.toDataURL called inside animation.onComplete?",
+      "passed": false,
+      "evidence": "No Chart.js animation.onComplete, no canvas.toDataURL, no initPPTXExport anywhere in the file"
+    }
+  ]
+}

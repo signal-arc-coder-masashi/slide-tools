@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "bar-chart-monthly-sales",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "uses_chartjs: Does the HTML use Chart.js (not CSS-only bars)?",
+      "passed": true,
+      "evidence": "chart.js@4.4.0 loaded via CDN; `new Chart(ctx, { type: 'bar', ... })` instantiated in script"
+    },
+    {
+      "text": "all_six_months: Are all 6 months (1〜6月) present in the chart data?",
+      "passed": true,
+      "evidence": "labels = ['1月', '2月', '3月', '4月', '5月', '6月'] with values [120, 150, 90, 180, 210, 170]"
+    },
+    {
+      "text": "has_pptx_export: Is there a PPTX export button or function?",
+      "passed": true,
+      "evidence": "pptxgenjs@3.12.0 loaded; `initPPTXExport({ filename: '月別売上推移.pptx', ... })` called in animation.onComplete"
+    },
+    {
+      "text": "animation_pptx_timing: Is initPPTXExport or canvas.toDataURL called inside animation.onComplete?",
+      "passed": true,
+      "evidence": "animation: { onComplete: () => { const chartImg = document.getElementById('bar-chart').toDataURL('image/png'); initPPTXExport({...}) } }"
+    }
+  ]
+}

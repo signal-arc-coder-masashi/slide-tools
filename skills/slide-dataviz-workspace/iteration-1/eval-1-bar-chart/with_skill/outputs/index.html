@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>月別売上推移</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F8F9FC;
+      --surface: #FFFFFF;
+      --accent: #3B82F6;
+      --accent-light: #DBEAFE;
+      --text: #0F172A;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --chart-h: 360px;
+      --chart-radius: 14px;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      font-family: 'Noto Sans JP', 'Calibri', sans-serif;
+      color: var(--text);
+    }
+
+    .slide {
+      width: 1280px;
+      min-height: 720px;
+      margin: 0 auto;
+      padding: 52px 64px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Header ── */
+    .slide-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+    }
+    .accent-bar {
+      width: 36px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin: 4px 0 2px;
+    }
+    .slide-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    /* ── Main layout ── */
+    .slide-body {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 28px;
+      align-items: start;
+      flex: 1;
+    }
+
+    /* ── Chart card ── */
+    .chart-card {
+      background: var(--surface);
+      border-radius: var(--chart-radius);
+      padding: 28px 28px 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .chart-wrap {
+      position: relative;
+      height: var(--chart-h);
+      width: 100%;
+    }
+
+    /* ── KPI sidebar ── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      border-left: 4px solid var(--accent);
+    }
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+    .kpi-unit {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .kpi-card.highlight {
+      background: var(--accent);
+      border-left-color: #1D4ED8;
+    }
+    .kpi-card.highlight .kpi-label,
+    .kpi-card.highlight .kpi-value,
+    .kpi-card.highlight .kpi-unit,
+    .kpi-card.highlight .kpi-sub {
+      color: #FFFFFF;
+    }
+
+    /* ── Footer note ── */
+    .slide-footer {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ── Fullscreen body centering ── */
+    @media (min-width: 1400px) {
+      body { display: flex; align-items: flex-start; justify-content: center; padding-top: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide">
+
+  <header class="slide-header">
+    <span class="kicker">SALES REPORT</span>
+    <div class="accent-bar"></div>
+    <h1 class="slide-title">月別売上推移</h1>
+  </header>
+
+  <div class="slide-body">
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-wrap">
+        <canvas id="bar-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- KPI sidebar -->
+    <aside class="sidebar">
+      <div class="kpi-card highlight">
+        <div class="kpi-label">上半期合計</div>
+        <div class="kpi-value">720<span class="kpi-unit">万円</span></div>
+        <div class="kpi-sub">1〜6月 累計</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">月平均売上</div>
+        <div class="kpi-value">120<span class="kpi-unit">万円</span></div>
+        <div class="kpi-sub">6ヶ月平均</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最高月</div>
+        <div class="kpi-value">210<span class="kpi-unit">万円</span></div>
+        <div class="kpi-sub">5月（最大値）</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最低月</div>
+        <div class="kpi-value">90<span class="kpi-unit">万円</span></div>
+        <div class="kpi-sub">3月（最小値）</div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="slide-footer">
+    ※ 売上データ（単位：万円）&nbsp;&nbsp;|&nbsp;&nbsp;2025年1〜6月
+  </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="../../../../../pptx-exporter.js"></script>
+
+<script>
+  /* ── Chart.js グローバル設定 ── */
+  Chart.defaults.font.family = "'Noto Sans JP', 'Calibri', sans-serif";
+  Chart.defaults.color = '#64748B';
+  Chart.defaults.plugins.tooltip.backgroundColor = '#0F172A';
+  Chart.defaults.plugins.tooltip.padding = 12;
+  Chart.defaults.plugins.tooltip.cornerRadius = 8;
+  Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: '600' };
+  Chart.defaults.plugins.tooltip.bodyFont  = { size: 13 };
+
+  const AXIS_STYLE = {
+    grid:   { color: 'rgba(0,0,0,0.05)' },
+    border: { display: false },
+    ticks:  { padding: 8, font: { size: 12 } }
+  };
+  const AXIS_NO_GRID = {
+    grid:   { display: false },
+    border: { display: false },
+    ticks:  { font: { size: 13, weight: '600' } }
+  };
+
+  /* ── データ ── */
+  const labels = ['1月', '2月', '3月', '4月', '5月', '6月'];
+  const values = [120, 150, 90, 180, 210, 170];
+
+  /* ── グラデーション生成 ── */
+  const ctx = document.getElementById('bar-chart');
+
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: '売上（万円）',
+        data: values,
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx: c, chartArea } = chart;
+          if (!chartArea) return '#3B82F6';
+          const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, '#3B82F6');
+          gradient.addColorStop(1, '#93C5FD');
+          return gradient;
+        },
+        borderRadius: 8,
+        borderSkipped: false,
+        barThickness: 52,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (item) => ` ${item.raw} 万円`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ...AXIS_NO_GRID,
+          ticks: { font: { size: 14, weight: '600' } }
+        },
+        y: {
+          ...AXIS_STYLE,
+          beginAtZero: true,
+          max: 250,
+          ticks: {
+            stepSize: 50,
+            padding: 8,
+            font: { size: 12 },
+            callback: (v) => v + ' 万'
+          }
+        }
+      },
+      animation: {
+        onComplete: () => {
+          /* PPTX エクスポート設定：アニメーション完了後に PNG を取得 */
+          const chartImg = document.getElementById('bar-chart').toDataURL('image/png');
+
+          initPPTXExport({
+            filename: '月別売上推移.pptx',
+            title:    '月別売上推移',
+            accent:   '3B82F6',
+            slides: [
+              {
+                type:    'image',
+                kicker:  'SALES REPORT',
+                heading: '月別売上推移',
+                src:     chartImg,
+                caption: '出典：社内売上データ（2025年1〜6月）',
+                bg:      'F8F9FC',
+              }
+            ]
+          });
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

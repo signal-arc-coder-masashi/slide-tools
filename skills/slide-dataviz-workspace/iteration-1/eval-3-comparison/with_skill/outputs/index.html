@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIツール機能比較</title>
+  <style>
+    :root {
+      --accent:   #F97316;
+      --accent-bg:#FFF7ED;
+      --surface:  #FFFFFF;
+      --base:     #F1F5F9;
+      --text:     #1E293B;
+      --muted:    #64748B;
+      --border:   #E2E8F0;
+      --green:    #10B981;
+      --red:      #EF4444;
+      --amber:    #F59E0B;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      background: #0F172A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Slide Container (16:9) ─────────────────── */
+    .slide {
+      background: var(--base);
+      width: 1280px;
+      min-height: 720px;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 32px 80px rgba(0,0,0,.5);
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .slide-header {
+      background: #1E293B;
+      padding: 28px 48px 24px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .slide-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .slide-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #F8FAFC;
+      line-height: 1.2;
+    }
+    .slide-subtitle {
+      font-size: 13px;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+    .export-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity .15s;
+    }
+    .export-btn:hover { opacity: .85; }
+
+    /* ── Body ────────────────────────────────────── */
+    .slide-body {
+      flex: 1;
+      padding: 32px 48px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Price hero strip ────────────────────────── */
+    .price-strip {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .price-label-col {
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+    }
+    .price-label-col span {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .price-card {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 20px 16px 16px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: transform .15s;
+      position: relative;
+    }
+    .price-card:hover { transform: translateY(-2px); }
+    .price-card.highlight {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+    }
+    .price-card.highlight::before {
+      content: '推奨';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      padding: 3px 12px;
+      border-radius: 20px;
+    }
+    .col-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .price-card.highlight .col-name { color: var(--accent); }
+    .price-value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+    .price-card.highlight .price-value { color: var(--accent); }
+    .price-unit {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .price-badge {
+      display: inline-block;
+      background: #DCFCE7;
+      color: #166534;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-top: 6px;
+    }
+
+    /* ── Comparison Table ────────────────────────── */
+    .compare-table-wrap {
+      background: var(--surface);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: #1E293B;
+    }
+    thead th {
+      padding: 14px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #94A3B8;
+      text-align: center;
+    }
+    thead th:first-child { text-align: left; padding-left: 24px; }
+    thead th.th-highlight {
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F8FAFC; }
+    tbody td {
+      padding: 16px 16px;
+      font-size: 15px;
+      text-align: center;
+      color: var(--text);
+    }
+    tbody td:first-child {
+      text-align: left;
+      padding-left: 24px;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: .04em;
+    }
+    td.cell-highlight {
+      background: var(--accent-bg);
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* ── Badge cells ─────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .badge-green { background: #DCFCE7; color: #16A34A; }
+    .badge-amber { background: #FEF3C7; color: #B45309; }
+    .badge-red   { background: #FEE2E2; color: #B91C1C; }
+    .badge-best  { background: var(--accent); color: #fff; font-size: 14px; }
+
+    .support-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-best { background: var(--accent); color: #fff; }
+    .tag-mid  { background: #E2E8F0; color: var(--muted); }
+    .tag-low  { background: #FEE2E2; color: #B91C1C; }
+
+    /* ── Footer summary ──────────────────────────── */
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    }
+    .summary-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .summary-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .summary-text span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Source note ─────────────────────────────── */
+    .source-note {
+      font-size: 11px;
+      color: #94A3B8;
+      text-align: right;
+      padding-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide" id="slide">
+
+    <!-- Header -->
+    <div class="slide-header">
+      <div>
+        <div class="slide-kicker">COMPARISON</div>
+        <div class="slide-title">3社 AIツール機能比較</div>
+        <div class="slide-subtitle">自社 vs. A社 vs. B社 — 価格・機能・サポートの総合評価</div>
+      </div>
+      <button class="export-btn" id="exportBtn">
+        &#x2193; PPTX 書き出し
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="slide-body">
+
+      <!-- Price Strip -->
+      <div class="price-strip">
+        <div class="price-label-col"><span>月額料金</span></div>
+
+        <div class="price-card highlight">
+          <div class="col-name">自社</div>
+          <div class="price-value">¥5,000</div>
+          <div class="price-unit">/ 月</div>
+          <div class="price-badge">最高コスパ</div>
+        </div>
+
+        <div class="price-card">
+          <div class="col-name">A社</div>
+          <div class="price-value">¥8,000</div>
+          <div class="price-unit">/ 月</div>
+        </div>
+
+        <div class="price-card">
+          <div class="col-name">B社</div>
+          <div class="price-value">¥3,500</div>
+          <div class="price-unit">/ 月</div>
+        </div>
+      </div>
+
+      <!-- Comparison Table -->
+      <div class="compare-table-wrap" id="compareTable">
+        <table>
+          <thead>
+            <tr>
+              <th>比較項目</th>
+              <th class="th-highlight">自社</th>
+              <th>A社</th>
+              <th>B社</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>月額価格</td>
+              <td class="cell-highlight">¥5,000</td>
+              <td>¥8,000</td>
+              <td>¥3,500</td>
+            </tr>
+            <tr>
+              <td>API 連携</td>
+              <td class="cell-highlight">
+                <span class="badge badge-best">○</span>
+              </td>
+              <td><span class="badge badge-green">○</span></td>
+              <td><span class="badge badge-red">✕</span></td>
+            </tr>
+            <tr>
+              <td>日本語対応</td>
+              <td class="cell-highlight">
+                <span class="badge badge-best">◎</span>
+              </td>
+              <td><span class="badge badge-amber">△</span></td>
+              <td><span class="badge badge-green">○</span></td>
+            </tr>
+            <tr>
+              <td>サポート体制</td>
+              <td class="cell-highlight">
+                <span class="support-tag tag-best">24時間対応</span>
+              </td>
+              <td><span class="support-tag tag-mid">営業時間のみ</span></td>
+              <td><span class="support-tag tag-low">メールのみ</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary Strip -->
+      <div class="summary-strip">
+        <div class="summary-card">
+          <div class="summary-icon">&#128176;</div>
+          <div class="summary-text">
+            <strong>A社より 37.5% 安い</strong>
+            <span>同等以上の機能で大幅コスト削減</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">&#127482;&#127479;</div>
+          <div class="summary-text">
+            <strong>日本語対応は業界最高水準</strong>
+            <span>3社中唯一の「◎」評価</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">&#128222;</div>
+          <div class="summary-text">
+            <strong>24時間サポートで安心運用</strong>
+            <span>他社にはない障害即応体制</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="source-note">※ 各社公開情報をもとに自社調査（2026年3月時点）</div>
+    </div>
+  </div>
+
+  <!-- PPTX Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('exportBtn');
+      btn.textContent = '生成中...';
+      btn.disabled = true;
+
+      try {
+        // Capture the full slide as PNG via html2canvas
+        const slideEl = document.getElementById('slide');
+        const canvas = await html2canvas(slideEl, {
+          backgroundColor: '#F1F5F9',
+          scale: 2,
+          useCORS: true
+        });
+        const slideImg = canvas.toDataURL('image/png');
+
+        // Capture comparison table separately for fidelity
+        const tableEl = document.getElementById('compareTable');
+        const tableCanvas = await html2canvas(tableEl, {
+          backgroundColor: '#FFFFFF',
+          scale: 2,
+          useCORS: true
+        });
+        const tableImg = tableCanvas.toDataURL('image/png');
+
+        // Build PPTX
+        const pptx = new PptxGenJS();
+        pptx.layout = 'LAYOUT_WIDE'; // 13.33 x 7.5 inches
+
+        // Slide 1: Title / Overview
+        const slide1 = pptx.addSlide();
+        slide1.background = { color: '1E293B' };
+
+        // Header bar accent
+        slide1.addShape(pptx.ShapeType.rect, {
+          x: 0, y: 0, w: 13.33, h: 0.08,
+          fill: { color: 'F97316' },
+          line: { type: 'none' }
+        });
+
+        slide1.addText('COMPARISON', {
+          x: 0.5, y: 0.3, w: 12, h: 0.3,
+          fontSize: 10, bold: true, color: 'F97316',
+          charSpacing: 3
+        });
+        slide1.addText('3社 AIツール機能比較', {
+          x: 0.5, y: 0.7, w: 12, h: 0.8,
+          fontSize: 36, bold: true, color: 'F8FAFC'
+        });
+        slide1.addText('自社 vs. A社 vs. B社 — 価格・機能・サポートの総合評価', {
+          x: 0.5, y: 1.5, w: 12, h: 0.4,
+          fontSize: 14, color: '94A3B8'
+        });
+
+        // Price cards
+        const priceData = [
+          { name: '自社', price: '¥5,000', highlight: true },
+          { name: 'A社',  price: '¥8,000', highlight: false },
+          { name: 'B社',  price: '¥3,500', highlight: false }
+        ];
+        priceData.forEach((p, i) => {
+          const x = 0.5 + i * 4.1;
+          slide1.addShape(pptx.ShapeType.roundRect, {
+            x, y: 2.2, w: 3.8, h: 1.6,
+            rectRadius: 0.1,
+            fill: { color: p.highlight ? 'FFF7ED' : 'FFFFFF' },
+            line: { color: p.highlight ? 'F97316' : 'E2E8F0', pt: p.highlight ? 2 : 1 }
+          });
+          if (p.highlight) {
+            slide1.addShape(pptx.ShapeType.roundRect, {
+              x: x + 1.3, y: 2.05, w: 1.2, h: 0.25,
+              rectRadius: 0.1,
+              fill: { color: 'F97316' },
+              line: { type: 'none' }
+            });
+            slide1.addText('推奨', {
+              x: x + 1.3, y: 2.05, w: 1.2, h: 0.25,
+              fontSize: 9, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle'
+            });
+          }
+          slide1.addText(p.name, {
+            x, y: 2.25, w: 3.8, h: 0.35,
+            fontSize: 11, bold: true,
+            color: p.highlight ? 'F97316' : '64748B',
+            align: 'center'
+          });
+          slide1.addText(p.price, {
+            x, y: 2.6, w: 3.8, h: 0.7,
+            fontSize: 28, bold: true,
+            color: p.highlight ? 'F97316' : '1E293B',
+            align: 'center'
+          });
+          slide1.addText('/ 月', {
+            x, y: 3.3, w: 3.8, h: 0.3,
+            fontSize: 11, color: '64748B', align: 'center'
+          });
+        });
+
+        // Comparison table as image
+        slide1.addImage({
+          data: tableImg,
+          x: 0.5, y: 4.0, w: 12.3, h: 2.5,
+          sizing: { type: 'contain', w: 12.3, h: 2.5 }
+        });
+
+        // Footer note
+        slide1.addText('※ 各社公開情報をもとに自社調査（2026年3月時点）', {
+          x: 0.5, y: 7.1, w: 12.3, h: 0.3,
+          fontSize: 9, color: '64748B', align: 'right'
+        });
+
+        // Slide 2: Full slide capture
+        const slide2 = pptx.addSlide();
+        slide2.addImage({
+          data: slideImg,
+          x: 0, y: 0, w: 13.33, h: 7.5,
+          sizing: { type: 'cover', w: 13.33, h: 7.5 }
+        });
+
+        await pptx.writeFile({ fileName: 'ai-tool-comparison.pptx' });
+
+      } catch (err) {
+        console.error('PPTX export error:', err);
+        alert('書き出しに失敗しました。コンソールを確認してください。');
+      } finally {
+        btn.innerHTML = '&#x2193; PPTX 書き出し';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

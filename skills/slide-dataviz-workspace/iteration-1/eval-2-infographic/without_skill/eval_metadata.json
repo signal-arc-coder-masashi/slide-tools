@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "eval_name": "kpi-before-after-infographic",
+  "prompt": "AI導入前後のKPI比較をインフォグラフィックでWebスライド1枚にまとめてください。導入前: 処理時間4時間、エラー率12%、月間コスト80万円。導入後: 処理時間20分、エラー率1.5%、月間コスト35万円。",
+  "assertions": [
+    { "id": "before_after_structure", "description": "Before / After を明確に分ける視覚構造がある（列・パネル・矢印など）" },
+    { "id": "all_three_kpis", "description": "処理時間・エラー率・月間コストの3指標がすべて入っている" },
+    { "id": "big_number_emphasis", "description": "数値が大きく・目立つフォント・カラーで強調されている（Big Number 的な処理）" },
+    { "id": "has_pptx_export", "description": "PPTX エクスポート機能が実装されている（html2canvas インラインも可）" }
+  ]
+}

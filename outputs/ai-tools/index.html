@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GitHub Copilot 完全解説 — Claude Code / Cursor 比較</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --bg: #f4f7fb;
+  --bg2: #eef2f9;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --text: #0f172a;
+  --muted: #64748b;
+  --faint: #f1f5f9;
+
+  --copilot: #1d6ef5;
+  --copilot-dim: rgba(29,110,245,0.08);
+  --copilot-glow: rgba(29,110,245,0.2);
+
+  --claude: #7c3aed;
+  --claude-dim: rgba(124,58,237,0.08);
+  --claude-glow: rgba(124,58,237,0.2);
+
+  --cursor: #0891b2;
+  --cursor-dim: rgba(8,145,178,0.08);
+  --cursor-glow: rgba(8,145,178,0.2);
+
+  --accent: #1d6ef5;
+  --gold: #d97706;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: var(--bg);
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--text);
+}
+
+/* ── GRID BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(29,110,245,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,110,245,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  z-index: 0;
+}
+
+/* ── SLIDES CONTAINER ── */
+#deck {
+  position: fixed; inset: 0;
+  display: flex; align-items: stretch;
+  z-index: 1;
+}
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 5vw 6vw;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.55s cubic-bezier(.4,0,.2,1), transform 0.55s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.slide.active {
+  opacity: 1; transform: translateX(0); pointer-events: all;
+}
+.slide.exit-left {
+  opacity: 0; transform: translateX(-60px);
+}
+
+/* ── PROGRESS BAR ── */
+#progress-wrap {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 100;
+  background: rgba(255,255,255,0.06);
+}
+#progress-bar {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--claude));
+  transition: width 0.4s ease;
+}
+
+/* ── NAV ── */
+#nav {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 16px; z-index: 100;
+}
+.nav-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+#slide-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
+  min-width: 52px; text-align: center;
+}
+
+/* ── KEY HINT ── */
+#key-hint {
+  position: fixed; bottom: 28px; right: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: rgba(107,122,153,0.5);
+  letter-spacing: 0.08em; z-index: 100;
+}
+
+/* ── SHARED TYPOGRAPHY ── */
+.label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.label::before { content: ''; display: block; width: 24px; height: 1px; background: currentColor; }
+
+h1.hero-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2.8rem, 6vw, 6rem);
+  font-weight: 900; line-height: 1.05; letter-spacing: -0.03em;
+  color: #0f172a;
+}
+h2.slide-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 900; line-height: 1.1; letter-spacing: -0.02em;
+  color: #0f172a; margin-bottom: 10px;
+}
+.subtitle {
+  font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.8;
+}
+
+/* ── ACCENT LINE ── */
+.accent-line {
+  width: 48px; height: 3px; border-radius: 2px;
+  background: var(--accent); margin: 20px 0 32px;
+}
+.accent-line.copilot { background: var(--copilot); }
+.accent-line.claude { background: var(--claude); }
+.accent-line.cursor { background: var(--cursor); }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px 28px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.card.copilot-card { border-color: rgba(29,110,245,0.2); }
+.card.claude-card  { border-color: rgba(124,58,237,0.2); }
+.card.cursor-card  { border-color: rgba(8,145,178,0.2); }
+
+/* ── TAG ── */
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+}
+.tag.copilot { background: var(--copilot-dim); color: var(--copilot); border: 1px solid rgba(33,136,255,0.3); }
+.tag.claude  { background: var(--claude-dim);  color: var(--claude);  border: 1px solid rgba(192,132,252,0.3); }
+.tag.cursor  { background: var(--cursor-dim);  color: var(--cursor);  border: 1px solid rgba(0,229,195,0.3); }
+
+/* ── FEATURE LIST ── */
+.feat-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feat-list li {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 14px; line-height: 1.7; color: #334155;
+}
+.feat-list li::before {
+  content: '→'; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; margin-top: 3px; flex-shrink: 0;
+}
+.feat-list li.copilot::before { color: var(--copilot); }
+.feat-list li.claude::before  { color: var(--claude); }
+.feat-list li.cursor::before  { color: var(--cursor); }
+.feat-list li.neutral::before { color: var(--accent); }
+
+/* ── COMPARISON TABLE ── */
+.cmp-table { width: 100%; border-collapse: collapse; }
+.cmp-table th, .cmp-table td {
+  padding: 12px 16px; text-align: left;
+  font-size: 13px; border-bottom: 1px solid var(--border);
+}
+.cmp-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.12em; color: var(--muted);
+  background: var(--faint); font-weight: 400;
+}
+.cmp-table td { color: #334155; }
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table .row-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--muted); font-weight: 700;
+}
+.cmp-table .col-co { color: var(--copilot); font-weight: 500; }
+.cmp-table .col-cl { color: var(--claude);  font-weight: 500; }
+.cmp-table .col-cu { color: var(--cursor);  font-weight: 500; }
+
+/* ── TOOL HEADER ── */
+.tool-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+}
+.tool-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.tool-icon.copilot { background: var(--copilot-dim); border: 1px solid rgba(33,136,255,0.3); }
+.tool-icon.claude  { background: var(--claude-dim);  border: 1px solid rgba(192,132,252,0.3); }
+.tool-icon.cursor  { background: var(--cursor-dim);  border: 1px solid rgba(0,229,195,0.3); }
+
+/* ── PLAN BADGES ── */
+.plan-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.plan-badge {
+  background: var(--faint); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px;
+  display: flex; flex-direction: column; gap: 4px; min-width: 120px;
+}
+.plan-badge .plan-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; color: var(--muted);
+}
+.plan-badge .plan-price {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px; font-weight: 700; color: #0f172a;
+}
+.plan-badge .plan-note { font-size: 11px; color: var(--muted); }
+
+/* ── GRID LAYOUTS ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: 1100px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; max-width: 1100px; }
+.content-wrap { max-width: 1100px; width: 100%; }
+
+/* ── GLOW DOTS ── */
+.glow-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; margin-right: 8px;
+  flex-shrink: 0;
+}
+.glow-dot.co { background: var(--copilot); box-shadow: 0 0 8px var(--copilot-glow); }
+.glow-dot.cl { background: var(--claude);  box-shadow: 0 0 8px var(--claude-glow); }
+.glow-dot.cu { background: var(--cursor);  box-shadow: 0 0 8px var(--cursor-glow); }
+
+/* ── BIG STAT ── */
+.stat-grid { display: flex; gap: 32px; flex-wrap: wrap; }
+.stat-item { display: flex; flex-direction: column; gap: 4px; }
+.stat-num {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.4rem; font-weight: 900; letter-spacing: -0.03em;
+}
+.stat-label { font-size: 11px; color: var(--muted); }
+
+/* ── POSITIONING MAP ── */
+.pos-map {
+  position: relative; width: 480px; height: 300px;
+  border: 1px solid var(--border); border-radius: 16px;
+  background: var(--surface); overflow: hidden;
+}
+.pos-map::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 1px; background: var(--faint);
+}
+.pos-map::after {
+  content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+  width: 1px; background: var(--faint);
+}
+.pos-label {
+  position: absolute; font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.1em; color: var(--muted);
+}
+.pos-dot {
+  position: absolute; padding: 8px 14px; border-radius: 8px;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  transform: translate(-50%, -50%);
+}
+
+/* ── USE CASE CARDS ── */
+.usecase-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; width: 100%; max-width: 1100px; }
+.usecase-card {
+  border-radius: 14px; padding: 24px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.usecase-card.co { background: var(--copilot-dim); border: 1px solid rgba(33,136,255,0.2); }
+.usecase-card.cl { background: var(--claude-dim);  border: 1px solid rgba(192,132,252,0.2); }
+.usecase-card.cu { background: var(--cursor-dim);  border: 1px solid rgba(0,229,195,0.2); }
+.usecase-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; }
+.usecase-title.co { color: var(--copilot); }
+.usecase-title.cl { color: var(--claude); }
+.usecase-title.cu { color: var(--cursor); }
+.usecase-who { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.usecase-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.usecase-list li { font-size: 12px; color: #334155; line-height: 1.6; display: flex; gap: 8px; }
+.usecase-list li::before { content: '◆'; font-size: 7px; margin-top: 5px; flex-shrink: 0; }
+.usecase-list.co li::before { color: var(--copilot); }
+.usecase-list.cl li::before { color: var(--claude); }
+.usecase-list.cu li::before { color: var(--cursor); }
+
+/* ── HERO DECORATIONS ── */
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(29,110,245,0.08); border: 1px solid rgba(29,110,245,0.2);
+  border-radius: 6px; padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--accent); letter-spacing: 0.1em;
+  margin-bottom: 28px;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+
+.hero-tools {
+  display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap;
+}
+.hero-tool-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 18px; border-radius: 30px;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700;
+  border: 1px solid; cursor: default;
+}
+.hero-tool-chip.co { color: var(--copilot); border-color: rgba(33,136,255,0.4); background: var(--copilot-dim); }
+.hero-tool-chip.cl { color: var(--claude);  border-color: rgba(192,132,252,0.4); background: var(--claude-dim); }
+.hero-tool-chip.cu { color: var(--cursor);  border-color: rgba(0,229,195,0.4);   background: var(--cursor-dim); }
+
+.hero-right {
+  position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 14px; opacity: 0.35;
+}
+.hero-code-line {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: #475569; white-space: nowrap;
+}
+
+/* ── OVERVIEW CARDS ── */
+.overview-cards { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 1100px; }
+.overview-card {
+  display: flex; align-items: center; gap: 20px;
+  padding: 18px 24px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.overview-card:hover { border-color: rgba(29,110,245,0.3); box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+.overview-card-num {
+  font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 900;
+  opacity: 0.15; min-width: 36px;
+}
+.overview-card-content { flex: 1; }
+.overview-card-title { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.overview-card-desc { font-size: 12px; color: #64748b; line-height: 1.7; }
+
+/* ── SUMMARY ── */
+.summary-list { display: flex; flex-direction: column; gap: 14px; max-width: 700px; }
+.summary-item {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px 20px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+.summary-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.summary-text { font-size: 13px; line-height: 1.8; color: #475569; }
+.summary-text strong { color: #0f172a; font-weight: 700; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+.export-btn {
+  position: fixed; top: 20px; right: 24px; z-index: 200;
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: 'JetBrains Mono',monospace;
+  font-size: 11px; letter-spacing: .06em; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: all .18s;
+}
+.export-btn:hover { border-color: var(--accent); color: var(--accent); }
+.export-btn:disabled { opacity: .5; cursor: default; }
+</style>
+</head>
+<body>
+
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<div id="deck">
+
+  <!-- ─── SLIDE 1: TITLE ─── -->
+  <section class="slide active" id="s1">
+    <div class="content-wrap">
+      <div class="hero-badge">2025 Edition — AIコーディングツール比較</div>
+      <h1 class="hero-title">GitHub<br>Copilot<br><span style="color:var(--accent)">完全解説</span></h1>
+      <p class="subtitle" style="margin-top:16px; max-width:520px; font-size:15px;">
+        Claude Code・Cursor との違いを徹底比較。<br>
+        3つのツールを正確に理解し、最適な選択と組み合わせを導く。
+      </p>
+      <div class="hero-tools">
+        <div class="hero-tool-chip co">⬡ GitHub Copilot</div>
+        <div class="hero-tool-chip cl">◈ Claude Code</div>
+        <div class="hero-tool-chip cu">⬢ Cursor</div>
+      </div>
+    </div>
+    <div class="hero-right" aria-hidden="true">
+      <div class="hero-code-line">$ claude "implement auth flow"</div>
+      <div class="hero-code-line">// Copilot suggestion accepted</div>
+      <div class="hero-code-line">@Codebase find all API routes</div>
+      <div class="hero-code-line">✓ 12 files modified</div>
+      <div class="hero-code-line">$ git commit -am "feat: ..."</div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 2: 3ツール概観 ─── -->
+  <section class="slide" id="s2">
+    <div class="content-wrap">
+      <div class="label">Overview</div>
+      <h2 class="slide-title">3ツールのポジション</h2>
+      <div class="accent-line"></div>
+
+      <div class="overview-cards">
+        <div class="overview-card">
+          <div class="overview-card-num" style="color:var(--copilot)">01</div>
+          <div class="overview-card-content">
+            <div class="overview-card-title" style="color:var(--copilot)">⬡ GitHub Copilot — IDE統合型コード補完・Chat</div>
+            <div class="overview-card-desc">既存IDEに追加する拡張機能。2021年登場の先駆者。インライン補完が核で、VS Code・JetBrainsなど主要IDEに対応。GitHub・Microsoft・OpenAIが共同開発。</div>
+          </div>
+          <div class="tag copilot">IDE拡張</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-num" style="color:var(--claude)">02</div>
+          <div class="overview-card-content">
+            <div class="overview-card-title" style="color:var(--claude)">◈ Claude Code — CLIエージェント型開発ツール</div>
+            <div class="overview-card-desc">2025年登場。ターミナルで動くAIエージェント。ファイル操作・Git・コマンド実行まで自律的に行う。Anthropicが開発。200Kトークンの深いコンテキスト理解。</div>
+          </div>
+          <div class="tag claude">CLIエージェント</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-num" style="color:var(--cursor)">03</div>
+          <div class="overview-card-content">
+            <div class="overview-card-title" style="color:var(--cursor)">⬢ Cursor — AI-first IDE（VS Codeフォーク）</div>
+            <div class="overview-card-desc">VS CodeをベースにAI機能を完全統合したIDE。Anysphereが2023年開発。マルチモデル対応（Claude・GPT・Gemini等）。Composerで複数ファイル同時編集が可能。</div>
+          </div>
+          <div class="tag cursor">AI-IDE</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 3: Copilot とは ─── -->
+  <section class="slide" id="s3">
+    <div class="two-col">
+      <div>
+        <div class="label">Tool 01</div>
+        <div class="tool-header">
+          <div class="tool-icon copilot">⬡</div>
+          <div>
+            <div class="tag copilot" style="margin-bottom:6px">GitHub Copilot</div>
+            <h2 class="slide-title" style="font-size:clamp(1.5rem,3vw,2.4rem)">業界標準の<br>AIコード補完</h2>
+          </div>
+        </div>
+        <div class="accent-line copilot"></div>
+
+        <ul class="feat-list">
+          <li class="copilot"><strong>2021年6月</strong>リリース。GitHub・Microsoft・OpenAIの共同開発</li>
+          <li class="copilot">IDE内に常駐する「<strong>AIペアプログラマー</strong>」という概念を確立</li>
+          <li class="copilot">VS Code・JetBrains・Vim・Neovim・Xcode等<strong>広範囲のIDEに対応</strong></li>
+          <li class="copilot">使用モデルは<strong>GPT-4o・Claude・Gemini等</strong>をバックエンドに採用</li>
+          <li class="copilot">GitHubのプルリク・コードレビューとの深い統合が強み</li>
+        </ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="stat-grid" style="margin-bottom:8px;">
+          <div class="stat-item">
+            <div class="stat-num" style="color:var(--copilot)">2021</div>
+            <div class="stat-label">リリース年</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" style="color:var(--copilot)">30M+</div>
+            <div class="stat-label">開発者が利用</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" style="color:var(--copilot)">10+</div>
+            <div class="stat-label">対応IDE数</div>
+          </div>
+        </div>
+
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.12em; margin-bottom:12px;">CORE STRENGTH</div>
+          <ul class="feat-list">
+            <li class="copilot">既存の開発ワークフローを変えない</li>
+            <li class="copilot">リアルタイムのインライン補完精度</li>
+            <li class="copilot">GitHub エコシステムとの完全統合</li>
+            <li class="copilot">企業向け管理機能・セキュリティポリシー</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 4: Copilot 主要機能 ─── -->
+  <section class="slide" id="s4">
+    <div class="content-wrap">
+      <div class="label">GitHub Copilot — Features</div>
+      <h2 class="slide-title">主要機能 6つ</h2>
+      <div class="accent-line copilot"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); letter-spacing:0.1em; margin-bottom:10px;">01 / INLINE COMPLETION</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px;">コード補完（Ghost Text）</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">入力しながらリアルタイムで次のコードを提案。行補完・関数補完・ブロック補完に対応。Tab で受け入れ。</div>
+        </div>
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); letter-spacing:0.1em; margin-bottom:10px;">02 / CHAT</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px;">Copilot Chat</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">IDE内のチャットパネルで質問・リファクタ・デバッグを依頼。コードを選択して「/explain」「/fix」等のコマンドが使える。</div>
+        </div>
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); letter-spacing:0.1em; margin-bottom:10px;">03 / CLI</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px;">Copilot in the CLI</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">ターミナルでシェルコマンドをAIで生成・解説。「gh copilot suggest」でコマンドを自然言語から生成。</div>
+        </div>
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); letter-spacing:0.1em; margin-bottom:10px;">04 / WORKSPACE</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px;">Copilot Workspace</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">GitHub Issue から実装計画を自動作成。ブランチ・PR・コード変更を一括で提案するエージェント機能。</div>
+        </div>
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); letter-spacing:0.1em; margin-bottom:10px;">05 / CODE REVIEW</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px;">AIコードレビュー</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">Pull Requestに対してAIが自動レビューコメントを付与。バグ・セキュリティ問題・改善点を指摘。</div>
+        </div>
+        <div class="card copilot-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); letter-spacing:0.1em; margin-bottom:10px;">06 / EXTENSIONS</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px;">Copilot Extensions</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">サードパーティサービスをCopilot Chatに統合する拡張機構。Sentry・Docker・Datadog等と連携可能。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 5: Copilot プラン ─── -->
+  <section class="slide" id="s5">
+    <div class="two-col">
+      <div>
+        <div class="label">GitHub Copilot — Pricing</div>
+        <h2 class="slide-title">対応IDE・<br>プラン・価格</h2>
+        <div class="accent-line copilot"></div>
+        <ul class="feat-list" style="margin-bottom:20px;">
+          <li class="copilot">VS Code / Visual Studio</li>
+          <li class="copilot">JetBrains IDE 全製品（IntelliJ・PyCharm等）</li>
+          <li class="copilot">Vim / Neovim</li>
+          <li class="copilot">Xcode（Apple開発向け）</li>
+          <li class="copilot">Eclipse・Azure Data Studio</li>
+          <li class="copilot">GitHub.com（ブラウザ上でも利用可）</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.12em; margin-bottom:16px;">PLANS</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="card copilot-card" style="padding:16px 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--copilot);">Free</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--text);">$0</div>
+            </div>
+            <div style="font-size:11px; color:var(--muted);">月2,000補完 / 50チャット / GPT-4o mini・Claude 3.5 Sonnet</div>
+          </div>
+          <div class="card copilot-card" style="padding:16px 20px; border-color:rgba(33,136,255,0.5);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--copilot);">Pro</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--text);">$10<span style="font-size:11px; font-weight:400; color:var(--muted);">/月</span></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted);">補完・チャット無制限 / GPT-4o・Claude 3.7 Sonnet・Gemini等</div>
+          </div>
+          <div class="card copilot-card" style="padding:16px 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--copilot);">Business</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--text);">$19<span style="font-size:11px; font-weight:400; color:var(--muted);">/月・ユーザー</span></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted);">チーム管理・ポリシー設定・監査ログ・VPN対応</div>
+          </div>
+          <div class="card copilot-card" style="padding:16px 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--copilot);">Enterprise</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--text);">$39<span style="font-size:11px; font-weight:400; color:var(--muted);">/月・ユーザー</span></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted);">ナレッジベース統合・社内コード学習・高度なセキュリティ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 6: Claude Code とは ─── -->
+  <section class="slide" id="s6">
+    <div class="two-col">
+      <div>
+        <div class="label">Tool 02</div>
+        <div class="tool-header">
+          <div class="tool-icon claude">◈</div>
+          <div>
+            <div class="tag claude" style="margin-bottom:6px">Claude Code</div>
+            <h2 class="slide-title" style="font-size:clamp(1.5rem,3vw,2.4rem)">ターミナルから<br>動くAIエージェント</h2>
+          </div>
+        </div>
+        <div class="accent-line claude"></div>
+
+        <ul class="feat-list">
+          <li class="claude"><strong>2025年</strong>リリース。Anthropicが開発したCLIツール</li>
+          <li class="claude">IDE不要。<strong>ターミナルで起動し</strong>、プロジェクト全体を把握して作業</li>
+          <li class="claude">ファイル作成・編集・Git・コマンド実行まで<strong>自律的に実行</strong></li>
+          <li class="claude"><strong>200Kトークン</strong>の大きなコンテキストウィンドウ</li>
+          <li class="claude">CLAUDE.mdでプロジェクトルール・エージェント設計が可能</li>
+        </ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="card claude-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--claude); letter-spacing:0.1em; margin-bottom:12px;">WHAT MAKES IT DIFFERENT</div>
+          <ul class="feat-list">
+            <li class="claude"><strong>エージェント型</strong>：一つの指示で複数ファイルを跨ぐタスクを完遂</li>
+            <li class="claude">IDEに依存しない（どの環境でも同じ操作感）</li>
+            <li class="claude">Agent SDK でマルチエージェントシステムの構築も可能</li>
+            <li class="claude">Permission モードで自律度をコントロール</li>
+          </ul>
+        </div>
+        <div class="card claude-card" style="background:rgba(192,132,252,0.05);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.1em; margin-bottom:10px;">TERMINAL EXAMPLE</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:12px; line-height:2; color:#475569;">
+            <span style="color:var(--cursor);">$</span> claude<br>
+            <span style="color:var(--muted);">&gt;</span> <span style="color:#e8edf5;">認証フローを実装して、テストも書いて</span><br>
+            <span style="color:var(--claude);">✓</span> auth.ts を作成<br>
+            <span style="color:var(--claude);">✓</span> auth.test.ts を作成<br>
+            <span style="color:var(--claude);">✓</span> index.ts にインポート追加
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 7: Cursor とは ─── -->
+  <section class="slide" id="s7">
+    <div class="two-col">
+      <div>
+        <div class="label">Tool 03</div>
+        <div class="tool-header">
+          <div class="tool-icon cursor">⬢</div>
+          <div>
+            <div class="tag cursor" style="margin-bottom:6px">Cursor</div>
+            <h2 class="slide-title" style="font-size:clamp(1.5rem,3vw,2.4rem)">AI-first IDE<br>VSCodeフォーク</h2>
+          </div>
+        </div>
+        <div class="accent-line cursor"></div>
+
+        <ul class="feat-list">
+          <li class="cursor"><strong>2023年</strong>リリース。Anysphereが開発</li>
+          <li class="cursor">VS Codeをベースに<strong>IDE自体をAI統合</strong>した開発環境</li>
+          <li class="cursor">Claude・GPT-4o・Gemini等<strong>複数モデルを切り替えて利用</strong>可能</li>
+          <li class="cursor">VS Code の拡張機能・設定・キーバインドをそのまま引き継ぎ</li>
+          <li class="cursor">月間アクティブユーザーが急成長中</li>
+        </ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="card cursor-card">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cursor); letter-spacing:0.1em; margin-bottom:12px;">KEY FEATURES</div>
+          <ul class="feat-list">
+            <li class="cursor"><strong>Composer（Agent）</strong>：複数ファイルを自律的に同時編集・作成</li>
+            <li class="cursor"><strong>@Codebase</strong>：リポジトリ全体をコンテキストに指定してChat</li>
+            <li class="cursor"><strong>Tab補完</strong>：次の編集を先読みして提案（インライン補完の進化版）</li>
+            <li class="cursor">Web検索・ドキュメント参照（@Web, @Docs）</li>
+          </ul>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="card cursor-card" style="padding:14px 16px;">
+            <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">FREE</div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:16px;">$0</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:4px;">月2,000補完・50 slow requests</div>
+          </div>
+          <div class="card cursor-card" style="padding:14px 16px; border-color:rgba(0,229,195,0.4);">
+            <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">PRO</div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:16px;">$20<span style="font-size:11px; font-weight:400; color:var(--muted);">/月</span></div>
+            <div style="font-size:11px; color:var(--muted); margin-top:4px;">無制限補完・500 fast requests</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 8: 比較表 ─── -->
+  <section class="slide" id="s8">
+    <div class="content-wrap">
+      <div class="label">Comparison</div>
+      <h2 class="slide-title">3ツール 徹底比較</h2>
+      <div class="accent-line"></div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th style="width:160px;">項目</th>
+              <th><span class="glow-dot co"></span>GitHub Copilot</th>
+              <th><span class="glow-dot cl"></span>Claude Code</th>
+              <th><span class="glow-dot cu"></span>Cursor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">形態</td>
+              <td class="col-co">IDE 拡張機能</td>
+              <td class="col-cl">CLI（ターミナル）</td>
+              <td class="col-cu">AI-first IDE</td>
+            </tr>
+            <tr>
+              <td class="row-label">主な用途</td>
+              <td class="col-co">インライン補完・Chat</td>
+              <td class="col-cl">大規模タスク自動実行</td>
+              <td class="col-cu">統合AI開発環境</td>
+            </tr>
+            <tr>
+              <td class="row-label">AIモデル</td>
+              <td>GPT-4o・Claude・Gemini等</td>
+              <td class="col-cl">Claude 専用</td>
+              <td class="col-cu">マルチモデル（自由選択）</td>
+            </tr>
+            <tr>
+              <td class="row-label">自律性</td>
+              <td>低〜中（補完・提案）</td>
+              <td class="col-cl" style="font-weight:700;">高（エージェント実行）</td>
+              <td class="col-cu">中〜高（Agentモード）</td>
+            </tr>
+            <tr>
+              <td class="row-label">IDE依存</td>
+              <td>必要（既存IDEに追加）</td>
+              <td class="col-cl">不要（ターミナルのみ）</td>
+              <td class="col-cu">Cursor自体がIDE</td>
+            </tr>
+            <tr>
+              <td class="row-label">複数ファイル操作</td>
+              <td>Workspace（限定的）</td>
+              <td class="col-cl" style="font-weight:700;">得意（横断的に実行）</td>
+              <td class="col-cu">Composerで対応</td>
+            </tr>
+            <tr>
+              <td class="row-label">GitHub 連携</td>
+              <td class="col-co" style="font-weight:700;">最強（PR・Issue統合）</td>
+              <td>Git CLI 経由</td>
+              <td>拡張機能で対応</td>
+            </tr>
+            <tr>
+              <td class="row-label">価格（個人）</td>
+              <td>Free〜$10/月</td>
+              <td class="col-cl">Pro $20/月〜</td>
+              <td class="col-cu">Free〜$20/月</td>
+            </tr>
+            <tr>
+              <td class="row-label">VSCode互換</td>
+              <td class="col-co">完全対応</td>
+              <td>IDE非依存</td>
+              <td class="col-cu">フォーク（ほぼ互換）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 9: 使い分けガイド ─── -->
+  <section class="slide" id="s9">
+    <div class="content-wrap">
+      <div class="label">Decision Guide</div>
+      <h2 class="slide-title">どれを選ぶか</h2>
+      <div class="accent-line"></div>
+
+      <div class="usecase-grid">
+        <div class="usecase-card co">
+          <div class="tag copilot" style="align-self:flex-start;">⬡ Copilot を選ぶ</div>
+          <div class="usecase-who">こんな人・状況に最適</div>
+          <ul class="usecase-list co">
+            <li>今のIDEを変えたくない</li>
+            <li>コード補完をメインに使いたい</li>
+            <li>チーム全員に同じ環境を配布したい（Business/Enterprise）</li>
+            <li>GitHub のPR・Issue ワークフローで使いたい</li>
+            <li>企業のセキュリティ要件が厳しい</li>
+            <li>まず無料で試してみたい</li>
+          </ul>
+        </div>
+        <div class="usecase-card cl">
+          <div class="tag claude" style="align-self:flex-start;">◈ Claude Code を選ぶ</div>
+          <div class="usecase-who">こんな人・状況に最適</div>
+          <ul class="usecase-list cl">
+            <li>「〇〇を全部実装して」という大きな指示を出したい</li>
+            <li>複数ファイルを横断する変更を一括でやってほしい</li>
+            <li>IDE に縛られず、どこでも同じ操作をしたい</li>
+            <li>AIエージェントをカスタム設計・組み合わせたい</li>
+            <li>Claudeの長文理解力（200K）を最大限活用したい</li>
+          </ul>
+        </div>
+        <div class="usecase-card cu">
+          <div class="tag cursor" style="align-self:flex-start;">⬢ Cursor を選ぶ</div>
+          <div class="usecase-who">こんな人・状況に最適</div>
+          <ul class="usecase-list cu">
+            <li>AI統合IDEに完全移行したい</li>
+            <li>状況に応じてAIモデルを切り替えたい</li>
+            <li>VSCodeの慣れた環境を保ちつつAIを強化したい</li>
+            <li>コードベース全体を参照しながら会話したい</li>
+            <li>GUIで直感的にAI機能を操作したい</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 10: 組み合わせ戦略 ─── -->
+  <section class="slide" id="s10">
+    <div class="two-col">
+      <div>
+        <div class="label">Strategy</div>
+        <h2 class="slide-title">競合ではなく<br>"役割分担"として使う</h2>
+        <div class="accent-line"></div>
+        <p style="font-size:14px; color:var(--muted); line-height:1.9; max-width:480px;">
+          3つのツールは競合ではなく、それぞれが異なる「仕事の粒度」を担う。
+          目的ごとに最適なツールを使い分け、あるいは組み合わせることで
+          開発速度と品質が最大化される。
+        </p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="card" style="padding:18px 22px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); margin-bottom:10px; letter-spacing:0.1em;">PATTERN 01 — スタンダード</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div class="tag copilot">Copilot</div>
+            <span style="color:var(--muted); font-size:12px;">+</span>
+            <div class="tag claude">Claude Code</div>
+          </div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">普段のコーディングはCopilotで補完・Chat。大きな機能追加やリファクタはClaude Codeに任せる。</div>
+        </div>
+        <div class="card" style="padding:18px 22px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); margin-bottom:10px; letter-spacing:0.1em;">PATTERN 02 — IDE乗り換え派</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div class="tag cursor">Cursor</div>
+            <span style="color:var(--muted); font-size:12px;">+</span>
+            <div class="tag claude">Claude Code</div>
+          </div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">CursorをメインIDEとして使いながら、CLIの自律タスクはClaude Codeで実行。モデルをClaude統一。</div>
+        </div>
+        <div class="card" style="padding:18px 22px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); margin-bottom:10px; letter-spacing:0.1em;">PATTERN 03 — チーム導入</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div class="tag copilot">Copilot Business</div>
+          </div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.7;">チーム全員に同じポリシーで配布。管理・監査ログが必要な企業環境ではCopilot Businessが現実的。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SLIDE 11: まとめ ─── -->
+  <section class="slide" id="s11">
+    <div class="two-col">
+      <div>
+        <div class="label">Summary</div>
+        <h2 class="slide-title">まとめ</h2>
+        <div class="accent-line"></div>
+        <div class="summary-list">
+          <div class="summary-item">
+            <div class="summary-icon">⬡</div>
+            <div class="summary-text">
+              <strong>GitHub Copilot</strong> は業界標準のIDE統合型。既存環境を変えず、GitHub連携が最強。企業導入に向いている。
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-icon">◈</div>
+            <div class="summary-text">
+              <strong>Claude Code</strong> はエージェント型の最前線。「複数ファイルを横断して丸ごと実装」という大きなタスクに強い。
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-icon">⬢</div>
+            <div class="summary-text">
+              <strong>Cursor</strong> はAI-native IDEへの乗り換え。VSCode資産を活かしつつ、GUI上でAIをフル活用したい人向け。
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-icon" style="color:var(--gold);">◎</div>
+            <div class="summary-text">
+              3つは<strong>競合ではなく役割分担</strong>。補完→対話→エージェントの粒度ごとに使い分けることで開発効率が最大化。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:center; gap:24px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.12em;">QUICK REFERENCE</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--copilot-dim); border:1px solid rgba(33,136,255,0.2); border-radius:10px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--copilot); min-width:80px;">補完・Chat</span>
+            <span style="font-size:12px; color:#334155;">→ GitHub Copilot</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--claude-dim); border:1px solid rgba(192,132,252,0.2); border-radius:10px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--claude); min-width:80px;">大タスク自動化</span>
+            <span style="font-size:12px; color:#334155;">→ Claude Code</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--cursor-dim); border:1px solid rgba(0,229,195,0.2); border-radius:10px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cursor); min-width:80px;">AI-IDE統合</span>
+            <span style="font-size:12px; color:#334155;">→ Cursor</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(240,160,80,0.08); border:1px solid rgba(240,160,80,0.2); border-radius:10px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gold); min-width:80px;">最強の組み合わせ</span>
+            <span style="font-size:12px; color:#334155;">→ 用途に応じて併用</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<button class="export-btn" id="export-btn" onclick="generatePPTX()">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  PPTXを書き出す
+</button>
+<div id="nav">
+  <button class="nav-btn" id="btn-prev">&#8592;</button>
+  <div id="slide-counter">1 / 11</div>
+  <button class="nav-btn" id="btn-next">&#8594;</button>
+</div>
+<div id="key-hint">← → / Space で移動</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+let animating = false;
+
+const counter = document.getElementById('slide-counter');
+const bar = document.getElementById('progress-bar');
+
+function goTo(next) {
+  if (animating || next < 0 || next >= total || next === current) return;
+  animating = true;
+
+  const prev = current;
+  slides[prev].classList.add('exit-left');
+  slides[prev].classList.remove('active');
+
+  current = next;
+  slides[current].classList.add('active');
+
+  counter.textContent = `${current + 1} / ${total}`;
+  bar.style.width = `${((current + 1) / total) * 100}%`;
+
+  setTimeout(() => {
+    slides[prev].classList.remove('exit-left');
+    animating = false;
+  }, 560);
+}
+
+document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
+document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); goTo(current + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+});
+
+// Touch swipe
+let touchX = 0;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) goTo(dx < 0 ? current + 1 : current - 1);
+});
+
+// Init
+bar.style.width = `${(1 / total) * 100}%`;
+
+// ─── PPTX EXPORT ───
+async function generatePPTX() {
+  const btn = document.getElementById('export-btn');
+  btn.disabled = true; btn.textContent = '生成中...';
+
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE';
+  pptx.title  = 'GitHub Copilot 完全解説 — Claude Code / Cursor 比較';
+
+  const C = {
+    bg:'F4F7FB', dark:'050810', white:'FFFFFF',
+    text:'0F172A', muted:'64748B', faint:'F1F5F9',
+    co:'1D6EF5', coDim:'EBF2FF', coDeep:'1558D0',
+    cl:'7C3AED', clDim:'F5F0FF', clDeep:'6D28D9',
+    cu:'0891B2', cuDim:'E6F6FA', cuDeep:'0E7490',
+    border:'E2E8F0', accent:'1D6EF5',
+  };
+  const F = { disp:'Georgia', body:'Calibri', mono:'Courier New' };
+
+  function newSlide(bg){ const s=pptx.addSlide(); s.background={color:bg||C.bg}; return s; }
+  function hd(s,kicker,title,accent){
+    s.addText(kicker.toUpperCase(),{x:.5,y:.55,w:12,h:.3,fontSize:9,color:C.muted,fontFace:F.mono,charSpacing:3,bold:true});
+    s.addShape(pptx.ShapeType.rect,{x:.5,y:.92,w:.42,h:.05,fill:{color:accent},line:{type:'none'}});
+    s.addText(title,{x:.5,y:.95,w:12,h:.85,fontSize:28,color:C.text,bold:true,fontFace:F.disp});
+  }
+  function card(s,x,y,w,h,lbl,body,accent){
+    s.addShape(pptx.ShapeType.roundRect,{x,y,w,h,rectRadius:.07,fill:{color:C.white},line:{color:accent,pt:1.2}});
+    if(lbl)  s.addText(lbl, {x:x+.15,y:y+.13,w:w-.3,h:.2, fontSize:9, color:accent,fontFace:F.mono,bold:true});
+    if(body) s.addText(body,{x:x+.15,y:y+(lbl?.35:.14),w:w-.3,h:h-(lbl?.48:.28),fontSize:11.5,color:C.text,fontFace:F.body,lineSpacingMultiple:1.4,valign:'top'});
+  }
+  function buls(s,x,y,w,items,accent){
+    items.forEach((txt,i)=>s.addText(
+      [{text:'→ ',options:{color:accent,bold:true,fontSize:12}},{text:txt,options:{color:C.text,fontSize:12}}],
+      {x,y:y+i*.42,w,h:.42,fontFace:F.body,lineSpacingMultiple:1.3,valign:'middle'}));
+  }
+
+  /* ══ SLIDE 1: TITLE ══ */
+  {
+    const s=newSlide(C.dark);
+    s.addText('2025 Edition — AIコーディングツール比較',{x:.6,y:.48,w:11,h:.28,fontSize:10,color:'888888',fontFace:F.mono});
+    s.addText('GitHub\nCopilot\n完全解説',{x:.6,y:.85,w:10,h:3.5,fontSize:52,color:C.white,bold:true,fontFace:F.disp,lineSpacingMultiple:1.15});
+    s.addShape(pptx.ShapeType.rect,{x:.6,y:4.5,w:3.2,h:.05,fill:{color:C.co},line:{type:'none'}});
+    s.addText('Claude Code・Cursor との違いを徹底比較',{x:.6,y:4.7,w:11,h:.5,fontSize:16,color:'CCCCCC',fontFace:F.disp,italic:true});
+    s.addText('3つのツールを正確に理解し、最適な選択と組み合わせを導く。',{x:.6,y:5.35,w:9,h:.6,fontSize:13,color:'888888',fontFace:F.body,lineSpacingMultiple:1.7});
+    const chips=[['⬡ GitHub Copilot',C.co,'1A2A4A'],['◈ Claude Code',C.cl,'2A1A4A'],['⬢ Cursor',C.cu,'0A2530']];
+    chips.forEach(([t,col,bg],i)=>{
+      s.addShape(pptx.ShapeType.roundRect,{x:.6+i*3.1,y:6.1,w:2.8,h:.42,rectRadius:.2,fill:{color:bg},line:{color:col,pt:1.5}});
+      s.addText(t,{x:.6+i*3.1,y:6.1,w:2.8,h:.42,fontSize:12,color:col,bold:true,align:'center',valign:'middle',fontFace:F.body});
+    });
+  }
+
+  /* ══ SLIDE 2: 3ツールのポジション ══ */
+  {
+    const s=newSlide();
+    hd(s,'Overview','3ツールのポジション',C.co);
+    const tools=[
+      [C.co,'⬡ GitHub Copilot — IDE統合型コード補完・Chat','既存IDEに追加する拡張機能。2021年登場の先駆者。インライン補完が核で、VS Code・JetBrainsなど主要IDEに対応。GitHub・Microsoft・OpenAIが共同開発。','IDE拡張'],
+      [C.cl,'◈ Claude Code — CLIエージェント型開発ツール','2025年登場。ターミナルで動くAIエージェント。ファイル操作・Git・コマンド実行まで自律的に行う。Anthropicが開発。200Kトークンの深いコンテキスト理解。','CLIエージェント'],
+      [C.cu,'⬢ Cursor — AI-first IDE（VS Codeフォーク）','VS CodeをベースにAI機能を完全統合したIDE。Anysphereが2023年開発。マルチモデル対応（Claude・GPT・Gemini等）。Composerで複数ファイル同時編集が可能。','AI-IDE'],
+    ];
+    tools.forEach(([color,title,desc,tag],i)=>{
+      const y=2.0+i*1.65;
+      s.addShape(pptx.ShapeType.roundRect,{x:.5,y,w:12.3,h:1.52,rectRadius:.08,fill:{color:C.white},line:{color:C.border,pt:1}});
+      s.addText(String(i+1).padStart(2,'0'),{x:.65,y,w:.7,h:1.52,fontSize:24,color:color,bold:true,fontFace:F.disp,align:'center',valign:'middle',italic:true,transparency:70});
+      s.addText(title,{x:1.5,y:y+.16,w:9.5,h:.35,fontSize:13,color:color,bold:true,fontFace:F.body});
+      s.addText(desc,{x:1.5,y:y+.52,w:9.5,h:.82,fontSize:11.5,color:C.muted,fontFace:F.body,lineSpacingMultiple:1.5});
+      s.addShape(pptx.ShapeType.roundRect,{x:11.3,y:y+.52,w:1.35,h:.38,rectRadius:.12,fill:{color:color+'18'},line:{color:color+'60',pt:1}});
+      s.addText(tag,{x:11.3,y:y+.52,w:1.35,h:.38,fontSize:9,color,align:'center',valign:'middle',bold:true,fontFace:F.mono});
+    });
+  }
+
+  /* ══ SLIDE 3: Copilot とは ══ */
+  {
+    const s=newSlide();
+    hd(s,'Tool 01','GitHub Copilot — 業界標準のAIコード補完',C.co);
+    buls(s,.5,2.1,6.3,[
+      '2021年6月リリース。GitHub・Microsoft・OpenAIの共同開発',
+      'IDE内に常駐する「AIペアプログラマー」という概念を確立',
+      'VS Code・JetBrains・Vim・Neovim・Xcode等広範囲のIDEに対応',
+      '使用モデルはGPT-4o・Claude・Gemini等をバックエンドに採用',
+      'GitHubのプルリク・コードレビューとの深い統合が強み',
+    ],C.co);
+    s.addText('2021',{x:7.2,y:2.0,w:1.8,h:.65,fontSize:30,color:C.co,bold:true,fontFace:F.disp});
+    s.addText('リリース年',{x:7.2,y:2.68,w:1.8,h:.22,fontSize:10,color:C.muted});
+    s.addText('30M+',{x:9.2,y:2.0,w:1.8,h:.65,fontSize:30,color:C.co,bold:true,fontFace:F.disp});
+    s.addText('開発者が利用',{x:9.2,y:2.68,w:1.8,h:.22,fontSize:10,color:C.muted});
+    s.addText('10+',{x:11.1,y:2.0,w:1.8,h:.65,fontSize:30,color:C.co,bold:true,fontFace:F.disp});
+    s.addText('対応IDE数',{x:11.1,y:2.68,w:1.8,h:.22,fontSize:10,color:C.muted});
+    card(s,7.1,3.1,5.7,1.6,'CORE STRENGTH',
+      '・既存の開発ワークフローを変えない\n・リアルタイムのインライン補完精度\n・GitHub エコシステムとの完全統合\n・企業向け管理機能・セキュリティポリシー',C.co);
+  }
+
+  /* ══ SLIDE 4: Copilot 主要機能 ══ */
+  {
+    const s=newSlide();
+    hd(s,'GitHub Copilot — Features','主要機能 6つ',C.co);
+    const feats=[
+      ['01 / INLINE COMPLETION','コード補完（Ghost Text）\n入力しながらリアルタイムで次のコードを提案。行補完・関数補完・ブロック補完に対応。'],
+      ['02 / CHAT','Copilot Chat\nIDE内のチャットパネルで質問・リファクタ・デバッグを依頼。/explain、/fixコマンドが使える。'],
+      ['03 / CLI','Copilot in the CLI\nターミナルでシェルコマンドをAIで生成・解説。自然言語からコマンドを生成。'],
+      ['04 / WORKSPACE','Copilot Workspace\nGitHub IssueからPR・コード変更を一括で提案するエージェント機能。'],
+      ['05 / CODE REVIEW','AIコードレビュー\nPull Requestに対してAIが自動レビューコメントを付与。バグ・改善点を指摘。'],
+      ['06 / EXTENSIONS','Copilot Extensions\nSentry・Docker・Datadog等のサードパーティサービスをCopilot Chatに統合。'],
+    ];
+    feats.forEach(([lbl,body],i)=>{ card(s,.5+(i%3)*4.27,2.0+Math.floor(i/3)*2.42,4.1,2.28,lbl,body,C.co); });
+  }
+
+  /* ══ SLIDE 5: Copilot プラン ══ */
+  {
+    const s=newSlide();
+    hd(s,'GitHub Copilot — Pricing','対応IDE・プラン・価格',C.co);
+    buls(s,.5,2.1,5.8,['VS Code / Visual Studio','JetBrains IDE 全製品（IntelliJ・PyCharm等）','Vim / Neovim','Xcode（Apple開発向け）','GitHub.com（ブラウザ上でも利用可）'],C.co);
+    const plans=[['Free','$0','月2,000補完 / 50チャット / GPT-4o mini・Claude 3.5 Sonnet'],['Pro','$10/月','補完・チャット無制限 / GPT-4o・Claude 3.7 Sonnet・Gemini等'],['Business','$19/月・ユーザー','チーム管理・ポリシー設定・監査ログ・VPN対応'],['Enterprise','$39/月・ユーザー','ナレッジベース統合・社内コード学習・高度なセキュリティ']];
+    plans.forEach(([name,price,desc],i)=>{
+      const y=2.1+i*1.15;
+      s.addShape(pptx.ShapeType.roundRect,{x:6.9,y,w:5.9,h:1.05,rectRadius:.07,fill:{color:C.white},line:{color:C.co+'44',pt:1.2}});
+      s.addText(name, {x:7.1,y:y+.13,w:2,h:.3,fontSize:13,color:C.co,bold:true,fontFace:F.disp});
+      s.addText(price,{x:10.5,y:y+.08,w:2.1,h:.4,fontSize:18,color:C.text,bold:true,fontFace:F.disp,align:'right'});
+      s.addText(desc, {x:7.1,y:y+.52,w:5.5,h:.4,fontSize:11,color:C.muted,fontFace:F.body});
+    });
+  }
+
+  /* ══ SLIDE 6: Claude Code とは ══ */
+  {
+    const s=newSlide();
+    hd(s,'Tool 02','Claude Code — ターミナルから動くAIエージェント',C.cl);
+    buls(s,.5,2.1,6.3,[
+      '2025年リリース。Anthropicが開発したCLIツール',
+      'IDE不要。ターミナルで起動し、プロジェクト全体を把握して作業',
+      'ファイル作成・編集・Git・コマンド実行まで自律的に実行',
+      '200Kトークンの大きなコンテキストウィンドウ',
+      'CLAUDE.mdでプロジェクトルール・エージェント設計が可能',
+    ],C.cl);
+    card(s,7.1,2.0,5.7,2.0,'WHAT MAKES IT DIFFERENT',
+      '・エージェント型：一つの指示で複数ファイルを跨ぐタスクを完遂\n・IDEに依存しない（どの環境でも同じ操作感）\n・Agent SDKでマルチエージェントシステムの構築も可能\n・Permissionモードで自律度をコントロール',C.cl);
+    card(s,7.1,4.2,5.7,2.65,'TERMINAL EXAMPLE',
+      '$ claude\n> 認証フローを実装して、テストも書いて\n✓ auth.ts を作成\n✓ auth.test.ts を作成\n✓ index.ts にインポート追加',C.cl);
+  }
+
+  /* ══ SLIDE 7: Cursor とは ══ */
+  {
+    const s=newSlide();
+    hd(s,'Tool 03','Cursor — AI-first IDE（VS Codeフォーク）',C.cu);
+    buls(s,.5,2.1,6.3,[
+      '2023年リリース。Anysphereが開発',
+      'VS CodeをベースにIDE自体をAI統合した開発環境',
+      'Claude・GPT-4o・Gemini等複数モデルを切り替えて利用可能',
+      'VS Code の拡張機能・設定・キーバインドをそのまま引き継ぎ',
+      '月間アクティブユーザーが急成長中',
+    ],C.cu);
+    card(s,7.1,2.0,5.7,2.0,'KEY FEATURES',
+      '・Composer（Agent）：複数ファイルを自律的に同時編集・作成\n・@Codebase：リポジトリ全体をコンテキストに指定してChat\n・Tab補完：次の編集を先読みして提案\n・Web検索・ドキュメント参照（@Web, @Docs）',C.cu);
+    s.addShape(pptx.ShapeType.roundRect,{x:7.1,y:4.2,w:2.7,h:2.65,rectRadius:.07,fill:{color:C.white},line:{color:C.cu+'44',pt:1}});
+    s.addText('FREE',{x:7.2,y:4.36,w:2.5,h:.25,fontSize:9,color:C.muted,fontFace:F.mono});
+    s.addText('$0',{x:7.2,y:4.64,w:2.5,h:.5,fontSize:28,color:C.text,bold:true,fontFace:F.disp});
+    s.addText('月2,000補完・50 slow requests',{x:7.2,y:5.2,w:2.5,h:.4,fontSize:10,color:C.muted,fontFace:F.body});
+    s.addShape(pptx.ShapeType.roundRect,{x:10.1,y:4.2,w:2.7,h:2.65,rectRadius:.07,fill:{color:C.white},line:{color:C.cu,pt:1.2}});
+    s.addText('PRO',{x:10.2,y:4.36,w:2.5,h:.25,fontSize:9,color:C.muted,fontFace:F.mono});
+    s.addText('$20/月',{x:10.2,y:4.64,w:2.5,h:.5,fontSize:22,color:C.text,bold:true,fontFace:F.disp});
+    s.addText('無制限補完・500 fast requests',{x:10.2,y:5.2,w:2.5,h:.4,fontSize:10,color:C.muted,fontFace:F.body});
+  }
+
+  /* ══ SLIDE 8: 比較表 ══ */
+  {
+    const s=newSlide();
+    hd(s,'Comparison','3ツール 徹底比較',C.co);
+    const TH={fill:{color:'F1F5F9'},color:C.muted,fontFace:F.mono,fontSize:10,bold:true};
+    const TD={color:C.text,fontFace:F.body,fontSize:11.5};
+    const TCO={color:C.coDeep,fontFace:F.body,fontSize:11.5,bold:true};
+    const TCL={color:C.clDeep,fontFace:F.body,fontSize:11.5,bold:true};
+    const TCU={color:C.cuDeep,fontFace:F.body,fontSize:11.5,bold:true};
+    const rows=[
+      [{text:'項目',options:TH},{text:'⬡ GitHub Copilot',options:{...TH,color:C.coDeep}},{text:'◈ Claude Code',options:{...TH,color:C.clDeep}},{text:'⬢ Cursor',options:{...TH,color:C.cuDeep}}],
+      [{text:'形態',options:TD},{text:'IDE 拡張機能',options:TCO},{text:'CLI（ターミナル）',options:TCL},{text:'AI-first IDE',options:TCU}],
+      [{text:'主な用途',options:TD},{text:'インライン補完・Chat',options:TCO},{text:'大規模タスク自動実行',options:TCL},{text:'統合AI開発環境',options:TCU}],
+      [{text:'AIモデル',options:TD},{text:'GPT-4o・Claude・Gemini等',options:TCO},{text:'Claude 専用',options:TCL},{text:'マルチモデル（自由選択）',options:TCU}],
+      [{text:'自律性',options:TD},{text:'低〜中（補完・提案）',options:TD},{text:'高（エージェント実行）',options:TCL},{text:'中〜高（Agentモード）',options:TCU}],
+      [{text:'IDE依存',options:TD},{text:'必要（既存IDEに追加）',options:TCO},{text:'不要（ターミナルのみ）',options:TCL},{text:'Cursor自体がIDE',options:TCU}],
+      [{text:'GitHub 連携',options:TD},{text:'最強（PR・Issue統合）',options:TCO},{text:'Git CLI 経由',options:TD},{text:'拡張機能で対応',options:TD}],
+      [{text:'価格（個人）',options:TD},{text:'Free〜$10/月',options:TCO},{text:'Pro $20/月〜',options:TCL},{text:'Free〜$20/月',options:TCU}],
+    ];
+    s.addTable(rows,{x:.5,y:2.0,w:12.3,rowH:.46,colW:[2.2,3.37,3.37,3.36],border:{type:'solid',color:C.border,pt:.8}});
+  }
+
+  /* ══ SLIDE 9: 使い分けガイド ══ */
+  {
+    const s=newSlide();
+    hd(s,'Decision Guide','どれを選ぶか',C.co);
+    const cols=[
+      [C.co,'⬡ Copilot を選ぶ',['今のIDEを変えたくない','コード補完をメインに使いたい','チーム全員に同じ環境を配布したい','GitHub のPR・Issue ワークフローで使いたい','企業のセキュリティ要件が厳しい','まず無料で試してみたい']],
+      [C.cl,'◈ Claude Code を選ぶ',['「〇〇を全部実装して」という大きな指示を出したい','複数ファイルを横断する変更を一括でやってほしい','IDE に縛られず、どこでも同じ操作をしたい','AIエージェントをカスタム設計・組み合わせたい','Claudeの長文理解力（200K）を最大限活用したい']],
+      [C.cu,'⬢ Cursor を選ぶ',['AI統合IDEに完全移行したい','状況に応じてAIモデルを切り替えたい','VSCodeの慣れた環境を保ちつつAIを強化したい','コードベース全体を参照しながら会話したい','GUIで直感的にAI機能を操作したい']],
+    ];
+    cols.forEach(([color,title,items],i)=>{
+      const x=.5+i*4.27;
+      s.addShape(pptx.ShapeType.roundRect,{x,y:2.0,w:4.1,h:5.3,rectRadius:.1,fill:{color:color+'12'},line:{color:color+'44',pt:1.2}});
+      s.addText(title,{x:x+.15,y:2.16,w:3.8,h:.38,fontSize:13,color,bold:true,fontFace:F.disp});
+      items.forEach((t,j)=>s.addText('◆ '+t,{x:x+.15,y:2.68+j*.5,w:3.8,h:.48,fontSize:11,color:C.text,fontFace:F.body,lineSpacingMultiple:1.3}));
+    });
+  }
+
+  /* ══ SLIDE 10: 組み合わせ戦略 ══ */
+  {
+    const s=newSlide();
+    hd(s,'Strategy','競合ではなく "役割分担" として使う',C.co);
+    s.addText('3つのツールは競合ではなく、それぞれが異なる「仕事の粒度」を担う。目的ごとに最適なツールを使い分け、あるいは組み合わせることで開発速度と品質が最大化される。',
+      {x:.5,y:2.1,w:6.1,h:1.2,fontSize:13,color:C.muted,fontFace:F.body,lineSpacingMultiple:1.7});
+    const patterns=[
+      ['PATTERN 01 — スタンダード','Copilot + Claude Code','普段のコーディングはCopilotで補完・Chat。大きな機能追加やリファクタはClaude Codeに任せる。'],
+      ['PATTERN 02 — IDE乗り換え派','Cursor + Claude Code','CursorをメインIDEとして使いながら、CLIの自律タスクはClaude Codeで実行。モデルをClaude統一。'],
+      ['PATTERN 03 — チーム導入','Copilot Business','チーム全員に同じポリシーで配布。管理・監査ログが必要な企業環境に現実的。'],
+    ];
+    patterns.forEach(([lbl,combo,desc],i)=>{
+      card(s,7.1,2.0+i*1.72,5.7,1.58,lbl,`${combo}\n${desc}`,C.co);
+    });
+  }
+
+  /* ══ SLIDE 11: まとめ ══ */
+  {
+    const s=newSlide();
+    hd(s,'Summary','まとめ',C.co);
+    const sums=[
+      [C.co,'⬡','GitHub Copilot は業界標準のIDE統合型。既存環境を変えず、GitHub連携が最強。企業導入に向いている。'],
+      [C.cl,'◈','Claude Code はエージェント型の最前線。「複数ファイルを横断して丸ごと実装」という大きなタスクに強い。'],
+      [C.cu,'⬢','Cursor はAI-native IDEへの乗り換え。VSCode資産を活かしつつ、GUI上でAIをフル活用したい人向け。'],
+      ['D97706','◎','3つは競合ではなく役割分担。補完→対話→エージェントの粒度ごとに使い分けることで開発効率が最大化。'],
+    ];
+    sums.forEach(([color,ico,txt],i)=>{
+      s.addShape(pptx.ShapeType.roundRect,{x:.5,y:2.0+i*1.12,w:7.8,h:1.0,rectRadius:.07,fill:{color:C.white},line:{color:C.border,pt:.8}});
+      s.addText(ico,{x:.65,y:2.0+i*1.12,w:.5,h:1.0,fontSize:18,color,align:'center',valign:'middle'});
+      s.addText(txt,{x:1.25,y:2.0+i*1.12,w:6.9,h:1.0,fontSize:12,color:C.text,fontFace:F.body,lineSpacingMultiple:1.5,valign:'middle'});
+    });
+    const picks=[['補完・Chat','→ GitHub Copilot',C.co],['大タスク自動化','→ Claude Code',C.cl],['AI-IDE統合','→ Cursor',C.cu],['最強の組み合わせ','→ 用途に応じて併用','D97706']];
+    picks.forEach(([lbl,val,color],i)=>{
+      const px=8.6+(i%2===0?0:2.9), py=2.0+Math.floor(i/2)*1.05;
+      const dimMap={[C.co]:C.coDim,[C.cl]:C.clDim,[C.cu]:C.cuDim,'D97706':'FFF8EC'};
+      s.addShape(pptx.ShapeType.roundRect,{x:px,y:py,w:2.7,h:.88,rectRadius:.07,fill:{color:dimMap[color]||'F8F8F8'},line:{color,pt:1}});
+      s.addText(lbl,{x:px+.1,y:py+.06,w:2.5,h:.3,fontSize:9,color,fontFace:F.mono,bold:true});
+      s.addText(val,{x:px+.1,y:py+.42,w:2.5,h:.35,fontSize:11,color:C.text,fontFace:F.body,bold:true});
+    });
+  }
+
+  await pptx.writeFile({fileName:'Copilot_ClaudeCode_Cursor_Comparison.pptx'});
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PPTXを書き出す';
+}
+</script>
+</body>
+</html>

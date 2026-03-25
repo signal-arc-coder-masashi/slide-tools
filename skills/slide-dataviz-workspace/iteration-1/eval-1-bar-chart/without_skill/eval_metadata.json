@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "bar-chart-monthly-sales",
+  "prompt": "月別売上データ（1月:120万, 2月:150万, 3月:90万, 4月:180万, 5月:210万, 6月:170万）を棒グラフにしたWebスライド資料を1枚作ってください。明るいトーンで。",
+  "assertions": [
+    { "id": "uses_chartjs", "description": "Chart.js ライブラリを使って棒グラフを描画している（CSS-only ではない）" },
+    { "id": "all_six_months", "description": "6ヶ月分のデータ（1月〜6月）がすべてグラフに含まれている" },
+    { "id": "has_pptx_export", "description": "PPTX エクスポートボタンまたはその相当の機能が実装されている" },
+    { "id": "animation_pptx_timing", "description": "Chart.js のアニメーション完了後に canvas を PNG キャプチャして PPTX に渡している（空白エクスポート回避）" }
+  ]
+}

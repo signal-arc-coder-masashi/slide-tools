@@ -234,6 +234,11 @@ outputs/
 
 ## 変更履歴
 
+### 2026-04-01
+- **変更ファイル**: `outputs/tjs-ga4-2026-02/index.html`, `outputs/index.html`
+- **内容**: 田口住生活設計室 GA4月次レポート（2026年2月 HPサイト編）を新規作成。Chart.jsによるKPIトレンド・チャネル分析・人気ページグラフを実装した6枚構成HTMLスライド
+- **理由**: クライアント向け月次レポートをWEBスライド化。アーカイブに登録済み
+
 ### 2026-03-25
 - **変更ファイル**: `pptx-exporter.js`, `skills/slide-dataviz/SKILL.md`, `skills/slide-dataviz/references/*.md`
 - **内容**: pptx-exporter.js に `image` タイプレンダラーを追加。データビジュアライゼーション用スキル（5エージェント構成）を新規作成

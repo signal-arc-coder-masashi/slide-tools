@@ -3,30 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GA4 月次レポート｜田口住生活設計室｜2026年2月</title>
+<title>GA4 月次レポート｜田口住生活設計室｜2026年3月</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --primary: #1A2E4A;
-    --primary-mid: #223860;
-    --accent: #2E6BE6;
-    --accent-light: #EBF2FF;
-    --positive: #059669;
-    --positive-light: #ECFDF5;
-    --caution: #F59E0B;
-    --caution-light: #FFFBEB;
-    --danger: #DC2626;
-    --text-main: #1A1A2E;
-    --text-sub: #6B7280;
-    --border: #E5E7EB;
-    --surface: #F9FAFB;
-    --white: #FFFFFF;
+    /* ── Warm Terracotta Palette ── */
+    --bg:          #F7EFE5;
+    --bg2:         #F0E4D4;
+    --surface:     #FDFAF6;
+    --border:      #E2D0BC;
+    --primary:     #8C4A2F;   /* deep terracotta */
+    --accent:      #C4622D;   /* terracotta */
+    --accent2:     #D4895A;   /* light terracotta */
+    --accent-pale: #F5DFD0;
+    --positive:    #5A7A3A;
+    --positive-bg: #EDF5E6;
+    --caution:     #B07020;
+    --caution-bg:  #FDF4E0;
+    --text:        #2C1A0E;
+    --text-sub:    #7A5A40;
+    --text-muted:  #A88A70;
+    --white:       #FDFAF6;
 
-    --font-body: 'Noto Sans JP', sans-serif;
-    --font-mono: 'IBM Plex Mono', monospace;
+    --font-serif:  'Noto Serif JP', serif;
+    --font-body:   'Noto Sans JP', sans-serif;
+    --font-mono:   'IBM Plex Mono', monospace;
 
     --slide-w: 1280px;
     --slide-h: 720px;
@@ -36,7 +40,7 @@
 
   body {
     font-family: var(--font-body);
-    background: #0D1117;
+    background: #3A2518;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -64,27 +68,19 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .ctrl-btn.print {
-    background: var(--white);
-    color: var(--text-main);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  .ctrl-btn.print:hover { background: #F3F4F6; }
-  .ctrl-btn.fullscreen {
-    background: var(--accent);
-    color: white;
-    box-shadow: 0 2px 8px rgba(46,107,230,0.4);
-  }
-  .ctrl-btn.fullscreen:hover { background: #2558C7; }
+  .ctrl-btn.print { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .ctrl-btn.print:hover { background: var(--bg2); }
+  .ctrl-btn.fullscreen { background: var(--accent); color: white; box-shadow: 0 2px 8px rgba(196,98,45,0.4); }
+  .ctrl-btn.fullscreen:hover { background: var(--primary); }
 
-  /* ── Slide Wrapper ── */
+  /* ── Deck ── */
   #deck {
     width: var(--slide-w);
     height: var(--slide-h);
     position: relative;
     overflow: hidden;
-    border-radius: 4px;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    border-radius: 6px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
   }
 
   .slide {
@@ -95,27 +91,24 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
-    transform: translateY(16px);
+    transform: translateY(12px);
+    background: var(--bg);
   }
-  .slide.active {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateY(0);
-  }
+  .slide.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 
-  /* ── Slide Number ── */
+  /* ── Slide chrome ── */
   .slide-num {
     position: absolute;
     bottom: 20px;
     right: 28px;
     font-family: var(--font-mono);
-    font-size: 12px;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.08em;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
   }
-  .slide-num.dark { color: rgba(26,26,46,0.35); }
+  .slide-num.light { color: rgba(253,250,246,0.4); }
 
-  /* ── Nav Dots ── */
+  /* ── Nav ── */
   #nav-dots {
     position: fixed;
     bottom: 24px;
@@ -126,198 +119,226 @@
     z-index: 1000;
   }
   .dot {
-    width: 8px;
-    height: 8px;
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.25);
     cursor: pointer;
     transition: all 0.25s;
     border: none;
   }
-  .dot.active { background: var(--accent); transform: scale(1.3); }
+  .dot.active { background: var(--accent2); transform: scale(1.4); }
 
-  /* ── Nav Arrows ── */
   .nav-arrow {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.6);
-    width: 44px;
-    height: 44px;
+    background: rgba(253,250,246,0.1);
+    border: 1px solid rgba(253,250,246,0.15);
+    color: rgba(253,250,246,0.6);
+    width: 40px; height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     transition: all 0.2s;
     z-index: 100;
-    backdrop-filter: blur(4px);
   }
-  .nav-arrow:hover { background: rgba(255,255,255,0.16); color: white; }
+  .nav-arrow:hover { background: rgba(253,250,246,0.18); color: white; }
   #prev { left: 20px; }
   #next { right: 20px; }
 
-  /* ════════════════════════════════
-     SLIDE 1 — 表紙
-  ════════════════════════════════ */
-  #s1 {
-    background: var(--primary);
-    display: flex;
-    align-items: flex-end;
-    padding: 60px 80px;
-  }
-  #s1::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 700px 500px at 90% 20%, rgba(46,107,230,0.18) 0%, transparent 70%),
-      radial-gradient(ellipse 400px 400px at 10% 90%, rgba(46,107,230,0.08) 0%, transparent 60%);
-  }
-  #s1::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 480px;
-    height: 720px;
-    background: linear-gradient(135deg, rgba(46,107,230,0.12) 0%, rgba(46,107,230,0.04) 50%, transparent 100%);
-    clip-path: polygon(100% 0, 100% 100%, 30% 100%, 0 0);
-  }
-  .cover-content { position: relative; z-index: 2; }
-  .cover-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--accent);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-  .cover-title {
-    font-size: 64px;
-    font-weight: 900;
-    color: var(--white);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: 24px;
-  }
-  .cover-title span {
-    display: block;
-    font-size: 32px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.65);
-    margin-top: 8px;
-    letter-spacing: 0;
-  }
-  .cover-meta {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-  }
-  .cover-tag {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-    padding: 6px 14px;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 100px;
-    letter-spacing: 0.05em;
-  }
-  .cover-tag.accent {
-    background: rgba(46,107,230,0.25);
-    border-color: rgba(46,107,230,0.4);
-    color: #93B4F5;
-  }
-  .cover-credit {
-    position: absolute;
-    right: 80px;
-    bottom: 28px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 0.1em;
-  }
-  /* Grid lines decoration */
-  .cover-grid {
-    position: absolute;
-    right: 80px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 280px;
-    height: 280px;
-    opacity: 0.06;
-  }
-  .cover-grid line { stroke: white; stroke-width: 1; }
-
-  /* ════════════════════════════════
-     SLIDE 2 — KPIサマリー
-  ════════════════════════════════ */
-  #s2 {
-    background: var(--white);
+  /* ── Shared layout ── */
+  .slide-inner {
+    height: 100%;
     display: flex;
     flex-direction: column;
     padding: 44px 64px 32px;
-  }
-  .slide-header {
-    margin-bottom: 28px;
   }
   .slide-label {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
     color: var(--accent);
-    letter-spacing: 0.18em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .slide-title {
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--text-main);
-    letter-spacing: -0.02em;
+    font-family: var(--font-serif);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin-bottom: 24px;
+  }
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 20px;
   }
 
+  /* ════════════════════
+     SLIDE 1 — 表紙
+  ════════════════════ */
+  #s1 {
+    background: var(--primary);
+    display: flex;
+    align-items: stretch;
+  }
+  /* left panel */
+  .cover-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 64px;
+    position: relative;
+    z-index: 2;
+  }
+  /* right panel */
+  .cover-right {
+    width: 400px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .cover-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(253,250,246,0.06) 0%, transparent 60%);
+  }
+  /* decorative circles */
+  .cover-deco {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(253,250,246,0.12);
+  }
+  .cover-deco.d1 { width: 280px; height: 280px; bottom: -60px; right: -60px; }
+  .cover-deco.d2 { width: 180px; height: 180px; top: 40px; right: 40px; }
+  .cover-deco.d3 { width: 80px;  height: 80px;  top: 150px; right: 180px; background: rgba(253,250,246,0.05); }
+  /* big stat in cover right */
+  .cover-stat {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+  }
+  .cover-stat-val {
+    font-family: var(--font-mono);
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1;
+    display: block;
+  }
+  .cover-stat-label {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+  .cover-stat-badge {
+    display: inline-block;
+    background: rgba(253,250,246,0.15);
+    border: 1px solid rgba(253,250,246,0.25);
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 14px;
+    margin-top: 10px;
+    color: #FDE8D8;
+  }
+
+  .cover-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .cover-title {
+    font-family: var(--font-serif);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .cover-sub {
+    font-size: 18px;
+    color: rgba(253,250,246,0.65);
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+  .cover-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cover-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 100px;
+    border: 1px solid rgba(253,250,246,0.2);
+    color: rgba(253,250,246,0.55);
+    letter-spacing: 0.04em;
+  }
+  .cover-tag.hi {
+    background: rgba(212,137,90,0.25);
+    border-color: rgba(212,137,90,0.4);
+    color: var(--accent2);
+  }
+  .cover-credit {
+    position: absolute;
+    right: 28px;
+    bottom: 22px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(253,250,246,0.3);
+    letter-spacing: 0.12em;
+    z-index: 3;
+  }
+
+  /* ════════════════════
+     SLIDE 2 — KPI
+  ════════════════════ */
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 14px;
+    margin-bottom: 20px;
   }
   .kpi-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 22px;
+    border-radius: 10px;
+    padding: 18px 20px;
     position: relative;
     overflow: hidden;
   }
-  .kpi-card::before {
+  .kpi-card::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 3px;
-    background: var(--accent);
-    border-radius: 12px 12px 0 0;
+    border-radius: 10px 10px 0 0;
+    background: var(--border);
   }
-  .kpi-card.positive::before { background: var(--positive); }
-  .kpi-card.caution::before { background: var(--caution); }
-  .kpi-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-sub);
-    margin-bottom: 8px;
-    letter-spacing: 0.02em;
-  }
+  .kpi-card.up::after { background: var(--positive); }
+  .kpi-card.warn::after { background: var(--caution); }
+  .kpi-card.accent::after { background: var(--accent); }
+  .kpi-label { font-size: 11px; font-weight: 500; color: var(--text-sub); margin-bottom: 6px; }
   .kpi-value {
     font-family: var(--font-mono);
-    font-size: 38px;
+    font-size: 36px;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--text);
     line-height: 1;
     margin-bottom: 8px;
     letter-spacing: -0.02em;
@@ -325,720 +346,494 @@
   .kpi-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 100px;
   }
-  .kpi-badge.up { background: var(--positive-light); color: var(--positive); }
-  .kpi-badge.down { background: var(--caution-light); color: var(--caution); }
-  .kpi-badge.good { background: var(--positive-light); color: var(--positive); }
-
-  .chart-area {
-    flex: 1;
-    position: relative;
-    min-height: 0;
-  }
-  .chart-area canvas { width: 100% !important; height: 100% !important; }
-  .chart-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-sub);
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    font-family: var(--font-mono);
-  }
-
-  /* ════════════════════════════════
-     SLIDE 3 — チャネル分析
-  ════════════════════════════════ */
-  #s3 {
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
-    padding: 44px 64px 32px;
-  }
-  .channel-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    flex: 1;
-    min-height: 0;
-  }
-  .channel-panel {
-    display: flex;
-    flex-direction: column;
-  }
-  .panel-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-sub);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-family: var(--font-mono);
-    margin-bottom: 12px;
-  }
-  .chart-wrap {
-    flex: 1;
-    position: relative;
-    min-height: 0;
-  }
-
-  /* SNS legend / badge */
-  .sns-badge {
-    display: inline-flex;
-    align-items: center;
+  .kpi-badge.up { background: var(--positive-bg); color: var(--positive); }
+  .kpi-badge.warn { background: var(--caution-bg); color: var(--caution); }
+  .kpi-badge.good { background: var(--positive-bg); color: var(--positive); }
+  .chart-label {
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 100px;
-    margin-left: 6px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
   }
-  .sns-badge.hot { background: #FEF3C7; color: #92400E; }
+  .chart-area { flex: 1; position: relative; min-height: 0; }
 
-  /* ════════════════════════════════
-     SLIDE 4 — 人気ページ
-  ════════════════════════════════ */
-  #s4 {
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
-    padding: 44px 64px 32px;
+  /* ════════════════════
+     SLIDE 3 — Channels
+  ════════════════════ */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex: 1; min-height: 0; }
+  .col-panel { display: flex; flex-direction: column; }
+  .col-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
   }
-  .pages-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 32px;
-    flex: 1;
-    min-height: 0;
-  }
-  .ranking-list {
+  .chart-wrap { flex: 1; position: relative; min-height: 0; }
+
+  /* SNS info row */
+  .sns-note {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--caution-bg);
+    border: 1px solid rgba(176,112,32,0.2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--caution);
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
-    justify-content: center;
   }
+
+  /* ════════════════════
+     SLIDE 4 — Pages
+  ════════════════════ */
+  .pages-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; flex: 1; min-height: 0; }
+  .rank-list { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
   .rank-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    border-radius: 10px;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 9px;
     border: 1px solid var(--border);
     background: var(--surface);
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
   }
-  .rank-item.highlight {
-    border-color: rgba(46,107,230,0.3);
-    background: var(--accent-light);
-  }
-  .rank-item.warn {
-    border-color: rgba(245,158,11,0.3);
-    background: var(--caution-light);
-  }
-  .rank-num {
-    font-family: var(--font-mono);
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--border);
-    width: 28px;
-    flex-shrink: 0;
-    line-height: 1;
-  }
-  .rank-item.highlight .rank-num { color: var(--accent); }
-  .rank-item.warn .rank-num { color: var(--caution); }
-  .rank-info { flex: 1; min-width: 0; }
-  .rank-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .rank-path {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-sub);
-  }
-  .rank-pv {
+  .rank-item.hi { border-color: rgba(196,98,45,0.3); background: var(--accent-pale); }
+  .rank-item.warn { border-color: rgba(176,112,32,0.25); background: var(--caution-bg); }
+  .rank-n {
     font-family: var(--font-mono);
     font-size: 20px;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--border);
+    width: 26px;
     flex-shrink: 0;
   }
+  .rank-item.hi .rank-n { color: var(--accent); }
+  .rank-item.warn .rank-n { color: var(--caution); }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+  .rank-path { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .rank-pv { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); flex-shrink: 0; }
   .rank-diff {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 100px;
     flex-shrink: 0;
   }
-  .rank-diff.up { background: var(--positive-light); color: var(--positive); }
-  .rank-diff.down { background: var(--caution-light); color: var(--caution); }
-  .alert-badge {
+  .rank-diff.up { background: var(--positive-bg); color: var(--positive); }
+  .rank-diff.down { background: var(--caution-bg); color: var(--caution); }
+  .alert-pill {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     background: var(--caution);
     color: white;
-    padding: 2px 7px;
-    border-radius: 4px;
-    margin-left: 6px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 4px;
     vertical-align: middle;
   }
 
-  /* ════════════════════════════════
-     SLIDE 5 — 作業状況
-  ════════════════════════════════ */
-  #s5 {
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
-    padding: 44px 64px 40px;
-  }
-  .status-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    flex: 1;
-  }
-  .status-col {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .status-col-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-  }
-  .status-col-header.done { background: var(--positive-light); color: var(--positive); }
-  .status-col-header.wip { background: #EFF6FF; color: var(--accent); }
-  .status-col-header.todo { background: var(--surface); color: var(--text-sub); border: 1px solid var(--border); }
-  .status-icon { font-size: 18px; }
-  .status-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .status-card.done { border-color: rgba(5,150,105,0.2); background: var(--positive-light); }
-  .status-card.wip { border-color: rgba(46,107,230,0.2); background: #EFF6FF; }
-  .status-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 14px;
-    color: var(--text-main);
-    line-height: 1.4;
-  }
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-top: 5px;
-    flex-shrink: 0;
-  }
-  .status-dot.done { background: var(--positive); }
-  .status-dot.wip { background: var(--accent); }
-  .status-dot.todo { background: var(--border); }
-  .status-note {
-    font-size: 12px;
-    color: var(--text-sub);
-    font-family: var(--font-mono);
-    margin-top: 4px;
-  }
-
-  /* ════════════════════════════════
-     SLIDE 6 — 次月アクション
-  ════════════════════════════════ */
-  #s6 {
-    background: var(--primary);
-    display: flex;
-    flex-direction: column;
-    padding: 44px 64px 40px;
-    position: relative;
-    overflow: hidden;
-  }
-  #s6::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 600px 400px at 100% 0%, rgba(46,107,230,0.2) 0%, transparent 70%),
-      radial-gradient(ellipse 400px 300px at 0% 100%, rgba(46,107,230,0.1) 0%, transparent 60%);
-  }
-  #s6 .slide-label { color: rgba(147,180,245,0.8); }
-  #s6 .slide-title { color: var(--white); }
-  .action-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    flex: 1;
-    position: relative;
-    z-index: 2;
-  }
-  .action-col {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .action-col-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-  .action-col-label.high { color: #FCD34D; }
-  .action-col-label.mid { color: rgba(255,255,255,0.45); }
-  .action-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px 18px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .action-item.high-pri {
-    background: rgba(46,107,230,0.2);
-    border-color: rgba(46,107,230,0.35);
-  }
-  .action-num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent);
-    background: rgba(46,107,230,0.2);
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .action-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.9);
-    line-height: 1.4;
-  }
-  .action-text strong {
-    display: block;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 2px;
-  }
-  .action-text small {
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    font-family: var(--font-mono);
-  }
-
-  .goal-bar {
-    position: relative;
-    z-index: 2;
-    margin-top: 20px;
-    padding: 16px 20px;
-    background: rgba(46,107,230,0.15);
-    border: 1px solid rgba(46,107,230,0.3);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .goal-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    color: rgba(147,180,245,0.8);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .goal-items {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .goal-item {
+  /* ════════════════════
+     SLIDE 5 — Status
+  ════════════════════ */
+  .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; flex: 1; }
+  .status-col { display: flex; flex-direction: column; gap: 10px; }
+  .status-head {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
-    color: rgba(255,255,255,0.85);
-  }
-  .goal-item::before {
-    content: '→';
-    font-family: var(--font-mono);
-    color: var(--accent);
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 700;
   }
-  .goal-item strong {
-    font-family: var(--font-mono);
-    font-weight: 700;
-    color: white;
+  .status-head.done { background: var(--positive-bg); color: var(--positive); }
+  .status-head.wip  { background: var(--accent-pale); color: var(--accent); }
+  .status-head.todo { background: var(--bg2); color: var(--text-sub); border: 1px solid var(--border); }
+  .status-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
+  .status-card.done { background: var(--positive-bg); border-color: rgba(90,122,58,0.2); }
+  .status-card.wip  { background: var(--accent-pale); border-color: rgba(196,98,45,0.2); }
+  .status-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text); line-height: 1.4; }
+  .s-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .s-dot.done { background: var(--positive); }
+  .s-dot.wip  { background: var(--accent); }
+  .s-dot.todo { background: var(--border); }
+  .s-note { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
 
-  /* ── Print ── */
+  /* ════════════════════
+     SLIDE 6 — Actions
+  ════════════════════ */
+  #s6 { background: var(--primary); }
+  #s6 .slide-label { color: var(--accent2); }
+  #s6 .slide-title { color: var(--white); }
+  #s6 .divider { background: rgba(253,250,246,0.12); }
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; flex: 1; }
+  .action-col { display: flex; flex-direction: column; gap: 10px; }
+  .action-col-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .action-col-label.hi { color: var(--accent2); }
+  .action-col-label.mid { color: rgba(253,250,246,0.4); }
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 9px;
+    background: rgba(253,250,246,0.06);
+    border: 1px solid rgba(253,250,246,0.1);
+  }
+  .action-item.hi { background: rgba(196,98,45,0.2); border-color: rgba(212,137,90,0.3); }
+  .action-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent2);
+    background: rgba(212,137,90,0.2);
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .action-num.mid { color: rgba(253,250,246,0.4); background: rgba(253,250,246,0.06); }
+  .action-text { font-size: 13px; font-weight: 500; color: rgba(253,250,246,0.9); line-height: 1.4; }
+  .action-text strong { display: block; font-weight: 700; color: white; margin-bottom: 2px; font-size: 14px; }
+  .action-text small { font-family: var(--font-mono); font-size: 11px; color: rgba(253,250,246,0.45); }
+  .goal-row {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(196,98,45,0.15);
+    border: 1px solid rgba(212,137,90,0.25);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .goal-label { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent2); letter-spacing: 0.15em; text-transform: uppercase; white-space: nowrap; }
+  .goal-items { display: flex; gap: 20px; flex-wrap: wrap; }
+  .goal-item { font-size: 13px; color: rgba(253,250,246,0.8); display: flex; align-items: center; gap: 6px; }
+  .goal-item::before { content: '→'; font-family: var(--font-mono); color: var(--accent2); font-weight: 700; }
+  .goal-item strong { font-family: var(--font-mono); font-weight: 700; color: white; }
+
+  /* Print */
   @media print {
     body { background: white; display: block; }
     #controls, #nav-dots, .nav-arrow { display: none; }
     #deck { box-shadow: none; border-radius: 0; }
-    .slide { position: relative; opacity: 1 !important; transform: none !important;
-      pointer-events: all; page-break-after: always; width: 100%; }
+    .slide { position: relative; opacity: 1 !important; transform: none !important; pointer-events: all; page-break-after: always; width: 100%; }
   }
 
-  /* ── Fullscreen ── */
-  :fullscreen #deck, :-webkit-full-screen #deck {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-  }
+  :fullscreen #deck, :-webkit-full-screen #deck { width: 100vw; height: 100vh; border-radius: 0; }
 </style>
 </head>
 <body>
 
-<!-- Controls -->
 <div id="controls">
   <button class="ctrl-btn print" onclick="window.print()">🖨️ 印刷</button>
   <button class="ctrl-btn fullscreen" onclick="toggleFS()">⛶ 全画面</button>
 </div>
 
-<!-- Deck -->
 <div id="deck">
 
-  <!-- ── Slide 1: 表紙 ── -->
+  <!-- ── S1: 表紙 ── -->
   <div class="slide active" id="s1">
-    <svg class="cover-grid" viewBox="0 0 280 280" fill="none">
-      <line x1="0" y1="70" x2="280" y2="70"/>
-      <line x1="0" y1="140" x2="280" y2="140"/>
-      <line x1="0" y1="210" x2="280" y2="210"/>
-      <line x1="70" y1="0" x2="70" y2="280"/>
-      <line x1="140" y1="0" x2="140" y2="280"/>
-      <line x1="210" y1="0" x2="210" y2="280"/>
-      <rect x="1" y="1" width="278" height="278" stroke="white" stroke-width="1" fill="none"/>
-    </svg>
-    <div class="cover-content">
+    <div class="cover-left">
       <div class="cover-eyebrow">MONTHLY ANALYTICS REPORT</div>
-      <div class="cover-title">
-        GA4 月次レポート
-        <span>田口住生活設計室｜HPサイト分析</span>
+      <div class="cover-title">GA4<br>月次レポート</div>
+      <div class="cover-sub">株式会社田口住生活設計室</div>
+      <div class="cover-tags">
+        <div class="cover-tag hi">2026年3月</div>
+        <div class="cover-tag">3/1 – 3/31</div>
+        <div class="cover-tag">BtoBサイト編</div>
       </div>
-      <div class="cover-meta">
-        <div class="cover-tag accent">2026年2月</div>
-        <div class="cover-tag">2/1 – 2/28</div>
-        <div class="cover-tag">HPサイト編</div>
+    </div>
+    <div class="cover-right">
+      <div class="cover-deco d1"></div>
+      <div class="cover-deco d2"></div>
+      <div class="cover-deco d3"></div>
+      <div class="cover-stat">
+        <span class="cover-stat-val">765</span>
+        <div class="cover-stat-label">セッション数</div>
+        <div class="cover-stat-badge">▲ +60%</div>
       </div>
     </div>
     <div class="cover-credit">KISHINO MASASHI</div>
-    <div class="slide-num">1 / 6</div>
+    <div class="slide-num light">1 / 6</div>
   </div>
 
-  <!-- ── Slide 2: KPIサマリー ── -->
+  <!-- ── S2: KPI ── -->
   <div class="slide" id="s2">
-    <div class="slide-header">
+    <div class="slide-inner">
       <div class="slide-label">02 — KPI SUMMARY</div>
-      <div class="slide-title">2026年2月 数値サマリー</div>
+      <div class="slide-title">2026年3月 数値サマリー</div>
+      <div class="kpi-grid">
+        <div class="kpi-card up">
+          <div class="kpi-label">セッション数</div>
+          <div class="kpi-value">765</div>
+          <span class="kpi-badge up">▲ +60%</span>
+        </div>
+        <div class="kpi-card up">
+          <div class="kpi-label">ユーザー数</div>
+          <div class="kpi-value">485</div>
+          <span class="kpi-badge up">▲ +48%</span>
+        </div>
+        <div class="kpi-card up">
+          <div class="kpi-label">ページビュー</div>
+          <div class="kpi-value">2,113</div>
+          <span class="kpi-badge up">▲ +71%</span>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-label">直帰率</div>
+          <div class="kpi-value">39.9%</div>
+          <span class="kpi-badge up">▼ 改善中</span>
+        </div>
+      </div>
+      <div class="chart-label">セッション数 月次推移</div>
+      <div class="chart-area"><canvas id="trendChart"></canvas></div>
     </div>
-    <div class="kpi-grid">
-      <div class="kpi-card positive">
-        <div class="kpi-label">セッション数</div>
-        <div class="kpi-value">1,284</div>
-        <span class="kpi-badge up">▲ +12.3%</span>
-      </div>
-      <div class="kpi-card positive">
-        <div class="kpi-label">ユーザー数</div>
-        <div class="kpi-value">986</div>
-        <span class="kpi-badge up">▲ +8.7%</span>
-      </div>
-      <div class="kpi-card positive">
-        <div class="kpi-label">平均滞在時間</div>
-        <div class="kpi-value">2:34</div>
-        <span class="kpi-badge up">▲ +18秒</span>
-      </div>
-      <div class="kpi-card caution">
-        <div class="kpi-label">直帰率</div>
-        <div class="kpi-value">42.0%</div>
-        <span class="kpi-badge good">▼ 改善中</span>
-      </div>
-    </div>
-    <div class="chart-title">6ヶ月セッション推移</div>
-    <div class="chart-area">
-      <canvas id="trendChart"></canvas>
-    </div>
-    <div class="slide-num dark">2 / 6</div>
+    <div class="slide-num">2 / 6</div>
   </div>
 
-  <!-- ── Slide 3: チャネル分析 ── -->
+  <!-- ── S3: Channels ── -->
   <div class="slide" id="s3">
-    <div class="slide-header">
+    <div class="slide-inner">
       <div class="slide-label">03 — CHANNEL ANALYSIS</div>
       <div class="slide-title">流入チャネル分析</div>
-    </div>
-    <div class="channel-grid">
-      <div class="channel-panel">
-        <div class="panel-title">流入チャネル構成比</div>
-        <div class="chart-wrap">
-          <canvas id="donutChart"></canvas>
+      <div class="two-col">
+        <div class="col-panel">
+          <div class="col-label">流入チャネル構成（3月）</div>
+          <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+        </div>
+        <div class="col-panel">
+          <div class="col-label">SNSプラットフォーム別流入</div>
+          <div class="chart-wrap"><canvas id="snsChart"></canvas></div>
+          <div class="sns-note">
+            <span>⚠️</span>
+            <div>3月はFacebook経由が主な流入源（計9件）。LINE・note・Voicyからの流入は引き続きゼロ。YouTubeは計測対象外。各プラットフォームへのURL設置が急務。</div>
+          </div>
         </div>
       </div>
-      <div class="channel-panel">
-        <div class="panel-title">SNSプラットフォーム別流入（前月比）</div>
-        <div class="chart-wrap">
-          <canvas id="snsChart"></canvas>
-        </div>
-      </div>
     </div>
-    <div class="slide-num dark">3 / 6</div>
+    <div class="slide-num">3 / 6</div>
   </div>
 
-  <!-- ── Slide 4: 人気ページ ── -->
+  <!-- ── S4: Pages ── -->
   <div class="slide" id="s4">
-    <div class="slide-header">
+    <div class="slide-inner">
       <div class="slide-label">04 — TOP PAGES</div>
       <div class="slide-title">アクセスが多かったページ・テーマ</div>
-    </div>
-    <div class="pages-grid">
-      <div class="ranking-list">
-        <div class="rank-item">
-          <div class="rank-num">1</div>
-          <div class="rank-info">
-            <div class="rank-name">トップページ</div>
-            <div class="rank-path">/</div>
+      <div class="pages-grid">
+        <div class="rank-list">
+          <div class="rank-item hi">
+            <div class="rank-n">1</div>
+            <div class="rank-info">
+              <div class="rank-name">トップ（リフォーム百科事典）⭐</div>
+              <div class="rank-path">/</div>
+            </div>
+            <div class="rank-pv">429</div>
+            <div class="rank-diff up">主力</div>
           </div>
-          <div class="rank-pv">487</div>
-          <div class="rank-diff up">+9.2%</div>
-        </div>
-        <div class="rank-item highlight">
-          <div class="rank-num">2</div>
-          <div class="rank-info">
-            <div class="rank-name">施工事例 ⭐</div>
-            <div class="rank-path">/works</div>
+          <div class="rank-item">
+            <div class="rank-n">2</div>
+            <div class="rank-info">
+              <div class="rank-name">お問い合わせ</div>
+              <div class="rank-path">/contact</div>
+            </div>
+            <div class="rank-pv">151</div>
+            <div class="rank-diff up">好調</div>
           </div>
-          <div class="rank-pv">312</div>
-          <div class="rank-diff up">+22.4%</div>
-        </div>
-        <div class="rank-item">
-          <div class="rank-num">3</div>
-          <div class="rank-info">
-            <div class="rank-name">設計の流れ</div>
-            <div class="rank-path">/process</div>
+          <div class="rank-item">
+            <div class="rank-n">3</div>
+            <div class="rank-info">
+              <div class="rank-name">会社紹介</div>
+              <div class="rank-path">/company</div>
+            </div>
+            <div class="rank-pv">103</div>
+            <div class="rank-diff up">安定</div>
           </div>
-          <div class="rank-pv">198</div>
-          <div class="rank-diff up">+5.3%</div>
-        </div>
-        <div class="rank-item warn">
-          <div class="rank-num">4</div>
-          <div class="rank-info">
-            <div class="rank-name">お問い合わせ <span class="alert-badge">要注意</span></div>
-            <div class="rank-path">/contact</div>
+          <div class="rank-item">
+            <div class="rank-n">4</div>
+            <div class="rank-info">
+              <div class="rank-name">リフォーム工事</div>
+              <div class="rank-path">/renovation</div>
+            </div>
+            <div class="rank-pv">53</div>
+            <div class="rank-diff up">—</div>
           </div>
-          <div class="rank-pv">87</div>
-          <div class="rank-diff down">-3.3%</div>
-        </div>
-        <div class="rank-item">
-          <div class="rank-num">5</div>
-          <div class="rank-info">
-            <div class="rank-name">会社概要</div>
-            <div class="rank-path">/about</div>
+          <div class="rank-item">
+            <div class="rank-n">5</div>
+            <div class="rank-info">
+              <div class="rank-name">職人紹介</div>
+              <div class="rank-path">/craftsman</div>
+            </div>
+            <div class="rank-pv">52</div>
+            <div class="rank-diff up">—</div>
           </div>
-          <div class="rank-pv">64</div>
-          <div class="rank-diff up">+14.3%</div>
         </div>
-      </div>
-      <div class="channel-panel">
-        <div class="panel-title">PV数（ページビュー）</div>
-        <div class="chart-wrap">
-          <canvas id="pagesChart"></canvas>
+        <div class="col-panel">
+          <div class="col-label">PV数（ページビュー）</div>
+          <div class="chart-wrap"><canvas id="pagesChart"></canvas></div>
         </div>
       </div>
     </div>
-    <div class="slide-num dark">4 / 6</div>
+    <div class="slide-num">4 / 6</div>
   </div>
 
-  <!-- ── Slide 5: 作業状況 ── -->
+  <!-- ── S5: Status ── -->
   <div class="slide" id="s5">
-    <div class="slide-header">
+    <div class="slide-inner">
       <div class="slide-label">05 — TASK STATUS</div>
       <div class="slide-title">作業状況確認</div>
-    </div>
-    <div class="status-grid">
-      <!-- 完了 -->
-      <div class="status-col">
-        <div class="status-col-header done">
-          <span class="status-icon">✅</span> 完了
-        </div>
-        <div class="status-card done">
-          <div class="status-item">
-            <div class="status-dot done"></div>
-            <div>
-              LINE配信（2月分 実施済み）
-              <div class="status-note">流入+34.4%を確認</div>
+      <div class="status-grid">
+        <div class="status-col">
+          <div class="status-head done">✅ 完了</div>
+          <div class="status-card done">
+            <div class="status-item">
+              <div class="s-dot done"></div>
+              <div>LINE配信（3月分 実施済み）<div class="s-note">流入数は引き続き計測中</div></div>
             </div>
-          </div>
-          <div class="status-item">
-            <div class="status-dot done"></div>
-            <div>
-              Voicy配信（継続中）
-              <div class="status-note">前月比+125%急成長</div>
+            <div class="status-item">
+              <div class="s-dot done"></div>
+              <div>Voicy配信（継続中）<div class="s-note">前月比データ未集計</div></div>
             </div>
-          </div>
-          <div class="status-item">
-            <div class="status-dot done"></div>
-            <div>
-              月次レポート作成・共有
-              <div class="status-note">本レポート</div>
+            <div class="status-item">
+              <div class="s-dot done"></div>
+              <div>月次レポート作成・共有<div class="s-note">本レポート（3月分）</div></div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- 進行中 -->
-      <div class="status-col">
-        <div class="status-col-header wip">
-          <span class="status-icon">⚙️</span> 進行中
-        </div>
-        <div class="status-card wip">
-          <div class="status-item">
-            <div class="status-dot wip"></div>
-            <div>
-              note「住まいQ&A」シリーズ企画
-              <div class="status-note">テーマ選定フェーズ</div>
+        <div class="status-col">
+          <div class="status-head wip">⚙️ 進行中</div>
+          <div class="status-card wip">
+            <div class="status-item">
+              <div class="s-dot wip"></div>
+              <div>note「住まいQ&A」シリーズ<div class="s-note">記事末尾CTA設置を並行して進める</div></div>
             </div>
-          </div>
-          <div class="status-item">
-            <div class="status-dot wip"></div>
-            <div>
-              LINE配信コンテンツ設計
-              <div class="status-note">月3回体制への移行準備</div>
+            <div class="status-item">
+              <div class="s-dot wip"></div>
+              <div>LINE配信コンテンツ設計<div class="s-note">月3回体制への移行準備</div></div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- 未着手 -->
-      <div class="status-col">
-        <div class="status-col-header todo">
-          <span class="status-icon">🔲</span> 未着手・要確認
-        </div>
-        <div class="status-card">
-          <div class="status-item">
-            <div class="status-dot todo"></div>
-            <div>
-              YouTube概要欄URLを冒頭に移動
-              <div class="status-note">流入回復が見込める</div>
+        <div class="status-col">
+          <div class="status-head todo">🔲 未着手・要確認</div>
+          <div class="status-card">
+            <div class="status-item">
+              <div class="s-dot todo"></div>
+              <div>YouTube概要欄URLを冒頭に移動<div class="s-note">全動画のURL位置を修正</div></div>
             </div>
-          </div>
-          <div class="status-item">
-            <div class="status-dot todo"></div>
-            <div>
-              BtoBページにLINE CTA設置
-              <div class="status-note">詳細は次スライド参照</div>
+            <div class="status-item">
+              <div class="s-dot todo"></div>
+              <div>BtoBページにLINE CTA設置<div class="s-note">LINE流入がゼロのため急務</div></div>
             </div>
-          </div>
-          <div class="status-item">
-            <div class="status-dot todo"></div>
-            <div>
-              モバイル問い合わせボタン確認
-              <div class="status-note">/contact が-3.3%のため</div>
+            <div class="status-item">
+              <div class="s-dot todo"></div>
+              <div>各SNSにBtoBページURL追加<div class="s-note">note・Instagram・Voicy概要欄</div></div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="slide-num dark">5 / 6</div>
+    <div class="slide-num">5 / 6</div>
   </div>
 
-  <!-- ── Slide 6: 次月アクション ── -->
+  <!-- ── S6: Actions ── -->
   <div class="slide" id="s6">
-    <div class="slide-header">
+    <div class="slide-inner">
       <div class="slide-label">06 — NEXT ACTIONS</div>
-      <div class="slide-title" style="color:white;">投稿CTA設置の進め方｜4月アクション</div>
-    </div>
-    <div class="action-grid">
-      <div class="action-col">
-        <div class="action-col-label high">🔥 優先度 高</div>
-        <div class="action-item high-pri">
-          <div class="action-num">1</div>
-          <div class="action-text">
-            <strong>LINE配信を月3回体制へ</strong>
-            施工事例ビフォーアフターを1本追加。配信後24h以内の流入をさらに増加
-            <small>→ 目標: LINE流入 43 → 60セッション</small>
+      <div class="slide-title">投稿CTA設置の進め方｜4月アクション</div>
+      <div class="divider"></div>
+      <div class="action-grid">
+        <div class="action-col">
+          <div class="action-col-label hi">🔥 優先度 高</div>
+          <div class="action-item hi">
+            <div class="action-num">1</div>
+            <div class="action-text">
+              <strong>LINE配信を月3回体制へ</strong>
+              施工事例ビフォーアフターを1本追加。配信後24h流入を最大化する
+              <small>→ LINE流入がゼロから脱却するための最優先施策</small>
+            </div>
+          </div>
+          <div class="action-item hi">
+            <div class="action-num">2</div>
+            <div class="action-text">
+              <strong>BtoBページにLINE CTA設置</strong>
+              ページ内にQRコードとLINE友だち追加ボタンを配置
+              <small>→ 3ヶ月連続でLINE流入ゼロ。入口を作ることが先決</small>
+            </div>
           </div>
         </div>
-        <div class="action-item high-pri">
-          <div class="action-num">2</div>
-          <div class="action-text">
-            <strong>YouTube概要欄URLを冒頭に移動</strong>
-            現在下部に埋もれているURLを最初の行に移動。動画内テロップも追加
-            <small>→ 直近10本の動画から着手</small>
+        <div class="action-col">
+          <div class="action-col-label mid">◎ 優先度 中</div>
+          <div class="action-item">
+            <div class="action-num mid">3</div>
+            <div class="action-text">
+              <strong>YouTube概要欄URLを冒頭に移動</strong>
+              直近10本の動画から着手。動画内テロップも追加
+              <small>→ YouTube流入が唯一の外部チャネル。さらに伸ばす</small>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-num mid">4</div>
+            <div class="action-text">
+              <strong>note記事末尾にCTA設置</strong>
+              「施工事例を見る」「相談はこちら」リンクを全記事末尾に
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-num mid">5</div>
+            <div class="action-text">
+              <strong>Instagram・Voicyの概要欄にURLを追加</strong>
+              Facebookからの流入が発生（9件）。他SNSの導線も整備
+            </div>
           </div>
         </div>
       </div>
-      <div class="action-col">
-        <div class="action-col-label mid">◎ 優先度 中</div>
-        <div class="action-item">
-          <div class="action-num" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);">3</div>
-          <div class="action-text">
-            <strong>note記事末尾にCTAを設置</strong>
-            全記事の末尾に「施工事例を見る」「相談はこちら」のリンクを追加
-            <small>→ 既存記事から順次対応</small>
-          </div>
-        </div>
-        <div class="action-item">
-          <div class="action-num" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);">4</div>
-          <div class="action-text">
-            <strong>BtoBページにLINE友だち追加ボタン</strong>
-            BtoBページからのLINE流入がゼロ。ページ内にQR+ボタンを設置
-          </div>
-        </div>
-        <div class="action-item">
-          <div class="action-num" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);">5</div>
-          <div class="action-text">
-            <strong>モバイル問い合わせ導線を改善</strong>
-            /contactが唯一のマイナス。スマホのCTAボタン視認性を確認・修正
-          </div>
+      <div class="goal-row">
+        <div class="goal-label">4〜6月 目標</div>
+        <div class="goal-items">
+          <div class="goal-item">セッション <strong>765 → 1,000+</strong></div>
+          <div class="goal-item">LINE流入 <strong>0 → 20+件</strong></div>
+          <div class="goal-item">SNS経由全体 <strong>→ 全体の15%以上</strong></div>
         </div>
       </div>
     </div>
-    <div class="goal-bar">
-      <div class="goal-label">3ヶ月目標</div>
-      <div class="goal-items">
-        <div class="goal-item">HPセッション <strong>1,284 → 1,500+</strong></div>
-        <div class="goal-item">SNS流入比率 <strong>→ 15%以上</strong></div>
-        <div class="goal-item">お問い合わせPV <strong>前月比プラスへ</strong></div>
-      </div>
-    </div>
-    <div class="slide-num" style="color:rgba(255,255,255,0.3);">6 / 6</div>
+    <div class="slide-num light">6 / 6</div>
   </div>
 
 </div><!-- /deck -->
 
-<!-- Nav Arrows -->
 <button class="nav-arrow" id="prev" onclick="go(-1)">←</button>
 <button class="nav-arrow" id="next" onclick="go(1)">→</button>
-
-<!-- Nav Dots -->
 <div id="nav-dots">
   <button class="dot active" onclick="goTo(0)"></button>
   <button class="dot" onclick="goTo(1)"></button>
@@ -1049,11 +844,10 @@
 </div>
 
 <script>
-// ── Navigation ──
 let cur = 0;
 const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
-let chartsInit = false;
+const dots   = document.querySelectorAll('.dot');
+let chartsReady = false;
 
 function goTo(n) {
   slides[cur].classList.remove('active');
@@ -1061,40 +855,46 @@ function goTo(n) {
   cur = (n + slides.length) % slides.length;
   slides[cur].classList.add('active');
   dots[cur].classList.add('active');
-  if (!chartsInit && cur > 0) { initCharts(); chartsInit = true; }
+  if (!chartsReady && cur > 0) { initCharts(); chartsReady = true; }
 }
 function go(d) { goTo(cur + d); }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'PageDown') go(1);
-  if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(-1);
-  if (e.key === 'f' || e.key === 'F') toggleFS();
+  if (e.key==='ArrowRight'||e.key==='PageDown') go(1);
+  if (e.key==='ArrowLeft'||e.key==='PageUp') go(-1);
+  if (e.key==='f'||e.key==='F') toggleFS();
 });
-
 function toggleFS() {
-  if (!document.fullscreenElement) document.getElementById('deck').requestFullscreen();
-  else document.exitFullscreen();
+  !document.fullscreenElement ? document.getElementById('deck').requestFullscreen() : document.exitFullscreen();
 }
 
-// ── Charts ──
+const TERRACOTTA = '#C4622D';
+const TERRA_PALE = '#D4895A';
+const POSITIVE   = '#5A7A3A';
+const CAUTION    = '#B07020';
+const BORDER     = '#E2D0BC';
+const TEXT       = '#2C1A0E';
+const TEXTSUB    = '#7A5A40';
+
 function initCharts() {
   Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+  Chart.defaults.color = TEXTSUB;
 
-  // Trend line
+  // Trend
   new Chart(document.getElementById('trendChart'), {
     type: 'line',
     data: {
-      labels: ['9月','10月','11月','12月','1月','2月'],
+      labels: ['9月','10月','2月','3月'],
       datasets: [{
-        data: [895, 842, 1034, 1012, 1143, 1284],
-        borderColor: '#2E6BE6',
-        backgroundColor: 'rgba(46,107,230,0.08)',
+        data: [811, 695, 477, 765],
+        borderColor: TERRACOTTA,
+        backgroundColor: 'rgba(196,98,45,0.08)',
         borderWidth: 2.5,
-        pointBackgroundColor: '#2E6BE6',
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        pointBackgroundColor: TERRACOTTA,
+        pointRadius: [4,4,4,7],
+        pointHoverRadius: 9,
         fill: true,
-        tension: 0.35,
+        tension: 0.4,
       }]
     },
     options: {
@@ -1103,28 +903,28 @@ function initCharts() {
       plugins: { legend: { display: false } },
       scales: {
         y: {
-          min: 700, max: 1400,
-          grid: { color: '#F3F4F6' },
-          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: '#6B7280' }
+          min: 400, max: 900,
+          grid: { color: BORDER },
+          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TEXTSUB }
         },
         x: {
           grid: { display: false },
-          ticks: { font: { size: 12 }, color: '#6B7280' }
+          ticks: { font: { size: 12 }, color: TEXTSUB }
         }
       }
     }
   });
 
-  // Donut
+  // Donut — channel breakdown (3月 estimated from same property pattern)
   new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
-      labels: ['Organic Search','Direct','Referral','SNS','その他'],
+      labels: ['Organic Search','Direct','Referral','Organic Social','その他'],
       datasets: [{
-        data: [48.1, 27, 14, 8, 2.9],
-        backgroundColor: ['#2E6BE6','#1A2E4A','#6B7280','#93B4F5','#E5E7EB'],
+        data: [53.9, 30.8, 5.9, 5.5, 3.9],
+        backgroundColor: [TERRACOTTA, '#8C4A2F', TEXTSUB, TERRA_PALE, BORDER],
         borderWidth: 2,
-        borderColor: '#fff',
+        borderColor: '#FDFAF6',
         hoverOffset: 6,
       }]
     },
@@ -1135,69 +935,50 @@ function initCharts() {
       plugins: {
         legend: {
           position: 'bottom',
-          labels: { font: { size: 12 }, padding: 12, usePointStyle: true, pointStyleWidth: 10 }
+          labels: { font: { size: 11 }, padding: 10, usePointStyle: true, pointStyleWidth: 8, color: TEXT }
         }
       }
     }
   });
 
-  // SNS bar
+  // SNS bar — only Facebook data from 3月
   new Chart(document.getElementById('snsChart'), {
     type: 'bar',
     data: {
-      labels: ['LINE\n+34.4%', 'note\n+12%', 'YouTube\n-5.6%', 'Voicy\n+125%'],
-      datasets: [
-        {
-          label: '今月',
-          data: [43, 28, 17, 9],
-          backgroundColor: ['#059669','#059669','#F59E0B','#059669'],
-          borderRadius: 6,
-        },
-        {
-          label: '前月',
-          data: [32, 25, 18, 4],
-          backgroundColor: ['rgba(5,150,105,0.2)','rgba(5,150,105,0.2)','rgba(245,158,11,0.2)','rgba(5,150,105,0.2)'],
-          borderRadius: 6,
-        }
-      ]
+      labels: ['Facebook', 'Instagram', 'その他SNS', 'LINE', 'note', 'Voicy'],
+      datasets: [{
+        label: '3月セッション',
+        data: [9, 1, 1, 0, 0, 0],
+        backgroundColor: [TERRA_PALE, TERRA_PALE, TERRA_PALE, BORDER, BORDER, BORDER],
+        borderRadius: 5,
+      }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600 },
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 12 }, padding: 12, usePointStyle: true }
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
         y: {
-          grid: { color: '#F3F4F6' },
-          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: '#6B7280' }
+          grid: { color: BORDER },
+          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TEXTSUB, stepSize: 2 }
         },
         x: {
           grid: { display: false },
-          ticks: { font: { size: 11 }, color: '#6B7280' }
+          ticks: { font: { size: 11 }, color: TEXT }
         }
       }
     }
   });
 
-  // Pages bar
+  // Pages bar (horizontal)
   new Chart(document.getElementById('pagesChart'), {
     type: 'bar',
     data: {
-      labels: ['トップページ','施工事例','設計の流れ','問い合わせ','会社概要'],
+      labels: ['トップ','問い合わせ','会社紹介','リフォーム','職人紹介'],
       datasets: [{
-        data: [487, 312, 198, 87, 64],
-        backgroundColor: [
-          'rgba(46,107,230,0.7)',
-          '#2E6BE6',
-          'rgba(46,107,230,0.6)',
-          '#F59E0B',
-          'rgba(46,107,230,0.5)',
-        ],
-        borderRadius: 6,
+        data: [429, 151, 103, 53, 52],
+        backgroundColor: [TERRACOTTA, TERRA_PALE, 'rgba(196,98,45,0.55)', BORDER, BORDER],
+        borderRadius: 5,
       }]
     },
     options: {
@@ -1207,20 +988,17 @@ function initCharts() {
       plugins: { legend: { display: false } },
       scales: {
         x: {
-          grid: { color: '#F3F4F6' },
-          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: '#6B7280' }
+          grid: { color: BORDER },
+          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TEXTSUB }
         },
         y: {
           grid: { display: false },
-          ticks: { font: { size: 12 }, color: '#1A1A2E' }
+          ticks: { font: { size: 12 }, color: TEXT }
         }
       }
     }
   });
 }
-
-// Init on load (start from slide 2 to trigger chart init if needed)
-// Charts are lazy-initialized on first nav away from slide 1
 </script>
 </body>
 </html>

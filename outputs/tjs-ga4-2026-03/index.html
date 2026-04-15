@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GA4 月次レポート｜田口住生活設計室｜2026年3月</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:#F7EFE5;--bg2:#F0E4D4;--surface:#FDFAF6;--border:#E2D0BC;
+    --primary:#8C4A2F;--accent:#C4622D;--accent2:#D4895A;--accent-pale:#F5DFD0;
+    --positive:#5A7A3A;--positive-bg:#EDF5E6;--caution:#B07020;--caution-bg:#FDF4E0;
+    --text:#2C1A0E;--text-sub:#7A5A40;--text-muted:#A88A70;--white:#FDFAF6;
+    --font-serif:'Noto Serif JP',serif;--font-body:'Noto Sans JP',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+    --slide-w:1280px;--slide-h:720px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-body);background:#3A2518;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;}
+  #controls{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:1000;}
+  .ctrl-btn{font-family:var(--font-body);font-size:13px;font-weight:500;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+  .ctrl-btn.print{background:var(--surface);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+  .ctrl-btn.fullscreen{background:var(--accent);color:white;box-shadow:0 2px 8px rgba(196,98,45,0.4);}
+  #deck{width:var(--slide-w);height:var(--slide-h);position:relative;overflow:hidden;border-radius:6px;box-shadow:0 32px 80px rgba(0,0,0,0.5);}
+  .slide{position:absolute;inset:0;width:var(--slide-w);height:var(--slide-h);opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s ease;transform:translateY(12px);background:var(--bg);}
+  .slide.active{opacity:1;pointer-events:all;transform:translateY(0);}
+  .slide-num{position:absolute;bottom:20px;right:28px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:0.1em;}
+  .slide-num.light{color:rgba(253,250,246,0.4);}
+  #nav-dots{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:1000;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer;transition:all 0.25s;border:none;}
+  .dot.active{background:var(--accent2);transform:scale(1.4);}
+  .nav-arrow{position:fixed;top:50%;transform:translateY(-50%);background:rgba(253,250,246,0.1);border:1px solid rgba(253,250,246,0.15);color:rgba(253,250,246,0.6);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.2s;z-index:100;}
+  #prev{left:20px;}#next{right:20px;}
+  .slide-inner{height:100%;display:flex;flex-direction:column;padding:44px 64px 32px;}
+  .slide-label{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:4px;}
+  .slide-title{font-family:var(--font-serif);font-size:30px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:24px;}
+
+  /* S1 */
+  #s1{background:var(--primary);display:flex;align-items:stretch;}
+  .cover-left{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:60px 64px;position:relative;z-index:2;}
+  .cover-right{width:400px;background:var(--accent);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;}
+  .cover-right::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(253,250,246,0.06) 0%,transparent 60%);}
+  .cover-deco{position:absolute;border-radius:50%;border:1px solid rgba(253,250,246,0.12);}
+  .cover-deco.d1{width:280px;height:280px;bottom:-60px;right:-60px;}
+  .cover-deco.d2{width:180px;height:180px;top:40px;right:40px;}
+  .cover-deco.d3{width:80px;height:80px;top:150px;right:180px;background:rgba(253,250,246,0.05);}
+  .cover-stat{position:relative;z-index:2;text-align:center;color:white;}
+  .cover-stat-val{font-family:var(--font-mono);font-size:72px;font-weight:700;line-height:1;display:block;}
+  .cover-stat-label{font-size:13px;opacity:0.7;margin-top:8px;letter-spacing:0.05em;}
+  .cover-stat-badge{display:inline-block;background:rgba(253,250,246,0.15);border:1px solid rgba(253,250,246,0.25);border-radius:100px;font-family:var(--font-mono);font-size:14px;font-weight:600;padding:4px 14px;margin-top:10px;color:#FDE8D8;}
+  .cover-eyebrow{font-family:var(--font-mono);font-size:11px;color:var(--accent2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;}
+  .cover-title{font-family:var(--font-serif);font-size:48px;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:8px;}
+  .cover-sub{font-size:18px;color:rgba(253,250,246,0.65);margin-bottom:28px;font-weight:400;}
+  .cover-tags{display:flex;gap:10px;flex-wrap:wrap;}
+  .cover-tag{font-family:var(--font-mono);font-size:12px;padding:5px 14px;border-radius:100px;border:1px solid rgba(253,250,246,0.2);color:rgba(253,250,246,0.55);letter-spacing:0.04em;}
+  .cover-tag.hi{background:rgba(212,137,90,0.25);border-color:rgba(212,137,90,0.4);color:var(--accent2);}
+  .cover-credit{position:absolute;right:28px;bottom:22px;font-family:var(--font-mono);font-size:10px;color:rgba(253,250,246,0.3);letter-spacing:0.12em;z-index:3;}
+
+  /* S2 KPI */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+  .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
+  .kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0;background:var(--border);}
+  .kpi-card.up::after{background:var(--positive);}
+  .kpi-card.warn::after{background:var(--caution);}
+  .kpi-card.accent::after{background:var(--accent);}
+  .kpi-label{font-size:11px;font-weight:500;color:var(--text-sub);margin-bottom:6px;}
+  .kpi-value{font-family:var(--font-mono);font-size:36px;font-weight:700;color:var(--text);line-height:1;margin-bottom:8px;letter-spacing:-0.02em;}
+  .kpi-badge{display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
+  .kpi-badge.up{background:var(--positive-bg);color:var(--positive);}
+  .kpi-badge.warn{background:var(--caution-bg);color:var(--caution);}
+  .chart-label{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+  .chart-area{flex:1;position:relative;min-height:0;}
+
+  /* S3 Channels */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px;flex:1;min-height:0;}
+  .col-panel{display:flex;flex-direction:column;}
+  .col-label{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;}
+  .chart-wrap{flex:1;position:relative;min-height:0;}
+  .sns-note{margin-top:12px;padding:10px 14px;background:var(--positive-bg);border:1px solid rgba(90,122,58,0.2);border-radius:8px;font-size:12px;color:var(--positive);display:flex;align-items:flex-start;gap:8px;}
+
+  /* S4 Pages */
+  .pages-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;flex:1;min-height:0;}
+  .rank-list{display:flex;flex-direction:column;gap:8px;justify-content:center;}
+  .rank-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);}
+  .rank-item.hi{border-color:rgba(196,98,45,0.3);background:var(--accent-pale);}
+  .rank-n{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--border);width:26px;flex-shrink:0;}
+  .rank-item.hi .rank-n{color:var(--accent);}
+  .rank-info{flex:1;min-width:0;}
+  .rank-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:1px;}
+  .rank-path{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
+  .rank-pv{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text);flex-shrink:0;}
+
+  /* S5 Insights */
+  .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0;}
+  .insight-col{display:flex;flex-direction:column;gap:10px;}
+  .insight-head{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;padding:8px 14px;border-radius:7px;margin-bottom:2px;}
+  .insight-head.good{background:var(--positive-bg);color:var(--positive);}
+  .insight-head.action{background:var(--accent-pale);color:var(--accent);}
+  .insight-item{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:13px;color:var(--text);line-height:1.5;}
+  .insight-bullet{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .insight-bullet.green{background:var(--positive);}
+  .insight-bullet.orange{background:var(--accent);}
+  .insight-summary{margin-top:auto;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-sub);line-height:1.6;}
+
+  /* S6 Actions */
+  .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;}
+  .action-col{display:flex;flex-direction:column;gap:12px;}
+  .action-head{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:8px 16px;border-radius:7px;margin-bottom:4px;}
+  .action-head.high{background:var(--accent-pale);color:var(--accent);}
+  .action-head.mid{background:var(--caution-bg);color:var(--caution);}
+  .action-item{padding:12px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:13px;color:var(--text);line-height:1.5;display:flex;gap:10px;align-items:flex-start;}
+  .action-num{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--border);flex-shrink:0;margin-top:1px;}
+  .kpi-summary-bar{padding:14px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;display:flex;gap:32px;align-items:center;margin-top:auto;}
+  .kpi-s-item{text-align:center;}
+  .kpi-s-label{font-size:10px;color:var(--text-muted);margin-bottom:2px;}
+  .kpi-s-val{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--text);}
+
+  @media print{body{background:white;display:block;}#controls,#nav-dots,.nav-arrow{display:none;}#deck{box-shadow:none;border-radius:0;}.slide{position:relative;opacity:1!important;transform:none!important;pointer-events:all;page-break-after:always;width:100%;}}
+  :fullscreen #deck,:-webkit-full-screen #deck{width:100vw;height:100vh;border-radius:0;}
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <button class="ctrl-btn print" onclick="window.print()">🖨️ 印刷</button>
+  <button class="ctrl-btn fullscreen" onclick="toggleFS()">⛶ 全画面</button>
+</div>
+
+<div id="deck">
+
+  <!-- S1: 表紙 -->
+  <div class="slide active" id="s1">
+    <div class="cover-left">
+      <div class="cover-eyebrow">MONTHLY ANALYTICS REPORT</div>
+      <div class="cover-title">GA4<br>月次レポート</div>
+      <div class="cover-sub">株式会社田口住生活設計室</div>
+      <div class="cover-tags">
+        <div class="cover-tag hi">2026年3月</div>
+        <div class="cover-tag">3/1 – 3/31</div>
+        <div class="cover-tag">HPサイト編</div>
+      </div>
+    </div>
+    <div class="cover-right">
+      <div class="cover-deco d1"></div>
+      <div class="cover-deco d2"></div>
+      <div class="cover-deco d3"></div>
+      <div class="cover-stat">
+        <span class="cover-stat-val">765</span>
+        <div class="cover-stat-label">セッション数</div>
+        <div class="cover-stat-badge">▲ +60%</div>
+      </div>
+    </div>
+    <div class="cover-credit">KISHINO MASASHI</div>
+    <div class="slide-num light">1 / 6</div>
+  </div>
+
+  <!-- S2: KPI -->
+  <div class="slide" id="s2">
+    <div class="slide-inner">
+      <div class="slide-label">01 — CORPORATE SITE KPI SUMMARY</div>
+      <div class="slide-title">コーポレートサイト 2026年3月 数値サマリー</div>
+      <div class="kpi-grid">
+        <div class="kpi-card up">
+          <div class="kpi-label">セッション数</div>
+          <div class="kpi-value">765</div>
+          <span class="kpi-badge up">▲ +60%</span>
+        </div>
+        <div class="kpi-card up">
+          <div class="kpi-label">ユーザー数</div>
+          <div class="kpi-value">485</div>
+          <span class="kpi-badge up">▲ +48%</span>
+        </div>
+        <div class="kpi-card up">
+          <div class="kpi-label">ページビュー</div>
+          <div class="kpi-value">2,113</div>
+          <span class="kpi-badge up">▲ +71%</span>
+        </div>
+        <div class="kpi-card warn">
+          <div class="kpi-label">直帰率</div>
+          <div class="kpi-value">39.9%</div>
+          <span class="kpi-badge warn">平均滞在 3分8秒</span>
+        </div>
+      </div>
+      <div class="chart-label">セッション数 月次推移（10月〜3月）</div>
+      <div class="chart-area"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="slide-num">2 / 6</div>
+  </div>
+
+  <!-- S3: チャネル -->
+  <div class="slide" id="s3">
+    <div class="slide-inner">
+      <div class="slide-label">02 — CHANNEL & SNS ANALYSIS</div>
+      <div class="slide-title">流入チャネル分析 ／ SNS別振り返り</div>
+      <div class="two-col">
+        <div class="col-panel">
+          <div class="col-label">流入チャネル構成（3月）</div>
+          <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+        </div>
+        <div class="col-panel">
+          <div class="col-label">SNSプラットフォーム別流入（セッション数）</div>
+          <div class="chart-wrap"><canvas id="snsChart"></canvas></div>
+          <div class="sns-note">
+            <span>✅</span>
+            <div>YouTubeが月間52件の流入をもたらしており、SNS施策の中で最も機能しています。一方LINEはまだ活用が限定的なので、公式アカウントの認知拡大とコンテンツ配信を強化する余地があります。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">3 / 6</div>
+  </div>
+
+  <!-- S4: ページ -->
+  <div class="slide" id="s4">
+    <div class="slide-inner">
+      <div class="slide-label">03 — TOP PAGES</div>
+      <div class="slide-title">アクセスが多かったページ Top6</div>
+      <div class="pages-grid">
+        <div class="rank-list">
+          
+          <div class="rank-item hi">
+            <div class="rank-n">1</div>
+            <div class="rank-info">
+              <div class="rank-name">さいたま市のリフォームなら田口住生活設計</div>
+              <div class="rank-path">/</div>
+            </div>
+            <div class="rank-pv">760</div>
+          </div>
+          
+          <div class="rank-item hi">
+            <div class="rank-n">2</div>
+            <div class="rank-info">
+              <div class="rank-name">お問い合わせ | 株式会社田口住生活設計</div>
+              <div class="rank-path">/contact</div>
+            </div>
+            <div class="rank-pv">204</div>
+          </div>
+          
+          <div class="rank-item ">
+            <div class="rank-n">3</div>
+            <div class="rank-info">
+              <div class="rank-name">ブログ | 株式会社田口住生活設計室</div>
+              <div class="rank-path">/blog</div>
+            </div>
+            <div class="rank-pv">137</div>
+          </div>
+          
+          <div class="rank-item ">
+            <div class="rank-n">4</div>
+            <div class="rank-info">
+              <div class="rank-name">会社紹介 | 株式会社田口住生活設計室</div>
+              <div class="rank-path">/company</div>
+            </div>
+            <div class="rank-pv">117</div>
+          </div>
+          
+          <div class="rank-item ">
+            <div class="rank-n">5</div>
+            <div class="rank-info">
+              <div class="rank-name">リフォーム工事 | 株式会社田口住生活設</div>
+              <div class="rank-path">/renovation</div>
+            </div>
+            <div class="rank-pv">87</div>
+          </div>
+          
+          <div class="rank-item ">
+            <div class="rank-n">6</div>
+            <div class="rank-info">
+              <div class="rank-name">耐震診断・補強計画 | 株式会社田口住生</div>
+              <div class="rank-path">/inspection</div>
+            </div>
+            <div class="rank-pv">66</div>
+          </div>
+          
+        </div>
+        <div class="col-panel">
+          <div class="col-label">PV数（ページビュー）</div>
+          <div class="chart-wrap"><canvas id="pagesChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">4 / 6</div>
+  </div>
+
+  <!-- S5: インサイト -->
+  <div class="slide" id="s5">
+    <div class="slide-inner">
+      <div class="slide-label">04 — AI INSIGHTS</div>
+      <div class="slide-title">今月の分析 ／ 強みと課題</div>
+      <div class="insight-grid">
+        <div class="insight-col">
+          <div class="insight-head good">✅ 今月の強み</div>
+          
+          <div class="insight-item">
+            <div class="insight-bullet green"></div>
+            <div>オーガニック検索が49%を占め、SEO施策が功を奏している</div>
+          </div>
+          
+          <div class="insight-item">
+            <div class="insight-bullet green"></div>
+            <div>新規ユーザー456人（94%）で認知層の獲得が加速中</div>
+          </div>
+          
+          <div class="insight-item">
+            <div class="insight-bullet green"></div>
+            <div>トップページへの流入が760PVで、ブランド認知が着実に進展</div>
+          </div>
+          
+        </div>
+        <div class="insight-col">
+          <div class="insight-head action">🎯 次月アクション</div>
+          
+          <div class="insight-item">
+            <div class="insight-bullet orange"></div>
+            <div>直帰率39.9%の改善に向け、トップページから施工事例やブログへの導線を強化する</div>
+          </div>
+          
+          <div class="insight-item">
+            <div class="insight-bullet orange"></div>
+            <div>YouTube（52件）とnote（8件）の流入を活かし、定期投稿や更新頻度を増やす</div>
+          </div>
+          
+          <div class="insight-item">
+            <div class="insight-bullet orange"></div>
+            <div>お問い合わせページへの流入が204PVに留まっているため、トップページからのCTA最適化を検討</div>
+          </div>
+          
+        </div>
+      </div>
+      <div class="insight-summary" style="margin-top:16px;">前月比でセッション60%、ユーザー48%の大幅成長を達成し、検索流入が全体の約半分を占める堅実な状態です。新規ユーザーが94%を占め、認知拡大が進んでいます。</div>
+    </div>
+    <div class="slide-num">5 / 6</div>
+  </div>
+
+  <!-- S6: アクション -->
+  <div class="slide" id="s6">
+    <div class="slide-inner">
+      <div class="slide-label">05 — NEXT MONTH PLAN</div>
+      <div class="slide-title">来月の方針 ／ アクションプラン</div>
+      <div class="action-grid">
+        <div class="action-col">
+          <div class="action-head high">【優先度 高】</div>
+          
+          <div class="action-item">
+            <div class="action-num">1</div>
+            <div>直帰率39.9%の改善に向け、トップページから施工事例やブログへの導線を強化する</div>
+          </div>
+          
+          <div class="action-item">
+            <div class="action-num">2</div>
+            <div>YouTube（52件）とnote（8件）の流入を活かし、定期投稿や更新頻度を増やす</div>
+          </div>
+          
+        </div>
+        <div class="action-col">
+          <div class="action-head mid">【優先度 中】</div>
+          
+          <div class="action-item">
+            <div class="action-num">1</div>
+            <div>お問い合わせページへの流入が204PVに留まっているため、トップページからのCTA最適化を検討</div>
+          </div>
+          
+        </div>
+      </div>
+      <div class="kpi-summary-bar">
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">セッション</div>
+          <div class="kpi-s-val">765</div>
+        </div>
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">ユーザー</div>
+          <div class="kpi-s-val">485</div>
+        </div>
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">PV</div>
+          <div class="kpi-s-val">2,113</div>
+        </div>
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">直帰率</div>
+          <div class="kpi-s-val">39.9%</div>
+        </div>
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">YouTube</div>
+          <div class="kpi-s-val">52</div>
+        </div>
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">note</div>
+          <div class="kpi-s-val">8</div>
+        </div>
+        <div class="kpi-s-item">
+          <div class="kpi-s-label">LINE</div>
+          <div class="kpi-s-val">1</div>
+        </div>
+        <div style="margin-left:auto;font-size:11px;color:var(--text-muted);">📊 <a href="https://lookerstudio.google.com/s/iWXqudK6paQ" style="color:var(--accent);">Looker Studio</a></div>
+      </div>
+    </div>
+    <div class="slide-num">6 / 6</div>
+  </div>
+
+</div><!-- #deck -->
+
+<div id="nav-dots">
+  <button class="dot active" onclick="goTo(0)"></button>
+  <button class="dot" onclick="goTo(1)"></button>
+  <button class="dot" onclick="goTo(2)"></button>
+  <button class="dot" onclick="goTo(3)"></button>
+  <button class="dot" onclick="goTo(4)"></button>
+  <button class="dot" onclick="goTo(5)"></button>
+</div>
+<button class="nav-arrow" id="prev" onclick="move(-1)">&#8592;</button>
+<button class="nav-arrow" id="next" onclick="move(1)">&#8594;</button>
+
+<script>
+let cur = 0;
+const slides = document.querySelectorAll('.slide');
+const dots   = document.querySelectorAll('.dot');
+
+function goTo(n) {
+  slides[cur].classList.remove('active');
+  dots[cur].classList.remove('active');
+  cur = (n + slides.length) % slides.length;
+  slides[cur].classList.add('active');
+  dots[cur].classList.add('active');
+}
+function move(d) { goTo(cur + d); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
+});
+function toggleFS() {
+  if (!document.fullscreenElement) document.getElementById('deck').requestFullscreen();
+  else document.exitFullscreen();
+}
+
+const TC = '#C4622D', TP = '#D4895A', PO = '#5A7A3A', CA = '#B07020', BO = '#E2D0BC', TX = '#2C1A0E', TS = '#7A5A40';
+
+function initCharts() {
+  Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+  Chart.defaults.color = TS;
+
+  // トレンド
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: ["10\u6708", "11\u6708", "12\u6708", "1\u6708", "2\u6708", "3\u6708"],
+      datasets: [{
+        data: [695, 0, 0, 0, 477, 765],
+        borderColor: TC, backgroundColor: 'rgba(196,98,45,0.08)',
+        borderWidth: 2.5, pointBackgroundColor: TC,
+        pointRadius: 4, pointHoverRadius: 9,
+        fill: true, tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: BO }, ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TS } },
+        x: { grid: { display: false }, ticks: { font: { size: 12 }, color: TS } }
+      }
+    }
+  });
+
+  // チャネル ドーナツ
+  new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ["Organic Search 49.2%", "Direct 36.3%", "Organic Video 6.8%", "Referral 5.5%", "Organic Social 2.0%"],
+      datasets: [{
+        data: [49.2, 36.3, 6.8, 5.5, 2.0],
+        backgroundColor: [TC, '#8C4A2F', TS, TP, BO],
+        borderWidth: 2, borderColor: '#FDFAF6', hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 }, cutout: '62%',
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, usePointStyle: true, color: TX } } }
+    }
+  });
+
+  // SNS 棒グラフ
+  new Chart(document.getElementById('snsChart'), {
+    type: 'bar',
+    data: {
+      labels: ['YouTube', 'note', 'LINE', 'Voicy'],
+      datasets: [
+        { label: '3月', data: [52, 8, 1, 0], backgroundColor: [TC, TP, 'rgba(196,98,45,0.4)', BO], borderRadius: 5 },
+        { label: '前月', data: [26, 0, 0, 0], backgroundColor: [BO, BO, BO, BO], borderRadius: 5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 11 }, padding: 10, color: TX } } },
+      scales: {
+        y: { grid: { color: BO }, ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TS } },
+        x: { grid: { display: false }, ticks: { font: { size: 12 }, color: TX } }
+      }
+    }
+  });
+
+  // ページ 横棒
+  new Chart(document.getElementById('pagesChart'), {
+    type: 'bar',
+    data: {
+      labels: ["\u3055\u3044\u305f\u307e\u5e02\u306e\u30ea\u30d5\u30a9\u30fc\u30e0\u306a\u3089\u7530\u53e3\u4f4f\u751f\u6d3b\u8a2d\u8a08", "\u304a\u554f\u3044\u5408\u308f\u305b | \u682a\u5f0f\u4f1a\u793e\u7530\u53e3\u4f4f\u751f\u6d3b\u8a2d\u8a08", "\u30d6\u30ed\u30b0 | \u682a\u5f0f\u4f1a\u793e\u7530\u53e3\u4f4f\u751f\u6d3b\u8a2d\u8a08\u5ba4", "\u4f1a\u793e\u7d39\u4ecb | \u682a\u5f0f\u4f1a\u793e\u7530\u53e3\u4f4f\u751f\u6d3b\u8a2d\u8a08\u5ba4", "\u30ea\u30d5\u30a9\u30fc\u30e0\u5de5\u4e8b | \u682a\u5f0f\u4f1a\u793e\u7530\u53e3\u4f4f\u751f\u6d3b\u8a2d"],
+      datasets: [{ data: [760, 204, 137, 117, 87], backgroundColor: [TC, TP, 'rgba(196,98,45,0.55)', BO, BO, BO], borderRadius: 5 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: BO }, ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TS } },
+        y: { grid: { display: false }, ticks: { font: { size: 12 }, color: TX } }
+      }
+    }
+  });
+}
+
+initCharts();
+</script>
+</body>
+</html>

@@ -37,7 +37,7 @@
   .slide-label{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:4px;}
   .slide-title{font-family:var(--font-serif);font-size:30px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:24px;}
 
-  /* S1 表紙 */
+  /* S1 */
   #s1{background:var(--primary);display:flex;align-items:stretch;}
   .cover-left{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:60px 64px;position:relative;z-index:2;}
   .cover-right{width:400px;background:var(--accent);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;}
@@ -49,7 +49,7 @@
   .cover-stat{position:relative;z-index:2;text-align:center;color:white;}
   .cover-stat-val{font-family:var(--font-mono);font-size:72px;font-weight:700;line-height:1;display:block;}
   .cover-stat-label{font-size:13px;opacity:0.7;margin-top:8px;letter-spacing:0.05em;}
-  .cover-stat-badge{display:inline-block;background:rgba(253,250,246,0.15);border:1px solid rgba(253,250,246,0.25);border-radius:100px;font-family:var(--font-mono);font-size:14px;font-weight:600;padding:4px 14px;margin-top:10px;color:#FDE8D8;}
+  .cover-stat-badge{display:inline-block;background:rgba(253,250,246,0.15);border:1px solid rgba(253,250,246,0.25);border-radius:100px;font-family:var(--font-mono);font-size:13px;font-weight:600;padding:4px 14px;margin-top:10px;color:#FDE8D8;}
   .cover-eyebrow{font-family:var(--font-mono);font-size:11px;color:var(--accent2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;}
   .cover-title{font-family:var(--font-serif);font-size:48px;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:8px;}
   .cover-sub{font-size:18px;color:rgba(253,250,246,0.65);margin-bottom:28px;font-weight:400;}
@@ -64,60 +64,65 @@
   .kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0;background:var(--border);}
   .kpi-card.up::after{background:var(--positive);}
   .kpi-card.warn::after{background:var(--caution);}
-  .kpi-card.accent::after{background:var(--accent);}
+  .kpi-card.neutral::after{background:var(--accent2);}
   .kpi-label{font-size:11px;font-weight:500;color:var(--text-sub);margin-bottom:6px;}
   .kpi-value{font-family:var(--font-mono);font-size:36px;font-weight:700;color:var(--text);line-height:1;margin-bottom:8px;letter-spacing:-0.02em;}
   .kpi-badge{display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
   .kpi-badge.up{background:var(--positive-bg);color:var(--positive);}
   .kpi-badge.warn{background:var(--caution-bg);color:var(--caution);}
+  .kpi-badge.neutral{background:var(--bg2);color:var(--text-muted);}
+  .kpi-sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
   .chart-label{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
   .chart-area{flex:1;position:relative;min-height:0;}
 
-  /* S3 Channels */
+  /* S3 */
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px;flex:1;min-height:0;}
   .col-panel{display:flex;flex-direction:column;}
   .col-label{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;}
   .chart-wrap{flex:1;position:relative;min-height:0;}
-  .sns-note{margin-top:12px;padding:10px 14px;background:var(--positive-bg);border:1px solid rgba(90,122,58,0.2);border-radius:8px;font-size:12px;color:var(--positive);display:flex;align-items:flex-start;gap:8px;}
+  .sns-note{margin-top:12px;padding:10px 14px;background:var(--caution-bg);border:1px solid rgba(176,112,32,0.2);border-radius:8px;font-size:12px;color:var(--caution);display:flex;align-items:flex-start;gap:8px;}
 
-  /* S4 Pages */
+  /* S4 */
   .pages-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;flex:1;min-height:0;}
-  .rank-list{display:flex;flex-direction:column;gap:8px;justify-content:center;}
-  .rank-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);}
+  .rank-list{display:flex;flex-direction:column;gap:7px;justify-content:center;}
+  .rank-item{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);}
   .rank-item.hi{border-color:rgba(196,98,45,0.3);background:var(--accent-pale);}
+  .rank-item.new{border-color:rgba(90,122,58,0.3);background:var(--positive-bg);}
   .rank-n{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--border);width:26px;flex-shrink:0;}
   .rank-item.hi .rank-n{color:var(--accent);}
+  .rank-item.new .rank-n{color:var(--positive);}
   .rank-info{flex:1;min-width:0;}
-  .rank-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:1px;}
+  .rank-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .rank-path{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
-  .rank-pv{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text);flex-shrink:0;}
+  .rank-pv{font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--text);flex-shrink:0;}
+  .rank-badge{font-family:var(--font-mono);font-size:9px;background:var(--positive-bg);color:var(--positive);padding:1px 6px;border-radius:4px;margin-left:6px;}
 
   /* S5 作業状況 */
-  .work-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex:1;min-height:0;}
-  .work-col{display:flex;flex-direction:column;gap:10px;}
-  .work-head{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:9px 14px;border-radius:8px;margin-bottom:2px;display:flex;align-items:center;gap:8px;}
+  .work-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;flex:1;min-height:0;}
+  .work-col{display:flex;flex-direction:column;gap:8px;}
+  .work-head{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 14px;border-radius:8px;margin-bottom:2px;}
   .work-head.done{background:var(--positive-bg);color:var(--positive);}
   .work-head.check{background:var(--caution-bg);color:var(--caution);}
   .work-head.todo{background:var(--bg2);color:var(--text-muted);border:1px solid var(--border);}
-  .work-item{padding:11px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.55;display:flex;gap:9px;align-items:flex-start;}
+  .work-item{padding:10px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.55;display:flex;gap:9px;align-items:flex-start;}
   .work-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
   .work-dot.green{background:var(--positive);}
   .work-dot.yellow{background:var(--caution);}
   .work-dot.gray{background:var(--text-muted);}
 
-  /* S6 アクション */
+  /* S6 */
   .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;}
-  .action-col{display:flex;flex-direction:column;gap:12px;}
+  .action-col{display:flex;flex-direction:column;gap:10px;}
   .action-head{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:8px 16px;border-radius:7px;margin-bottom:4px;}
   .action-head.high{background:var(--accent-pale);color:var(--accent);}
   .action-head.mid{background:var(--caution-bg);color:var(--caution);}
   .action-item{padding:12px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.6;display:flex;gap:10px;align-items:flex-start;}
-  .action-num{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--border);flex-shrink:0;margin-top:1px;}
-  .action-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;}
-  .kpi-summary-bar{padding:14px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;display:flex;gap:28px;align-items:center;margin-top:auto;}
+  .action-num{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--border);flex-shrink:0;margin-top:2px;}
+  .action-data{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;}
+  .kpi-summary-bar{padding:12px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;display:flex;gap:24px;align-items:center;margin-top:auto;}
   .kpi-s-item{text-align:center;}
   .kpi-s-label{font-size:10px;color:var(--text-muted);margin-bottom:2px;}
-  .kpi-s-val{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--text);}
+  .kpi-s-val{font-family:var(--font-mono);font-size:19px;font-weight:700;color:var(--text);}
 
   @media print{body{background:white;display:block;}#controls,#nav-dots,.nav-arrow{display:none;}#deck{box-shadow:none;border-radius:0;}.slide{position:relative;opacity:1!important;transform:none!important;pointer-events:all;page-break-after:always;width:100%;}}
   :fullscreen #deck,:-webkit-full-screen #deck{width:100vw;height:100vh;border-radius:0;}
@@ -140,7 +145,7 @@
       <div class="cover-sub">株式会社田口住生活設計室</div>
       <div class="cover-tags">
         <div class="cover-tag hi">2026年4月 定例</div>
-        <div class="cover-tag">3/1 – 3/31 実績</div>
+        <div class="cover-tag">4/1 – 4/14 実測</div>
         <div class="cover-tag">HPサイト編</div>
       </div>
     </div>
@@ -149,9 +154,9 @@
       <div class="cover-deco d2"></div>
       <div class="cover-deco d3"></div>
       <div class="cover-stat">
-        <span class="cover-stat-val">765</span>
-        <div class="cover-stat-label">セッション数（3月）</div>
-        <div class="cover-stat-badge">▲ +60.4%</div>
+        <span class="cover-stat-val">221</span>
+        <div class="cover-stat-label">セッション（4月 14日間）</div>
+        <div class="cover-stat-badge">3月確定値 765</div>
       </div>
     </div>
     <div class="cover-credit">KISHINO MASASHI</div>
@@ -161,31 +166,34 @@
   <!-- S2: KPI -->
   <div class="slide" id="s2">
     <div class="slide-inner">
-      <div class="slide-label">01 — CORPORATE SITE KPI SUMMARY</div>
-      <div class="slide-title">コーポレートサイト 2026年3月 数値サマリー</div>
+      <div class="slide-label">01 — KPI SUMMARY</div>
+      <div class="slide-title">4月 途中経過（4/1〜4/14）／ 3月確定値 比較</div>
       <div class="kpi-grid">
-        <div class="kpi-card up">
-          <div class="kpi-label">セッション数</div>
-          <div class="kpi-value">765</div>
-          <span class="kpi-badge up">▲ +60.4%</span>
+        <div class="kpi-card neutral">
+          <div class="kpi-label">セッション数（4月 14日間）</div>
+          <div class="kpi-value">221</div>
+          <span class="kpi-badge neutral">3月: 765</span>
+          <div class="kpi-sub">日割り換算 → 月475ペース</div>
         </div>
-        <div class="kpi-card up">
-          <div class="kpi-label">ユーザー数</div>
-          <div class="kpi-value">482</div>
-          <span class="kpi-badge up">▲ +47.9%</span>
+        <div class="kpi-card neutral">
+          <div class="kpi-label">ユーザー数（4月 14日間）</div>
+          <div class="kpi-value">158</div>
+          <span class="kpi-badge neutral">3月: 482</span>
+          <div class="kpi-sub">日割り換算 → 月340ペース</div>
         </div>
-        <div class="kpi-card up">
-          <div class="kpi-label">イベント数</div>
-          <div class="kpi-value">5,810</div>
-          <span class="kpi-badge up">▲ +68.0%</span>
+        <div class="kpi-card neutral">
+          <div class="kpi-label">イベント数（4月 14日間）</div>
+          <div class="kpi-value">1,270</div>
+          <span class="kpi-badge neutral">3月: 5,810</span>
         </div>
         <div class="kpi-card warn">
-          <div class="kpi-label">直帰率</div>
-          <div class="kpi-value">39.9%</div>
-          <span class="kpi-badge warn">前月 36.3%</span>
+          <div class="kpi-label">直帰率（4月）</div>
+          <div class="kpi-value">43.9%</div>
+          <span class="kpi-badge warn">3月: 39.9%</span>
+          <div class="kpi-sub">▲ +4.0pt 微増</div>
         </div>
       </div>
-      <div class="chart-label">セッション数 月次推移（10月〜3月）</div>
+      <div class="chart-label">セッション数 月次推移（10月〜4月）</div>
       <div class="chart-area"><canvas id="trendChart"></canvas></div>
     </div>
     <div class="slide-num">2 / 6</div>
@@ -195,18 +203,18 @@
   <div class="slide" id="s3">
     <div class="slide-inner">
       <div class="slide-label">02 — CHANNEL & SNS ANALYSIS</div>
-      <div class="slide-title">流入チャネル分析 ／ SNS別振り返り</div>
+      <div class="slide-title">流入チャネル分析 ／ SNS別（4月 14日間実測）</div>
       <div class="two-col">
         <div class="col-panel">
-          <div class="col-label">流入チャネル構成（3月）</div>
+          <div class="col-label">流入チャネル構成（4月）</div>
           <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
         </div>
         <div class="col-panel">
-          <div class="col-label">SNSプラットフォーム別流入（セッション数）</div>
+          <div class="col-label">SNSプラットフォーム別流入（4月 vs 3月）</div>
           <div class="chart-wrap"><canvas id="snsChart"></canvas></div>
           <div class="sns-note">
-            <span>✅</span>
-            <div>YouTube（リフォーム百科事典）が52件で前月比2倍。HPリンクが概要欄に設定されているYouTubeだけが安定した流入構造になっています。noteは先月ゼロから15件に急増。</div>
+            <span>⚠️</span>
+            <div>Voicyは4月も3月もゼロ件。noteは3月7件→4月0件に減少。YouTubeのみが安定した流入源（4月20件）。HP直リンクがあるチャンネルだけが機能しています。</div>
           </div>
         </div>
       </div>
@@ -218,56 +226,56 @@
   <div class="slide" id="s4">
     <div class="slide-inner">
       <div class="slide-label">03 — TOP PAGES</div>
-      <div class="slide-title">アクセスが多かったページ Top6</div>
+      <div class="slide-title">アクセスが多かったページ（4月 14日間）</div>
       <div class="pages-grid">
         <div class="rank-list">
           <div class="rank-item hi">
             <div class="rank-n">1</div>
             <div class="rank-info">
-              <div class="rank-name">さいたま市のリフォームなら田口住生活設計</div>
+              <div class="rank-name">さいたま市のリフォームなら田口住生活設計室</div>
               <div class="rank-path">/</div>
             </div>
-            <div class="rank-pv">760</div>
+            <div class="rank-pv">181</div>
           </div>
           <div class="rank-item hi">
             <div class="rank-n">2</div>
             <div class="rank-info">
-              <div class="rank-name">お問い合わせ | 株式会社田口住生活設計</div>
-              <div class="rank-path">/contact</div>
+              <div class="rank-name">会社紹介 | 株式会社田口住生活設計室</div>
+              <div class="rank-path">/company</div>
             </div>
-            <div class="rank-pv">204</div>
+            <div class="rank-pv">51</div>
           </div>
           <div class="rank-item">
             <div class="rank-n">3</div>
             <div class="rank-info">
-              <div class="rank-name">ブログ | 株式会社田口住生活設計室</div>
-              <div class="rank-path">/blog</div>
+              <div class="rank-name">お問い合わせ | 株式会社田口住生活設計室</div>
+              <div class="rank-path">/contact</div>
             </div>
-            <div class="rank-pv">149</div>
+            <div class="rank-pv">37</div>
           </div>
-          <div class="rank-item">
+          <div class="rank-item new">
             <div class="rank-n">4</div>
             <div class="rank-info">
-              <div class="rank-name">会社紹介 | 株式会社田口住生活設計室</div>
-              <div class="rank-path">/company</div>
+              <div class="rank-name">TOTOトイレはタンクあり・タンクなしどちらがいい？<span class="rank-badge">ブログ</span></div>
+              <div class="rank-path">/blog/1848</div>
             </div>
-            <div class="rank-pv">117</div>
+            <div class="rank-pv">20</div>
           </div>
           <div class="rank-item">
             <div class="rank-n">5</div>
             <div class="rank-info">
-              <div class="rank-name">リフォーム工事 | 株式会社田口住生活設</div>
+              <div class="rank-name">リフォーム工事 | 株式会社田口住生活設計室</div>
               <div class="rank-path">/renovation</div>
             </div>
-            <div class="rank-pv">87</div>
+            <div class="rank-pv">17</div>
           </div>
           <div class="rank-item">
             <div class="rank-n">6</div>
             <div class="rank-info">
-              <div class="rank-name">耐震診断・補強計画 | 株式会社田口住生</div>
-              <div class="rank-path">/inspection</div>
+              <div class="rank-name">経営理念 | 株式会社田口住生活設計室</div>
+              <div class="rank-path">/concept</div>
             </div>
-            <div class="rank-pv">66</div>
+            <div class="rank-pv">15</div>
           </div>
         </div>
         <div class="col-panel">
@@ -279,32 +287,28 @@
     <div class="slide-num">4 / 6</div>
   </div>
 
-  <!-- S5: 作業状況確認 -->
+  <!-- S5: 作業状況 -->
   <div class="slide" id="s5">
     <div class="slide-inner">
       <div class="slide-label">04 — TASK STATUS</div>
-      <div class="slide-title">作業状況確認 ／ 3月〜4月</div>
+      <div class="slide-title">作業状況確認</div>
       <div class="work-grid">
         <div class="work-col">
           <div class="work-head done">✅ 完了</div>
           <div class="work-item">
             <div class="work-dot green"></div>
-            <div>YouTube「リフォーム百科事典」<br>概要欄にHP直リンク設定済み</div>
+            <div>YouTube「リフォーム百科事典」概要欄にHP直リンク設定済み<br>→ 安定した流入を維持（4月20件）</div>
           </div>
           <div class="work-item">
             <div class="work-dot green"></div>
-            <div>3月 GA4月次レポート作成・共有</div>
-          </div>
-          <div class="work-item">
-            <div class="work-dot green"></div>
-            <div>note記事からのHP誘導リンク（記事内）</div>
+            <div>4月定例MTG資料作成（スライド・レジュメ・カンペ）</div>
           </div>
         </div>
         <div class="work-col">
           <div class="work-head check">⚠️ 確認中</div>
           <div class="work-item">
             <div class="work-dot yellow"></div>
-            <div>Instagram プロフィールへのHP追加<br>（現在は記事内のみ）</div>
+            <div>Instagram プロフィールへのHP追加<br>（現状は記事内のみ）</div>
           </div>
           <div class="work-item">
             <div class="work-dot yellow"></div>
@@ -315,11 +319,11 @@
           <div class="work-head todo">🔲 次回アクション</div>
           <div class="work-item">
             <div class="work-dot gray"></div>
-            <div>Voicy 概要欄への<br>HP URL追加（5分で完了）</div>
+            <div>Voicy 概要欄に<br>HP URL追加</div>
           </div>
           <div class="work-item">
             <div class="work-dot gray"></div>
-            <div>note プロフィール設定に<br>WebサイトURL追加</div>
+            <div>note プロフィールに<br>WebサイトURL追加</div>
           </div>
           <div class="work-item">
             <div class="work-dot gray"></div>
@@ -342,17 +346,17 @@
           <div class="action-item">
             <div class="action-num">①</div>
             <div>
-              <strong>Voicy概要欄にHP URLを追加する</strong><br>
-              <div class="action-meta">根拠: GA4 Voicy流入 = 0件/月。概要欄・チャンネルページにリンクなし</div>
-              放送ごとの説明欄にtaguchijyuseikatsu.comを1行追加するだけ。毎放送の視聴者をHPへ誘導できる最もコストゼロの施策。
+              <strong>Voicy概要欄にHP URLを追加する</strong>
+              <div class="action-data">根拠: GA4 Voicy流入 = 0件（4月・3月ともにゼロ）</div>
+              各放送の説明欄に taguchijyuseikatsu.com を1行追加。チャンネルページにも設定。5分で完了。
             </div>
           </div>
           <div class="action-item">
             <div class="action-num">②</div>
             <div>
-              <strong>noteプロフィールにWebサイトURLを設定する</strong><br>
-              <div class="action-meta">根拠: note流入 2月0件 → 3月15件（急増）/ プロフィールリンクなし</div>
-              noteの設定画面「プロフィール編集 → ウェブサイト」にHPを追加。継続的な流入構造になる。
+              <strong>noteプロフィールにWebサイトURLを設定する</strong>
+              <div class="action-data">根拠: note流入 3月7件 → 4月0件に減少 / プロフィールリンクなし</div>
+              noteプロフィール編集 →「ウェブサイト」欄にHP追加。記事更新なくても恒常的に流入する構造になる。
             </div>
           </div>
         </div>
@@ -361,57 +365,53 @@
           <div class="action-item">
             <div class="action-num">③</div>
             <div>
-              <strong>Instagram プロフィールにHP直リンク追加</strong><br>
-              <div class="action-meta">現状: 記事内のみリンクあり。プロフィールページからHP誘導なし</div>
-              Instagramプロフィール編集 → 「ウェブサイト」欄にHP URL追加。
+              <strong>Instagram プロフィールにHP直リンク追加</strong>
+              <div class="action-data">現状: 記事内のみリンクあり。プロフィールページからの誘導なし</div>
+              プロフィール編集 →「ウェブサイト」欄にHP URL追加。
             </div>
           </div>
           <div class="action-item">
             <div class="action-num">④</div>
             <div>
-              <strong>YouTube「言葉の百科事典」概要欄にHP追加</strong><br>
-              <div class="action-meta">現状: リフォーム百科事典はHP直リンクあり・言葉の百科事典はなし</div>
-              2チャンネル体制のため、両チャンネルの概要欄統一を検討。
+              <strong>直帰率 43.9% の改善観察を継続</strong>
+              <div class="action-data">3月39.9% → 4月43.9%（+4.0pt）。月末まで推移を見る</div>
+              トップページから施工事例・ブログへの内部リンクを強化して回遊を促す。
             </div>
           </div>
         </div>
       </div>
       <div class="kpi-summary-bar">
         <div class="kpi-s-item">
-          <div class="kpi-s-label">セッション</div>
-          <div class="kpi-s-val">765</div>
+          <div class="kpi-s-label">4月セッション</div>
+          <div class="kpi-s-val">221</div>
         </div>
         <div class="kpi-s-item">
-          <div class="kpi-s-label">ユーザー</div>
-          <div class="kpi-s-val">482</div>
-        </div>
-        <div class="kpi-s-item">
-          <div class="kpi-s-label">イベント</div>
-          <div class="kpi-s-val">5,810</div>
+          <div class="kpi-s-label">4月ユーザー</div>
+          <div class="kpi-s-val">158</div>
         </div>
         <div class="kpi-s-item">
           <div class="kpi-s-label">直帰率</div>
-          <div class="kpi-s-val">39.9%</div>
+          <div class="kpi-s-val">43.9%</div>
         </div>
         <div class="kpi-s-item">
           <div class="kpi-s-label">YouTube</div>
-          <div class="kpi-s-val">52</div>
+          <div class="kpi-s-val">20</div>
         </div>
         <div class="kpi-s-item">
           <div class="kpi-s-label">note</div>
-          <div class="kpi-s-val">15</div>
+          <div class="kpi-s-val">0</div>
         </div>
         <div class="kpi-s-item">
           <div class="kpi-s-label">Voicy</div>
           <div class="kpi-s-val">0</div>
         </div>
-        <div style="margin-left:auto;font-size:11px;color:var(--text-muted);">3月データ確定値</div>
+        <div style="margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">4/1〜4/14 実測値</div>
       </div>
     </div>
     <div class="slide-num">6 / 6</div>
   </div>
 
-</div><!-- #deck -->
+</div>
 
 <div id="nav-dots">
   <button class="dot active" onclick="goTo(0)"></button>
@@ -428,114 +428,81 @@
 let cur = 0;
 const slides = document.querySelectorAll('.slide');
 const dots   = document.querySelectorAll('.dot');
+function goTo(n){slides[cur].classList.remove('active');dots[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dots[cur].classList.add('active');}
+function move(d){goTo(cur+d);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')move(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')move(-1);});
+function toggleFS(){if(!document.fullscreenElement)document.getElementById('deck').requestFullscreen();else document.exitFullscreen();}
 
-function goTo(n) {
-  slides[cur].classList.remove('active');
-  dots[cur].classList.remove('active');
-  cur = (n + slides.length) % slides.length;
-  slides[cur].classList.add('active');
-  dots[cur].classList.add('active');
-}
-function move(d) { goTo(cur + d); }
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
-});
-function toggleFS() {
-  if (!document.fullscreenElement) document.getElementById('deck').requestFullscreen();
-  else document.exitFullscreen();
-}
+const TC='#C4622D',TP='#D4895A',PO='#5A7A3A',CA='#B07020',BO='#E2D0BC',TX='#2C1A0E',TS='#7A5A40';
 
-const TC = '#C4622D', TP = '#D4895A', PO = '#5A7A3A', CA = '#B07020', BO = '#E2D0BC', TX = '#2C1A0E', TS = '#7A5A40';
+function initCharts(){
+  Chart.defaults.font.family="'Noto Sans JP',sans-serif";
+  Chart.defaults.color=TS;
 
-function initCharts() {
-  Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
-  Chart.defaults.color = TS;
-
-  // トレンド（10月〜3月）
-  new Chart(document.getElementById('trendChart'), {
-    type: 'line',
-    data: {
-      labels: ["10月", "11月", "12月", "1月", "2月", "3月"],
-      datasets: [{
-        data: [695, null, null, null, 477, 765],
-        borderColor: TC, backgroundColor: 'rgba(196,98,45,0.08)',
-        borderWidth: 2.5, pointBackgroundColor: TC,
-        pointRadius: [4,0,0,0,4,4], pointHoverRadius: 9,
-        fill: true, tension: 0.4,
-        spanGaps: false,
+  // トレンド（10月〜4月）
+  new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{
+      labels:['10月','11月','12月','1月','2月','3月','4月(途中)'],
+      datasets:[{
+        data:[695,null,null,null,477,765,221],
+        borderColor:TC,backgroundColor:'rgba(196,98,45,0.08)',
+        borderWidth:2.5,pointBackgroundColor:[TC,TC,TC,TC,TC,TC,TP],
+        pointRadius:[4,0,0,0,4,4,4],pointHoverRadius:9,
+        fill:true,tension:0.4,spanGaps:false,
       }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600 },
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { grid: { color: BO }, ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TS } },
-        x: { grid: { display: false }, ticks: { font: { size: 12 }, color: TS } }
-      }
-    }
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},
+      plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:BO},ticks:{font:{family:"'IBM Plex Mono'",size:11},color:TS}},
+              x:{grid:{display:false},ticks:{font:{size:12},color:TS}}}}
   });
 
-  // チャネル ドーナツ（3月推定）
-  new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ["Organic Search 49.2%", "Direct 36.3%", "Organic Video 6.8%", "Referral 5.5%", "Organic Social 2.2%"],
-      datasets: [{
-        data: [49.2, 36.3, 6.8, 5.5, 2.2],
-        backgroundColor: [TC, '#8C4A2F', TS, TP, BO],
-        borderWidth: 2, borderColor: '#FDFAF6', hoverOffset: 6,
+  // チャネル ドーナツ（4月実測）
+  new Chart(document.getElementById('donutChart'),{
+    type:'doughnut',
+    data:{
+      labels:['Organic Search 46.4%','Direct 38.1%','Organic Video 8.8%','Referral 3.9%','Organic Social 2.8%'],
+      datasets:[{
+        data:[46.4,38.1,8.8,3.9,2.8],
+        backgroundColor:[TC,'#8C4A2F',TS,TP,BO],
+        borderWidth:2,borderColor:'#FDFAF6',hoverOffset:6,
       }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600 }, cutout: '62%',
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, usePointStyle: true, color: TX } } }
-    }
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,color:TX}}}}
   });
 
-  // SNS 棒グラフ
-  new Chart(document.getElementById('snsChart'), {
-    type: 'bar',
-    data: {
-      labels: ['YouTube', 'note', 'LINE', 'Voicy'],
-      datasets: [
-        { label: '3月', data: [52, 15, 1, 0], backgroundColor: [TC, TP, 'rgba(196,98,45,0.4)', BO], borderRadius: 5 },
-        { label: '前月(2月)', data: [26, 0, 0, 0], backgroundColor: [BO, BO, BO, BO], borderRadius: 5 }
+  // SNS 棒グラフ（4月 vs 3月）
+  new Chart(document.getElementById('snsChart'),{
+    type:'bar',
+    data:{
+      labels:['YouTube','note','LINE','Voicy'],
+      datasets:[
+        {label:'4月(14日間)',data:[20,0,0,0],backgroundColor:[TC,TP,'rgba(196,98,45,0.4)',BO],borderRadius:5},
+        {label:'3月(全月)',data:[51,7,0,0],backgroundColor:[BO,BO,BO,BO],borderRadius:5}
       ]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600 },
-      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 11 }, padding: 10, color: TX } } },
-      scales: {
-        y: { grid: { color: BO }, ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TS } },
-        x: { grid: { display: false }, ticks: { font: { size: 12 }, color: TX } }
-      }
-    }
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},
+      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},padding:10,color:TX}}},
+      scales:{y:{grid:{color:BO},ticks:{font:{family:"'IBM Plex Mono'",size:11},color:TS}},
+              x:{grid:{display:false},ticks:{font:{size:12},color:TX}}}}
   });
 
   // ページ 横棒
-  new Chart(document.getElementById('pagesChart'), {
-    type: 'bar',
-    data: {
-      labels: ["トップ", "お問い合わせ", "ブログ", "会社紹介", "リフォーム工事", "耐震診断"],
-      datasets: [{ data: [760, 204, 149, 117, 87, 66], backgroundColor: [TC, TP, 'rgba(196,98,45,0.55)', BO, BO, BO], borderRadius: 5 }]
+  new Chart(document.getElementById('pagesChart'),{
+    type:'bar',
+    data:{
+      labels:['トップ','会社紹介','お問い合わせ','TOTOブログ','リフォーム工事','経営理念'],
+      datasets:[{data:[181,51,37,20,17,15],
+        backgroundColor:[TC,TP,'rgba(196,98,45,0.55)',PO,BO,BO],borderRadius:5}]
     },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 600 },
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: BO }, ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TS } },
-        y: { grid: { display: false }, ticks: { font: { size: 12 }, color: TX } }
-      }
-    }
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:600},
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:BO},ticks:{font:{family:"'IBM Plex Mono'",size:11},color:TS}},
+              y:{grid:{display:false},ticks:{font:{size:12},color:TX}}}}
   });
 }
-
 initCharts();
 </script>
 </body>

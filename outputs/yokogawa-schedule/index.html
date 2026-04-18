@@ -4,6 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>横川まさや県政事務所 年間運用計画 | セカンドパステル</title>
+<script>
+(function(){
+  const PW = 'yokokawa2026';
+  const KEY = 'sp_yw_auth';
+  if (sessionStorage.getItem(KEY) !== '1') {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('pw-overlay').style.display = 'flex';
+      document.getElementById('pw-input').focus();
+    });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('pw-overlay').style.display = 'none';
+    });
+  }
+  window.__checkPW = function() {
+    const val = document.getElementById('pw-input').value;
+    if (val === PW) {
+      sessionStorage.setItem(KEY, '1');
+      document.getElementById('pw-overlay').style.display = 'none';
+    } else {
+      document.getElementById('pw-error').style.opacity = '1';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+      setTimeout(function(){ document.getElementById('pw-error').style.opacity = '0'; }, 2000);
+    }
+  };
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
@@ -641,9 +669,83 @@ html, body {
   transition: background 0.35s ease;
 }
 .slide > *:not(.bg-blob) { position: relative; z-index: 1; }
+
+/* ===== PASSWORD OVERLAY ===== */
+#pw-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+#pw-overlay .pw-logo {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+#pw-overlay .pw-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+#pw-overlay .pw-box {
+  display: flex;
+  gap: 8px;
+}
+#pw-input {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 220px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#pw-input:focus { border-color: var(--accent); }
+#pw-submit {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+#pw-submit:hover { opacity: 0.85; }
+#pw-error {
+  font-size: 12px;
+  color: #EF5350;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
 </style>
 </head>
 <body>
+
+<!-- Password Overlay -->
+<div id="pw-overlay">
+  <div class="pw-logo">Second Pastel — Confidential</div>
+  <div class="pw-title">横川まさや県政事務所<br>年間運用計画</div>
+  <div class="pw-box">
+    <input id="pw-input" type="password" placeholder="パスワードを入力"
+      onkeydown="if(event.key==='Enter') __checkPW()">
+    <button id="pw-submit" onclick="__checkPW()">開く</button>
+  </div>
+  <div id="pw-error">パスワードが違います</div>
+</div>
 
 <!-- Theme Switcher -->
 <div class="theme-switcher">

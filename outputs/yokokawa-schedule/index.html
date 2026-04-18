@@ -762,6 +762,60 @@ html, body {
 .owner-them { color: var(--text-muted); }
 .deadline { font-size: 12px; color: var(--text-muted); }
 
+/* ===== PRINT BUTTON ===== */
+.print-btn {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 200;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.print-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  html, body {
+    overflow: visible !important;
+    background: white !important;
+  }
+  #pw-overlay, .theme-switcher, .nav-btn, .dots, .slide-counter, .print-btn, .bg-blob {
+    display: none !important;
+  }
+  .slides {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  .slide {
+    position: relative !important;
+    inset: unset !important;
+    width: 297mm !important;
+    height: 167mm !important;
+    display: flex !important;
+    opacity: 1 !important;
+    transform: none !important;
+    page-break-after: always;
+    break-after: page;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: white !important;
+  }
+  .slide:last-child { page-break-after: avoid; break-after: avoid; }
+}
+
 /* ===== BG DECORATION ===== */
 .bg-blob {
   position: absolute;
@@ -851,6 +905,9 @@ html, body {
   </div>
   <div id="pw-error">パスワードが違います</div>
 </div>
+
+<!-- Print Button -->
+<button class="print-btn" onclick="printSlides()">🖨 印刷 / PDF保存</button>
 
 <!-- Theme Switcher -->
 <div class="theme-switcher">
@@ -1463,6 +1520,18 @@ function setTheme(theme, btn) {
   document.documentElement.setAttribute('data-theme', theme);
   document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+}
+
+function printSlides() {
+  // 全スライドを一時的に visible にしてから印刷
+  slides.forEach(s => s.style.display = 'flex');
+  window.print();
+  // 印刷後に元の状態へ戻す
+  slides.forEach((s, i) => {
+    s.style.display = '';
+    if (i !== current) s.classList.remove('active');
+    else s.classList.add('active');
+  });
 }
 </script>
 </body>

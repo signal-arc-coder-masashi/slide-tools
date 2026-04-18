@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打ち合わせレジュメ｜田口住生活設計室｜2026年4月定例</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7EFE5;--surface:#FDFAF6;--border:#E2D0BC;
+    --primary:#8C4A2F;--accent:#C4622D;--accent2:#D4895A;--accent-pale:#F5DFD0;
+    --positive:#5A7A3A;--positive-bg:#EDF5E6;--caution:#B07020;--caution-bg:#FDF4E0;
+    --text:#2C1A0E;--text-sub:#7A5A40;--text-muted:#A88A70;
+    --font-serif:'Noto Serif JP',serif;--font-body:'Noto Sans JP',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-body);background:var(--bg);color:var(--text);padding:40px;max-width:900px;margin:0 auto;line-height:1.7;}
+  .header{border-bottom:3px solid var(--primary);padding-bottom:20px;margin-bottom:32px;}
+  .header-label{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;}
+  .header-title{font-family:var(--font-serif);font-size:28px;color:var(--primary);margin-bottom:6px;}
+  .header-meta{font-size:13px;color:var(--text-sub);display:flex;gap:24px;flex-wrap:wrap;}
+  section{margin-bottom:32px;}
+  h2{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .agenda{display:flex;flex-direction:column;gap:8px;}
+  .agenda-item{display:grid;grid-template-columns:60px 1fr 60px;gap:12px;align-items:center;padding:10px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);}
+  .agenda-time{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);}
+  .agenda-text{font-size:13px;font-weight:500;}
+  .agenda-min{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-align:right;}
+  .agenda-item.hi{border-color:rgba(196,98,45,0.3);background:var(--accent-pale);}
+  table{width:100%;border-collapse:collapse;}
+  th{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);background:var(--bg);}
+  td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .num{font-family:var(--font-mono);font-size:16px;font-weight:700;}
+  .num.sm{font-size:14px;}
+  .badge{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:2px 10px;border-radius:100px;}
+  .badge.neutral{background:var(--bg);border:1px solid var(--border);color:var(--text-muted);}
+  .badge.warn{background:var(--caution-bg);color:var(--caution);}
+  .badge.zero{background:#FEE2E2;color:#B91C1C;}
+  .note-row{background:var(--accent-pale);}
+  .disc-list{display:flex;flex-direction:column;gap:10px;}
+  .disc-item{padding:14px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border);}
+  .disc-item.urgent{border-color:rgba(196,98,45,0.4);background:var(--accent-pale);}
+  .disc-label{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;}
+  .disc-label.urgent{color:var(--accent);}
+  .disc-text{font-size:13px;line-height:1.6;}
+  .action-list{display:flex;flex-direction:column;gap:8px;}
+  .action-item{display:grid;grid-template-columns:24px 1fr 80px;gap:12px;align-items:start;padding:12px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:13px;}
+  .action-item.high{border-color:rgba(196,98,45,0.3);background:var(--accent-pale);}
+  .action-num{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent);}
+  .action-owner{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-align:right;padding-top:2px;}
+  .footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">MEETING RESUME — MONTHLY REPORT</div>
+  <div class="header-title">GA4 月次レポート 4月定例</div>
+  <div class="header-meta">
+    <span>📅 2026年4月25日（土）</span>
+    <span>🏢 株式会社田口住生活設計室</span>
+    <span>📊 4月途中経過（4/1〜4/14）+ 3月確定値</span>
+    <span>📝 KISHINO MASASHI</span>
+  </div>
+</div>
+
+<section>
+  <h2>アジェンダ</h2>
+  <div class="agenda">
+    <div class="agenda-item hi">
+      <div class="agenda-time">①</div>
+      <div class="agenda-text">4月途中経過 + 3月確定値 数値報告</div>
+      <div class="agenda-min">10分</div>
+    </div>
+    <div class="agenda-item hi">
+      <div class="agenda-time">②</div>
+      <div class="agenda-text">チャネル別流入分析（Voicy・note課題共有）</div>
+      <div class="agenda-min">10分</div>
+    </div>
+    <div class="agenda-item">
+      <div class="agenda-time">③</div>
+      <div class="agenda-text">改善アクション確認・合意</div>
+      <div class="agenda-min">10分</div>
+    </div>
+    <div class="agenda-item">
+      <div class="agenda-time">④</div>
+      <div class="agenda-text">作業状況確認・次回日程</div>
+      <div class="agenda-min">10分</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>KPI サマリー</h2>
+  <table>
+    <thead>
+      <tr><th>指標</th><th>4月（4/1〜4/14）</th><th>3月（確定）</th><th>状況</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>セッション数</td>
+        <td><span class="num">221</span> <span style="font-size:11px;color:var(--text-muted);">※日割月換算→475</span></td>
+        <td><span class="num">765</span></td>
+        <td>月末まで推移観察</td>
+      </tr>
+      <tr>
+        <td>ユーザー数</td>
+        <td><span class="num">158</span></td>
+        <td><span class="num">482</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>イベント数</td>
+        <td><span class="num">1,270</span></td>
+        <td><span class="num">5,810</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>直帰率</td>
+        <td><span class="num">43.9%</span></td>
+        <td><span class="num">39.9%</span></td>
+        <td><span class="badge warn">▲ +4.0pt 微増</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>SNS チャネル別流入</h2>
+  <table>
+    <thead>
+      <tr><th>チャネル</th><th>4月（14日間）</th><th>3月（全月）</th><th>HP直リンク</th><th>メモ</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>YouTube（リフォーム百科事典）</td>
+        <td><span class="num sm">20</span></td>
+        <td><span class="num sm">51</span></td>
+        <td>✅ 設定済</td>
+        <td>唯一安定した流入源</td>
+      </tr>
+      <tr class="note-row">
+        <td>note</td>
+        <td><span class="num sm" style="color:#B91C1C;">0</span></td>
+        <td><span class="num sm">7</span></td>
+        <td>❌ プロフになし</td>
+        <td>記事更新ない月はゼロに</td>
+      </tr>
+      <tr>
+        <td>LINE</td>
+        <td><span class="num sm" style="color:var(--text-muted);">0</span></td>
+        <td><span class="num sm" style="color:var(--text-muted);">0</span></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr class="note-row">
+        <td>Voicy</td>
+        <td><span class="num sm" style="color:#B91C1C;">0</span></td>
+        <td><span class="num sm" style="color:#B91C1C;">0</span></td>
+        <td>❌ リンクなし</td>
+        <td>2ヶ月連続ゼロ</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>人気ページ Top6（4月 4/1〜4/14）</h2>
+  <table>
+    <thead>
+      <tr><th>順位</th><th>ページ</th><th>PV</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>トップ（/）</td><td><span class="num sm">181</span></td></tr>
+      <tr><td>2</td><td>会社紹介（/company）</td><td><span class="num sm">51</span></td></tr>
+      <tr><td>3</td><td>お問い合わせ（/contact）</td><td><span class="num sm">37</span></td></tr>
+      <tr><td>4 <span class="badge neutral">ブログ</span></td><td>TOTOトイレはタンクあり・タンクなしどちらがいい？</td><td><span class="num sm">20</span></td></tr>
+      <tr><td>5</td><td>リフォーム工事（/renovation）</td><td><span class="num sm">17</span></td></tr>
+      <tr><td>6</td><td>経営理念（/concept）</td><td><span class="num sm">15</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>討議ポイント</h2>
+  <div class="disc-list">
+    <div class="disc-item urgent">
+      <div class="disc-label urgent">🎯 改善提案① Voicy</div>
+      <div class="disc-text">
+        <strong>Voicy概要欄にHP URLを追加する</strong><br>
+        4月・3月ともにGA4でVoicy流入ゼロ。概要欄・チャンネルページにHPリンクが存在しない状態が続いています。各放送の説明欄に taguchijyuseikatsu.com を1行追加するだけ。5分で完了できます。
+      </div>
+    </div>
+    <div class="disc-item urgent">
+      <div class="disc-label urgent">🎯 改善提案② note</div>
+      <div class="disc-text">
+        <strong>noteプロフィールにWebサイトURLを設定する</strong><br>
+        3月は7件の流入があったものの、4月は0件に減少。記事更新がない月は流入がゼロになる不安定な構造です。noteプロフィール設定の「ウェブサイト」欄にHP URLを追加すれば、記事更新なしでも恒常的な流入経路ができます。
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>次月アクションリスト</h2>
+  <div class="action-list">
+    <div class="action-item high">
+      <div class="action-num">①</div>
+      <div>Voicy 各放送説明欄 + チャンネルページにHP URL追加</div>
+      <div class="action-owner">田口さん</div>
+    </div>
+    <div class="action-item high">
+      <div class="action-num">②</div>
+      <div>noteプロフィール「ウェブサイト」にHP URL設定</div>
+      <div class="action-owner">田口さん</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">③</div>
+      <div>Instagram プロフィールにHP直リンク追加</div>
+      <div class="action-owner">田口さん</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num">④</div>
+      <div>4月末データ集計・5月定例準備</div>
+      <div class="action-owner">岸野</div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <span>GA4 月次レポート｜田口住生活設計室｜2026年4月定例</span>
+  <span>KISHINO MASASHI</span>
+</div>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GA4 月次レポート｜田口住生活設計室｜2026年3月</title>
+<title>GA4 月次レポート｜田口住生活設計室｜2026年2月</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -15,9 +15,9 @@
     --bg2:         #F0E4D4;
     --surface:     #FDFAF6;
     --border:      #E2D0BC;
-    --primary:     #8C4A2F;   /* deep terracotta */
-    --accent:      #C4622D;   /* terracotta */
-    --accent2:     #D4895A;   /* light terracotta */
+    --primary:     #8C4A2F;
+    --accent:      #C4622D;
+    --accent2:     #D4895A;
     --accent-pale: #F5DFD0;
     --positive:    #5A7A3A;
     --positive-bg: #EDF5E6;
@@ -188,7 +188,6 @@
     display: flex;
     align-items: stretch;
   }
-  /* left panel */
   .cover-left {
     flex: 1;
     display: flex;
@@ -198,7 +197,6 @@
     position: relative;
     z-index: 2;
   }
-  /* right panel */
   .cover-right {
     width: 400px;
     background: var(--accent);
@@ -215,7 +213,6 @@
     inset: 0;
     background: linear-gradient(135deg, rgba(253,250,246,0.06) 0%, transparent 60%);
   }
-  /* decorative circles */
   .cover-deco {
     position: absolute;
     border-radius: 50%;
@@ -224,7 +221,6 @@
   .cover-deco.d1 { width: 280px; height: 280px; bottom: -60px; right: -60px; }
   .cover-deco.d2 { width: 180px; height: 180px; top: 40px; right: 40px; }
   .cover-deco.d3 { width: 80px;  height: 80px;  top: 150px; right: 180px; background: rgba(253,250,246,0.05); }
-  /* big stat in cover right */
   .cover-stat {
     position: relative;
     z-index: 2;
@@ -256,7 +252,6 @@
     margin-top: 10px;
     color: #FDE8D8;
   }
-
   .cover-eyebrow {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -381,16 +376,14 @@
     margin-bottom: 10px;
   }
   .chart-wrap { flex: 1; position: relative; min-height: 0; }
-
-  /* SNS info row */
   .sns-note {
     margin-top: 12px;
     padding: 10px 14px;
-    background: var(--caution-bg);
-    border: 1px solid rgba(176,112,32,0.2);
+    background: var(--positive-bg);
+    border: 1px solid rgba(90,122,58,0.2);
     border-radius: 8px;
     font-size: 12px;
-    color: var(--caution);
+    color: var(--positive);
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -449,40 +442,59 @@
   }
 
   /* ════════════════════
-     SLIDE 5 — Status
+     SLIDE 5 — LINE活用方針
   ════════════════════ */
-  .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; flex: 1; }
-  .status-col { display: flex; flex-direction: column; gap: 10px; }
-  .status-head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 14px;
-    border-radius: 8px;
-    font-size: 13px;
+  .line-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+  .line-col { display: flex; flex-direction: column; gap: 10px; }
+  .line-head {
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 7px;
+    margin-bottom: 2px;
   }
-  .status-head.done { background: var(--positive-bg); color: var(--positive); }
-  .status-head.wip  { background: var(--accent-pale); color: var(--accent); }
-  .status-head.todo { background: var(--bg2); color: var(--text-sub); border: 1px solid var(--border); }
-  .status-card {
+  .line-head.status { background: var(--positive-bg); color: var(--positive); }
+  .line-head.issue  { background: var(--caution-bg); color: var(--caution); }
+  .line-head.action { background: var(--accent-pale); color: var(--accent); }
+  .line-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 11px 14px;
+    border-radius: 8px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 14px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
   }
-  .status-card.done { background: var(--positive-bg); border-color: rgba(90,122,58,0.2); }
-  .status-card.wip  { background: var(--accent-pale); border-color: rgba(196,98,45,0.2); }
-  .status-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text); line-height: 1.4; }
-  .s-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-  .s-dot.done { background: var(--positive); }
-  .s-dot.wip  { background: var(--accent); }
-  .s-dot.todo { background: var(--border); }
-  .s-note { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+  .line-item.hi { background: var(--accent-pale); border-color: rgba(196,98,45,0.25); }
+  .line-bullet {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+    background: var(--border);
+  }
+  .line-bullet.green { background: var(--positive); }
+  .line-bullet.orange { background: var(--accent); }
+  .line-bullet.caution { background: var(--caution); }
+  .line-stat-row {
+    margin-top: auto;
+    padding: 12px 16px;
+    background: var(--positive-bg);
+    border: 1px solid rgba(90,122,58,0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .line-stat-row strong { font-family: var(--font-mono); color: var(--positive); font-size: 20px; font-weight: 700; }
 
   /* ════════════════════
      SLIDE 6 — Actions
@@ -573,7 +585,7 @@
       <div class="cover-tags">
         <div class="cover-tag hi">2026年3月</div>
         <div class="cover-tag">3/1 – 3/31</div>
-        <div class="cover-tag">BtoBサイト編</div>
+        <div class="cover-tag">HPサイト編</div>
       </div>
     </div>
     <div class="cover-right">
@@ -583,7 +595,7 @@
       <div class="cover-stat">
         <span class="cover-stat-val">765</span>
         <div class="cover-stat-label">セッション数</div>
-        <div class="cover-stat-badge">▲ +60%</div>
+        <div class="cover-stat-badge">▲ +60.4%</div>
       </div>
     </div>
     <div class="cover-credit">KISHINO MASASHI</div>
@@ -593,31 +605,46 @@
   <!-- ── S2: KPI ── -->
   <div class="slide" id="s2">
     <div class="slide-inner">
-      <div class="slide-label">02 — KPI SUMMARY</div>
-      <div class="slide-title">2026年3月 数値サマリー</div>
+      <div class="slide-label">01 — CORPORATE SITE KPI SUMMARY</div>
+      <div class="slide-title">コーポレートサイト 2026年3月 数値サマリー</div>
       <div class="kpi-grid">
         <div class="kpi-card up">
           <div class="kpi-label">セッション数</div>
           <div class="kpi-value">765</div>
-          <span class="kpi-badge up">▲ +60%</span>
+          <span class="kpi-badge up">▲ +60.4%</span>
         </div>
         <div class="kpi-card up">
           <div class="kpi-label">ユーザー数</div>
-          <div class="kpi-value">485</div>
-          <span class="kpi-badge up">▲ +48%</span>
+          <div class="kpi-value">482</div>
+          <span class="kpi-badge up">▲ +47.4%</span>
         </div>
         <div class="kpi-card up">
-          <div class="kpi-label">ページビュー</div>
-          <div class="kpi-value">2,113</div>
-          <span class="kpi-badge up">▲ +71%</span>
+          <div class="kpi-label">イベント数</div>
+          <div class="kpi-value">5,810</div>
+          <span class="kpi-badge up">▲ +46.6%</span>
         </div>
-        <div class="kpi-card accent">
+        <div class="kpi-card warn">
           <div class="kpi-label">直帰率</div>
           <div class="kpi-value">39.9%</div>
-          <span class="kpi-badge up">▼ 改善中</span>
+          <span class="kpi-badge warn">▼ やや上昇</span>
         </div>
       </div>
-      <div class="chart-label">セッション数 月次推移</div>
+      <div style="display:flex;gap:12px;margin-bottom:12px;">
+        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+          <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:4px;">イベント内訳（主要）</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <span style="font-size:12px;color:var(--text);">page_view <strong style="font-family:var(--font-mono);">2,113</strong></span>
+            <span style="font-size:12px;color:var(--text);">scroll <strong style="font-family:var(--font-mono);">502</strong></span>
+            <span style="font-size:12px;color:var(--text);">click <strong style="font-family:var(--font-mono);">76</strong></span>
+            <span style="font-size:12px;color:var(--text);">first_visit <strong style="font-family:var(--font-mono);">456</strong></span>
+          </div>
+        </div>
+        <div style="flex:1;background:var(--caution-bg);border:1px solid rgba(176,112,32,0.2);border-radius:8px;padding:10px 14px;">
+          <div style="font-size:10px;font-family:var(--font-mono);color:var(--caution);margin-bottom:4px;">⚠️ 海外アクセスを確認</div>
+          <div style="font-size:12px;color:var(--text);">US <strong style="font-family:var(--font-mono);">62</strong>　China <strong style="font-family:var(--font-mono);">22</strong>　Singapore <strong style="font-family:var(--font-mono);">4</strong>　— ボットの可能性あり・要確認</div>
+        </div>
+      </div>
+      <div class="chart-label">セッション数 月次推移（コーポレートサイト）</div>
       <div class="chart-area"><canvas id="trendChart"></canvas></div>
     </div>
     <div class="slide-num">2 / 6</div>
@@ -626,19 +653,19 @@
   <!-- ── S3: Channels ── -->
   <div class="slide" id="s3">
     <div class="slide-inner">
-      <div class="slide-label">03 — CHANNEL ANALYSIS</div>
-      <div class="slide-title">流入チャネル分析</div>
+      <div class="slide-label">02 — CHANNEL & SNS ANALYSIS</div>
+      <div class="slide-title">流入チャネル分析 ／ SNS別振り返り</div>
       <div class="two-col">
         <div class="col-panel">
-          <div class="col-label">流入チャネル構成（3月）</div>
+          <div class="col-label">流入チャネル構成（2月）</div>
           <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
         </div>
         <div class="col-panel">
-          <div class="col-label">SNSプラットフォーム別流入</div>
+          <div class="col-label">SNSプラットフォーム別流入（セッション数）</div>
           <div class="chart-wrap"><canvas id="snsChart"></canvas></div>
           <div class="sns-note">
-            <span>⚠️</span>
-            <div>3月はFacebook経由が主な流入源（計9件）。LINE・note・Voicyからの流入は引き続きゼロ。YouTubeは計測対象外。各プラットフォームへのURL設置が急務。</div>
+            <span>✅</span>
+            <div>YouTube+100%（26→52）・note新規15件と急成長。LINEも初流入（1件）。VoicyはURL設置・連動施策で次月から伸ばしたい。</div>
           </div>
         </div>
       </div>
@@ -649,8 +676,8 @@
   <!-- ── S4: Pages ── -->
   <div class="slide" id="s4">
     <div class="slide-inner">
-      <div class="slide-label">04 — TOP PAGES</div>
-      <div class="slide-title">アクセスが多かったページ・テーマ</div>
+      <div class="slide-label">03 — TOP PAGES</div>
+      <div class="slide-title">アクセスが多かったページ Top5</div>
       <div class="pages-grid">
         <div class="rank-list">
           <div class="rank-item hi">
@@ -659,44 +686,53 @@
               <div class="rank-name">トップ（リフォーム百科事典）⭐</div>
               <div class="rank-path">/</div>
             </div>
-            <div class="rank-pv">429</div>
+            <div class="rank-pv">760</div>
             <div class="rank-diff up">主力</div>
           </div>
-          <div class="rank-item">
+          <div class="rank-item hi">
             <div class="rank-n">2</div>
             <div class="rank-info">
-              <div class="rank-name">お問い合わせ</div>
+              <div class="rank-name">お問い合わせ ⭐</div>
               <div class="rank-path">/contact</div>
             </div>
-            <div class="rank-pv">151</div>
+            <div class="rank-pv">204</div>
             <div class="rank-diff up">好調</div>
           </div>
           <div class="rank-item">
             <div class="rank-n">3</div>
             <div class="rank-info">
-              <div class="rank-name">会社紹介</div>
-              <div class="rank-path">/company</div>
+              <div class="rank-name">ブログ</div>
+              <div class="rank-path">/blog</div>
             </div>
-            <div class="rank-pv">103</div>
-            <div class="rank-diff up">安定</div>
+            <div class="rank-pv">149</div>
+            <div class="rank-diff up">新登場</div>
           </div>
           <div class="rank-item">
             <div class="rank-n">4</div>
             <div class="rank-info">
-              <div class="rank-name">リフォーム工事</div>
-              <div class="rank-path">/renovation</div>
+              <div class="rank-name">会社紹介</div>
+              <div class="rank-path">/company</div>
             </div>
-            <div class="rank-pv">53</div>
-            <div class="rank-diff up">—</div>
+            <div class="rank-pv">117</div>
+            <div class="rank-diff up">安定</div>
           </div>
           <div class="rank-item">
             <div class="rank-n">5</div>
             <div class="rank-info">
-              <div class="rank-name">職人紹介</div>
-              <div class="rank-path">/craftsman</div>
+              <div class="rank-name">リフォーム工事</div>
+              <div class="rank-path">/renovation</div>
             </div>
-            <div class="rank-pv">52</div>
+            <div class="rank-pv">87</div>
             <div class="rank-diff up">—</div>
+          </div>
+          <div class="rank-item">
+            <div class="rank-n">6</div>
+            <div class="rank-info">
+              <div class="rank-name">耐震診断・補強計画</div>
+              <div class="rank-path">/earthquake</div>
+            </div>
+            <div class="rank-pv">66</div>
+            <div class="rank-diff up">注目</div>
           </div>
         </div>
         <div class="col-panel">
@@ -708,57 +744,63 @@
     <div class="slide-num">4 / 6</div>
   </div>
 
-  <!-- ── S5: Status ── -->
+  <!-- ── S5: LINE活用方針 ── -->
   <div class="slide" id="s5">
     <div class="slide-inner">
-      <div class="slide-label">05 — TASK STATUS</div>
-      <div class="slide-title">作業状況確認</div>
-      <div class="status-grid">
-        <div class="status-col">
-          <div class="status-head done">✅ 完了</div>
-          <div class="status-card done">
-            <div class="status-item">
-              <div class="s-dot done"></div>
-              <div>LINE配信（3月分 実施済み）<div class="s-note">流入数は引き続き計測中</div></div>
-            </div>
-            <div class="status-item">
-              <div class="s-dot done"></div>
-              <div>Voicy配信（継続中）<div class="s-note">前月比データ未集計</div></div>
-            </div>
-            <div class="status-item">
-              <div class="s-dot done"></div>
-              <div>月次レポート作成・共有<div class="s-note">本レポート（3月分）</div></div>
-            </div>
+      <div class="slide-label">04 — LINE STRATEGY</div>
+      <div class="slide-title">LINE活用方針 整理</div>
+      <div class="line-grid">
+        <div class="line-col">
+          <div class="line-head status">現状・強み</div>
+          <div class="line-item">
+            <div class="line-bullet green"></div>
+            <div>LINE流入 <strong style="color:var(--positive);font-family:var(--font-mono);">+34.4%</strong>（32→43件）全チャネル最高伸び率</div>
+          </div>
+          <div class="line-item">
+            <div class="line-bullet green"></div>
+            <div>配信後24h以内の流入が集中。CTAが機能している証拠</div>
+          </div>
+          <div class="line-item">
+            <div class="line-bullet green"></div>
+            <div>郵送440通/月 → LINEへのデジタル移行ポテンシャルが高い</div>
+          </div>
+          <div class="line-item">
+            <div class="line-bullet green"></div>
+            <div>担当：大谷若菜さん。実務推進がしやすい体制</div>
+          </div>
+          <div class="line-head issue" style="margin-top:8px;">課題・未決事項</div>
+          <div class="line-item">
+            <div class="line-bullet caution"></div>
+            <div>複数端末からのアクセス方法が未確認</div>
+          </div>
+          <div class="line-item">
+            <div class="line-bullet caution"></div>
+            <div>配信テーマ・コンテンツ企画が未確定</div>
           </div>
         </div>
-        <div class="status-col">
-          <div class="status-head wip">⚙️ 進行中</div>
-          <div class="status-card wip">
-            <div class="status-item">
-              <div class="s-dot wip"></div>
-              <div>note「住まいQ&A」シリーズ<div class="s-note">記事末尾CTA設置を並行して進める</div></div>
-            </div>
-            <div class="status-item">
-              <div class="s-dot wip"></div>
-              <div>LINE配信コンテンツ設計<div class="s-note">月3回体制への移行準備</div></div>
-            </div>
+        <div class="line-col">
+          <div class="line-head action">今日決めること（チェックリスト）</div>
+          <div class="line-item hi">
+            <div class="line-bullet orange"></div>
+            <div>□ 配信テーマを1つ決定する（ビフォーアフター / 季節メンテ / Q&A）</div>
           </div>
-        </div>
-        <div class="status-col">
-          <div class="status-head todo">🔲 未着手・要確認</div>
-          <div class="status-card">
-            <div class="status-item">
-              <div class="s-dot todo"></div>
-              <div>YouTube概要欄URLを冒頭に移動<div class="s-note">全動画のURL位置を修正</div></div>
-            </div>
-            <div class="status-item">
-              <div class="s-dot todo"></div>
-              <div>BtoBページにLINE CTA設置<div class="s-note">LINE流入がゼロのため急務</div></div>
-            </div>
-            <div class="status-item">
-              <div class="s-dot todo"></div>
-              <div>各SNSにBtoBページURL追加<div class="s-note">note・Instagram・Voicy概要欄</div></div>
-            </div>
+          <div class="line-item hi">
+            <div class="line-bullet orange"></div>
+            <div>□ 配信頻度を確定する（月2回 → 3回移行タイミング）</div>
+          </div>
+          <div class="line-item hi">
+            <div class="line-bullet orange"></div>
+            <div>□ コーポレートサイトへのLINE登録CTA設置に合意する</div>
+          </div>
+          <div class="line-item hi">
+            <div class="line-bullet orange"></div>
+            <div>□ 友だち追加の促進方法を確認（QRコード・HP設置等）</div>
+          </div>
+          <div class="line-stat-row">
+            <div>現在の流入</div>
+            <strong>43</strong>
+            <div style="color:var(--text-sub);font-size:12px;">件/月（前月32）</div>
+            <div style="margin-left:auto;font-size:12px;color:var(--text-sub);">目標：SNS流入全体の <strong style="color:var(--positive);font-family:var(--font-mono);">15%以上</strong></div>
           </div>
         </div>
       </div>
@@ -769,8 +811,8 @@
   <!-- ── S6: Actions ── -->
   <div class="slide" id="s6">
     <div class="slide-inner">
-      <div class="slide-label">06 — NEXT ACTIONS</div>
-      <div class="slide-title">投稿CTA設置の進め方｜4月アクション</div>
+      <div class="slide-label">05 — NEXT ACTIONS</div>
+      <div class="slide-title">来月の施策・決定事項｜優先度別アクション</div>
       <div class="divider"></div>
       <div class="action-grid">
         <div class="action-col">
@@ -778,52 +820,45 @@
           <div class="action-item hi">
             <div class="action-num">1</div>
             <div class="action-text">
-              <strong>LINE配信を月3回体制へ</strong>
-              施工事例ビフォーアフターを1本追加。配信後24h流入を最大化する
-              <small>→ LINE流入がゼロから脱却するための最優先施策</small>
-            </div>
-          </div>
-          <div class="action-item hi">
-            <div class="action-num">2</div>
-            <div class="action-text">
-              <strong>BtoBページにLINE CTA設置</strong>
-              ページ内にQRコードとLINE友だち追加ボタンを配置
-              <small>→ 3ヶ月連続でLINE流入ゼロ。入口を作ることが先決</small>
+              <strong>LINE：配信テーマを決定する</strong>
+              今日この場でテーマを1本確定。配信日・担当者もセットで合意する
+              <small>→ 全チャネル最高の伸び率。最優先で強化すべき施策</small>
             </div>
           </div>
         </div>
         <div class="action-col">
           <div class="action-col-label mid">◎ 優先度 中</div>
           <div class="action-item">
+            <div class="action-num mid">2</div>
+            <div class="action-text">
+              <strong>YouTube：概要欄URLを冒頭に移動</strong>
+              直近10本の動画から着手。動画内に「詳細はリンクから」テロップも追加
+              <small>→ YouTube流入-5.6%の主因。すぐできる・無料の改善</small>
+            </div>
+          </div>
+          <div class="action-item">
             <div class="action-num mid">3</div>
             <div class="action-text">
-              <strong>YouTube概要欄URLを冒頭に移動</strong>
-              直近10本の動画から着手。動画内テロップも追加
-              <small>→ YouTube流入が唯一の外部チャネル。さらに伸ばす</small>
+              <strong>note：反応の良いテーマに絞り末尾にCTAを設置</strong>
+              「施工事例を見る」「相談はこちら」リンクを記事末尾に追加
+              <small>→ +12%安定成長中。CTAで問い合わせへの導線を作る</small>
             </div>
           </div>
           <div class="action-item">
             <div class="action-num mid">4</div>
             <div class="action-text">
-              <strong>note記事末尾にCTA設置</strong>
-              「施工事例を見る」「相談はこちら」リンクを全記事末尾に
-            </div>
-          </div>
-          <div class="action-item">
-            <div class="action-num mid">5</div>
-            <div class="action-text">
-              <strong>Instagram・Voicyの概要欄にURLを追加</strong>
-              Facebookからの流入が発生（9件）。他SNSの導線も整備
+              <strong>お問い合わせページの動線改善確認</strong>
+              モバイルCTAボタン視認性・施工事例→問い合わせ導線を見直す
+              <small>→ /contactが唯一のマイナス(-3.3%)。回遊は増えている</small>
             </div>
           </div>
         </div>
       </div>
       <div class="goal-row">
-        <div class="goal-label">4〜6月 目標</div>
+        <div class="goal-label">3ヶ月目標</div>
         <div class="goal-items">
-          <div class="goal-item">セッション <strong>765 → 1,000+</strong></div>
-          <div class="goal-item">LINE流入 <strong>0 → 20+件</strong></div>
-          <div class="goal-item">SNS経由全体 <strong>→ 全体の15%以上</strong></div>
+          <div class="goal-item">セッション数 <strong>765 → 1,000+</strong></div>
+          <div class="goal-item">SNS・LINE流入 <strong>全体の15%以上</strong></div>
         </div>
       </div>
     </div>
@@ -880,18 +915,19 @@ function initCharts() {
   Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
   Chart.defaults.color = TEXTSUB;
 
-  // Trend
+  // Trend — 6ヶ月推移 (9月〜2月)
   new Chart(document.getElementById('trendChart'), {
     type: 'line',
     data: {
-      labels: ['9月','10月','2月','3月'],
+      labels: ['10月','2月','3月'],
       datasets: [{
-        data: [811, 695, 477, 765],
+        data: [695, 477, 765],
         borderColor: TERRACOTTA,
         backgroundColor: 'rgba(196,98,45,0.08)',
         borderWidth: 2.5,
         pointBackgroundColor: TERRACOTTA,
-        pointRadius: [4,4,4,7],
+        pointRadius: [4,4,7],
+
         pointHoverRadius: 9,
         fill: true,
         tension: 0.4,
@@ -915,13 +951,13 @@ function initCharts() {
     }
   });
 
-  // Donut — channel breakdown (3月 estimated from same property pattern)
+  // Donut — channel breakdown (2月 HPサイト)
   new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
-      labels: ['Organic Search','Direct','Referral','Organic Social','その他'],
+      labels: ['Organic Search 49.3%','Direct 36.3%','Organic Video 6.8%','Referral 5.5%','Social 2.0%'],
       datasets: [{
-        data: [53.9, 30.8, 5.9, 5.5, 3.9],
+        data: [49.3, 36.3, 6.8, 5.5, 2.0],
         backgroundColor: [TERRACOTTA, '#8C4A2F', TEXTSUB, TERRA_PALE, BORDER],
         borderWidth: 2,
         borderColor: '#FDFAF6',
@@ -941,30 +977,44 @@ function initCharts() {
     }
   });
 
-  // SNS bar — only Facebook data from 3月
+  // SNS bar — 2月 HPサイトへの流入
   new Chart(document.getElementById('snsChart'), {
     type: 'bar',
     data: {
-      labels: ['Facebook', 'Instagram', 'その他SNS', 'LINE', 'note', 'Voicy'],
-      datasets: [{
-        label: '3月セッション',
-        data: [9, 1, 1, 0, 0, 0],
-        backgroundColor: [TERRA_PALE, TERRA_PALE, TERRA_PALE, BORDER, BORDER, BORDER],
-        borderRadius: 5,
-      }]
+      labels: ['YouTube', 'note', 'LINE', 'Voicy'],
+      datasets: [
+        {
+          label: '3月',
+          data: [52, 15, 1, 0],
+          backgroundColor: [TERRACOTTA, TERRA_PALE, 'rgba(196,98,45,0.4)', BORDER],
+          borderRadius: 5,
+        },
+        {
+          label: '2月（前月）',
+          data: [26, 0, 0, 0],
+          backgroundColor: [BORDER, BORDER, BORDER, BORDER],
+          borderRadius: 5,
+        }
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600 },
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { font: { size: 11 }, padding: 10, color: TEXT }
+        }
+      },
       scales: {
         y: {
           grid: { color: BORDER },
-          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TEXTSUB, stepSize: 2 }
+          ticks: { font: { family: "'IBM Plex Mono'", size: 11 }, color: TEXTSUB, stepSize: 10 }
         },
         x: {
           grid: { display: false },
-          ticks: { font: { size: 11 }, color: TEXT }
+          ticks: { font: { size: 12 }, color: TEXT }
         }
       }
     }
@@ -974,9 +1024,9 @@ function initCharts() {
   new Chart(document.getElementById('pagesChart'), {
     type: 'bar',
     data: {
-      labels: ['トップ','問い合わせ','会社紹介','リフォーム','職人紹介'],
+      labels: ['トップ','問い合わせ','ブログ','会社紹介','リフォーム','耐震診断'],
       datasets: [{
-        data: [429, 151, 103, 53, 52],
+        data: [760, 204, 149, 117, 87, 66],
         backgroundColor: [TERRACOTTA, TERRA_PALE, 'rgba(196,98,45,0.55)', BORDER, BORDER],
         borderRadius: 5,
       }]

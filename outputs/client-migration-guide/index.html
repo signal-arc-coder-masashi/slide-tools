@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>AIエージェント仕組み一式 クライアントPC 移植ガイド</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Source+Code+Pro:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #FAFAF8;
+    --accent: #4F46E5;
+    --accent-light: #EEF2FF;
+    --accent-dark: #3730A3;
+    --positive: #059669;
+    --positive-light: #ECFDF5;
+    --caution: #D97706;
+    --caution-light: #FFFBEB;
+    --danger: #DC2626;
+    --text-main: #111827;
+    --text-sub: #6B7280;
+    --border: #E5E7EB;
+    --font-jp: 'Noto Sans JP', sans-serif;
+    --font-code: 'Source Code Pro', monospace;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-jp);
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .deck {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+  }
+
+  /* ── Slide Base ── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 720px;
+    padding: 60px 80px;
+    background: var(--primary);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ── Slide number ── */
+  .slide-num {
+    position: absolute;
+    bottom: 22px;
+    right: 36px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Brand watermark ── */
+  .brand-mark {
+    position: absolute;
+    bottom: 22px;
+    left: 80px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-sub);
+    letter-spacing: 0.12em;
+    opacity: 0.6;
+  }
+
+  /* ═══════════════════════════════════════
+     SLIDE 1 — Cover
+  ═══════════════════════════════════════ */
+  .slide-cover {
+    background: var(--accent);
+    padding: 0;
+    justify-content: flex-end;
+  }
+
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 600px at 110% 120%, rgba(99,102,241,0.6) 0%, transparent 60%),
+      radial-gradient(ellipse 500px 400px at -10% -10%, rgba(79,70,229,0.4) 0%, transparent 50%),
+      var(--accent);
+  }
+
+  .cover-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .cover-content {
+    position: relative;
+    z-index: 2;
+    padding: 60px 80px 70px;
+  }
+
+  .cover-label {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 5px 12px;
+    border-radius: 4px;
+  }
+
+  .cover-title {
+    font-size: 58px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .cover-title span {
+    display: block;
+    font-size: 46px;
+    font-weight: 700;
+    opacity: 0.9;
+  }
+
+  .cover-sub {
+    font-size: 17px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 48px;
+    line-height: 1.7;
+  }
+
+  .cover-footer {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .cover-author {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.15em;
+  }
+
+  .cover-brand {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.2em;
+  }
+
+  .cover-deco {
+    position: absolute;
+    top: 60px;
+    right: 80px;
+    width: 280px;
+    height: 280px;
+    opacity: 0.12;
+    border: 2px solid #fff;
+    border-radius: 50%;
+  }
+  .cover-deco::before {
+    content: '';
+    position: absolute;
+    inset: 30px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+  }
+  .cover-deco::after {
+    content: '';
+    position: absolute;
+    inset: 60px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+  }
+
+  /* ═══════════════════════════════════════
+     Shared Content Styles
+  ═══════════════════════════════════════ */
+  .slide-header {
+    margin-bottom: 36px;
+  }
+
+  .slide-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .slide-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .slide-title-line {
+    display: block;
+    width: 48px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-top: 12px;
+  }
+
+  /* ── Two-column layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    flex: 1;
+    align-items: start;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    flex: 1;
+    align-items: start;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-light);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ── List items ── */
+  .item-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .item-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 15px;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
+
+  .item-list li .icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: #cdd6f4;
+    line-height: 1.7;
+    overflow: hidden;
+  }
+
+  .code-block .cmd {
+    color: #a6e3a1;
+  }
+  .code-block .comment {
+    color: #6c7086;
+  }
+  .code-block .key {
+    color: #89b4fa;
+  }
+  .code-block .str {
+    color: #fab387;
+  }
+  .code-block .num {
+    color: #f9e2af;
+  }
+
+  .code-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-sub);
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  /* ── Alert banners ── */
+  .alert {
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .alert-caution {
+    background: var(--caution-light);
+    border-left: 4px solid var(--caution);
+    color: #92400e;
+  }
+
+  .alert-info {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    color: var(--accent-dark);
+  }
+
+  /* ── Step number ── */
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    opacity: 0.15;
+    position: absolute;
+    top: 56px;
+    right: 80px;
+  }
+
+  /* ── Numbered steps ── */
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-text {
+    flex: 1;
+  }
+
+  .step-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 4px;
+  }
+
+  .step-text .step-cmd {
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: var(--text-sub);
+    background: #f3f4f6;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* ── File tree ── */
+  .file-tree {
+    background: #1e1e2e;
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: #cdd6f4;
+    line-height: 1.9;
+  }
+
+  .file-tree .dir { color: #89b4fa; font-weight: 600; }
+  .file-tree .file { color: #cdd6f4; }
+  .file-tree .desc { color: #6c7086; font-size: 11px; }
+  .file-tree .tree-line { color: #313244; }
+
+  /* ── Before/After ── */
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .ba-card {
+    border-radius: 12px;
+    padding: 22px;
+  }
+
+  .ba-card.before {
+    background: var(--caution-light);
+    border: 2px solid #fcd34d;
+  }
+
+  .ba-card.after {
+    background: var(--positive-light);
+    border: 2px solid #6ee7b7;
+  }
+
+  .ba-label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ba-card.before .ba-label { color: #92400e; }
+  .ba-card.after .ba-label { color: #065f46; }
+
+  .ba-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ba-list li {
+    font-size: 14px;
+    line-height: 1.5;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .ba-card.before .ba-list li { color: #92400e; }
+  .ba-card.after .ba-list li { color: #065f46; }
+
+  .ba-card.before .ba-list li::before { content: '✕'; position: absolute; left: 0; font-size: 12px; }
+  .ba-card.after .ba-list li::before { content: '✓'; position: absolute; left: 0; font-size: 12px; }
+
+  /* ── Table ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 9px 14px;
+    text-align: left;
+    letter-spacing: 0.05em;
+  }
+
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-main);
+    font-size: 13px;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: #f9fafb; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+
+  .tag-high { background: #fee2e2; color: #991b1b; }
+  .tag-mid { background: #fef3c7; color: #92400e; }
+  .tag-low { background: #d1fae5; color: #065f46; }
+
+  /* ── Trouble cards ── */
+  .trouble-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+  }
+
+  .trouble-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .trouble-q {
+    background: var(--caution-light);
+    padding: 14px 18px;
+    border-right: 1px solid #fcd34d;
+  }
+
+  .trouble-a {
+    background: var(--positive-light);
+    padding: 14px 18px;
+  }
+
+  .trouble-q-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--caution);
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+
+  .trouble-a-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--positive);
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+
+  .trouble-q p {
+    font-size: 13px;
+    font-weight: 600;
+    color: #92400e;
+    line-height: 1.5;
+  }
+
+  .trouble-a p {
+    font-size: 13px;
+    color: #065f46;
+    line-height: 1.5;
+  }
+
+  /* ═══════════════════════════════════════
+     SLIDE 10 — Checklist (dark)
+  ═══════════════════════════════════════ */
+  .slide-checklist {
+    background: var(--accent);
+    padding: 0;
+  }
+
+  .checklist-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 500px at 110% 110%, rgba(99,102,241,0.5) 0%, transparent 60%),
+      var(--accent);
+  }
+
+  .checklist-content {
+    position: relative;
+    z-index: 2;
+    padding: 52px 80px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .checklist-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 48px;
+    flex: 1;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .check-item:hover { background: rgba(255,255,255,0.15); }
+
+  .check-item.done { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.3); }
+
+  .check-box {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 5px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .check-item.done .check-box {
+    background: #a7f3d0;
+    border-color: #a7f3d0;
+    color: #065f46;
+  }
+
+  .check-item.done .check-box::after { content: '✓'; font-size: 13px; font-weight: 700; }
+
+  .check-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .checklist-footer {
+    margin-top: 24px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* ═══════════════════════════════════════
+     Architecture Diagram
+  ═══════════════════════════════════════ */
+  .arch-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .arch-box {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .arch-box-pc { background: var(--accent-light); color: var(--accent-dark); border: 2px solid var(--accent); }
+  .arch-box-claude { background: var(--accent); color: #fff; }
+  .arch-box-mcp { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .arch-box-svc { background: #f3f4f6; color: var(--text-main); border: 1px solid var(--border); font-size: 12px; font-weight: 500; }
+
+  .arch-arrow {
+    font-size: 18px;
+    color: var(--text-sub);
+    flex-shrink: 0;
+  }
+
+  .arch-indent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-left: 28px;
+  }
+
+  .arch-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-left: 28px;
+  }
+
+  /* ═══════════════════════════════════════
+     Navigation Controls
+  ═══════════════════════════════════════ */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    z-index: 100;
+  }
+
+  .nav-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .nav-btn:hover { background: rgba(255,255,255,0.25); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .nav-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-dot.active {
+    background: #fff;
+    width: 18px;
+    border-radius: 3px;
+  }
+
+  .nav-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    min-width: 44px;
+    text-align: center;
+  }
+
+  .fullscreen-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    transition: background 0.2s;
+    margin-left: 8px;
+  }
+
+  .fullscreen-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* ── Top-right action buttons ── */
+  .top-actions {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    z-index: 200;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-family: var(--font-jp);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .action-btn-pptx {
+    background: #fff;
+    color: #c04000;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .action-btn-pptx:hover {
+    background: #fff5f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+  }
+
+  .action-btn-print {
+    background: #fff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .action-btn-print:hover {
+    background: #f9fafb;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+  }
+
+  .action-btn-pptx .btn-icon,
+  .action-btn-print .btn-icon {
+    font-size: 15px;
+  }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; }
+    .top-actions, .nav { display: none !important; }
+    .deck { width: 100%; height: auto; position: relative; }
+    .slide {
+      position: relative !important;
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+      page-break-after: always;
+      width: 100%;
+      height: auto;
+      min-height: 720px;
+    }
+  }
+
+  /* ── Arch vertical ── */
+  .arch-v {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .arch-v-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* JSON highlight */
+  .code-block .jkey { color: #89b4fa; }
+  .code-block .jstr { color: #a6e3a1; }
+  .code-block .jnum { color: #f9e2af; }
+  .code-block .jpunc { color: #cdd6f4; opacity: 0.6; }
+
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 1: Cover -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide slide-cover active">
+    <div class="cover-bg"></div>
+    <div class="cover-grid"></div>
+    <div class="cover-deco"></div>
+    <div class="cover-content">
+      <div class="cover-label">Migration Guide — Signal Arc</div>
+      <div class="cover-title">
+        AIエージェント仕組み一式
+        <span>クライアントPC 移植ガイド</span>
+      </div>
+      <div class="cover-sub">スムーズに動かすための準備・手順・注意点まとめ</div>
+      <div class="cover-footer">
+        <div class="cover-author">KISHINO MASASHI</div>
+        <div class="cover-brand">Signal Arc</div>
+      </div>
+    </div>
+    <div class="slide-num" style="color:rgba(255,255,255,0.4)">1 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 2: 移植対象の全体像 -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-label">Overview</div>
+      <div class="slide-title">何を移植するのか<span class="slide-title-line"></span></div>
+    </div>
+    <div class="two-col">
+      <!-- Left: component list -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-sub);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;">構成要素</div>
+        <ul class="item-list">
+          <li><span class="icon">🤖</span><div><strong style="font-weight:700;color:var(--text-main)">Claude Code</strong><br><span style="font-size:13px;color:var(--text-sub)">AIエージェント本体。全操作の起点</span></div></li>
+          <li><span class="icon">🔌</span><div><strong style="font-weight:700;color:var(--text-main)">MCPサーバー</strong><br><span style="font-size:13px;color:var(--text-sub)">Gmail / Chatwork / Notion 等との外部連携</span></div></li>
+          <li><span class="icon">📁</span><div><strong style="font-weight:700;color:var(--text-main)">エージェントファイル群</strong><br><span style="font-size:13px;color:var(--text-sub)">CLAUDE.mdで動作を定義した指示書</span></div></li>
+          <li><span class="icon">🐍</span><div><strong style="font-weight:700;color:var(--text-main)">Pythonスクリプト</strong><br><span style="font-size:13px;color:var(--text-sub)">サムネ生成・自動化ツール</span></div></li>
+          <li><span class="icon">🔑</span><div><strong style="font-weight:700;color:var(--text-main)">APIキー・認証情報</strong><br><span style="font-size:13px;color:var(--text-sub)">各サービス接続に必要なシークレット</span></div></li>
+          <li><span class="icon">⚙️</span><div><strong style="font-weight:700;color:var(--text-main)">環境設定ファイル</strong><br><span style="font-size:13px;color:var(--text-sub)">.env / claude.json / CLAUDE.md</span></div></li>
+        </ul>
+      </div>
+      <!-- Right: architecture diagram -->
+      <div class="arch-diagram">
+        <div style="font-size:12px;font-weight:700;color:var(--text-sub);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">システム構成図</div>
+        <div class="arch-v">
+          <div class="arch-v-row">
+            <div class="arch-box arch-box-pc">💻 クライアントPC</div>
+          </div>
+          <div style="padding-left:28px;color:var(--text-sub);font-size:20px;">↓</div>
+          <div class="arch-v-row">
+            <div style="width:20px"></div>
+            <div class="arch-box arch-box-claude">🤖 Claude Code</div>
+          </div>
+          <div style="padding-left:48px;color:var(--text-sub);font-size:20px;">↓</div>
+          <div class="arch-v-row">
+            <div style="width:40px"></div>
+            <div class="arch-box arch-box-mcp">🔌 MCPサーバー群</div>
+          </div>
+          <div style="padding-left:16px;margin-top:4px;">
+            <div style="font-size:11px;font-weight:700;color:var(--text-sub);margin-bottom:8px;letter-spacing:0.08em;">外部サービス接続</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <div class="arch-box arch-box-svc">📧 Gmail</div>
+              <div class="arch-box arch-box-svc">💬 Chatwork</div>
+              <div class="arch-box arch-box-svc">📝 Notion</div>
+              <div class="arch-box arch-box-svc">📂 Google Drive</div>
+              <div class="arch-box arch-box-svc">💼 Slack</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">2 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 3: 事前準備 -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-label">Prerequisites</div>
+      <div class="slide-title">移植前に揃えるもの<span class="slide-title-line"></span></div>
+    </div>
+    <div class="alert alert-caution">
+      <span style="font-size:18px">⚠️</span>
+      <span><strong>これが揃っていないと始まりません</strong> — 以下3点をすべて確認してから作業に入ること</span>
+    </div>
+    <div class="three-col">
+      <!-- Card 1 -->
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">💿</div>ソフトウェア</div>
+        <ul class="item-list" style="gap:8px;">
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Node.js 20 LTS+</strong><br><span style="color:var(--text-sub);font-size:12px;">nvm経由インストール推奨</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Python 3.11+</strong><br><span style="color:var(--text-sub);font-size:12px;">pyenvまたは公式インストーラ</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Git</strong><br><span style="color:var(--text-sub);font-size:12px;">初期設定（name / email）済み</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Claude Code CLI</strong><br><span style="color:var(--text-sub);font-size:12px;">npm install -g で導入</span></div></li>
+        </ul>
+      </div>
+      <!-- Card 2 -->
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">🔑</div>APIキー</div>
+        <ul class="item-list" style="gap:8px;">
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Anthropic API Key</strong><br><span style="color:var(--text-sub);font-size:12px;">console.anthropic.com で発行</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>各サービスのAPIキー</strong><br><span style="color:var(--text-sub);font-size:12px;">Chatwork / Notion / Slack 等</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Google OAuth認証</strong><br><span style="color:var(--text-sub);font-size:12px;">Drive / Gmail の接続許可</span></div></li>
+        </ul>
+      </div>
+      <!-- Card 3 -->
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">🔓</div>アクセス権限</div>
+        <ul class="item-list" style="gap:8px;">
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Googleアカウント</strong><br><span style="color:var(--text-sub);font-size:12px;">Drive・Gmail へのAPI許可</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Chatwork</strong><br><span style="color:var(--text-sub);font-size:12px;">APIトークン取得権限</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>Notion / Slack</strong><br><span style="color:var(--text-sub);font-size:12px;">Integration追加の権限</span></div></li>
+          <li style="font-size:13px;"><span style="font-size:16px">✅</span><div><strong>GitHubアクセス</strong><br><span style="color:var(--text-sub);font-size:12px;">リポジトリのクローン権限</span></div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">3 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 4: Step 1 基盤環境 -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div style="position:absolute;top:52px;right:80px;font-family:var(--font-mono);font-size:80px;font-weight:900;color:var(--accent);opacity:0.08;line-height:1;letter-spacing:-0.04em;">01</div>
+    <div class="slide-header" style="margin-bottom:24px;">
+      <div class="slide-label">Step 1</div>
+      <div class="slide-title">基盤環境のセットアップ<span class="slide-title-line"></span></div>
+    </div>
+    <div class="two-col" style="gap:28px;">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-circle">1</div>
+          <div class="step-text">
+            <strong>パッケージマネージャーを導入</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="comment"># Mac</span><br>
+              <span class="cmd">/bin/bash -c "$(curl -fsSL https://brew.sh/install.sh)"</span><br>
+              <span class="comment"># Windows → WSL2 を先にセットアップ</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">2</div>
+          <div class="step-text">
+            <strong>Node.js 20 LTS をインストール（nvm推奨）</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="cmd">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash</span><br>
+              <span class="cmd">nvm install 20 && nvm use 20</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">3</div>
+          <div class="step-text">
+            <strong>Python 3.11 をインストール</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="cmd">brew install pyenv</span><br>
+              <span class="cmd">pyenv install 3.11 && pyenv global 3.11</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">4</div>
+          <div class="step-text">
+            <strong>Gitの初期設定</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="cmd">git config --global user.name "Your Name"</span><br>
+              <span class="cmd">git config --global user.email "you@example.com"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="alert alert-info" style="margin-bottom:16px;">
+          <span>💡</span>
+          <span><strong>Windowsを使う場合</strong>はWSL2（Ubuntu）環境上での作業を<strong>強く推奨</strong>。<br>パス区切り・権限・シェルの差異でトラブルになりやすい</span>
+        </div>
+        <div class="card" style="padding:18px;">
+          <div class="code-label">バージョン確認コマンド</div>
+          <div class="code-block" style="font-size:12px;line-height:2;">
+            <span class="cmd">node -v</span>   <span class="comment"># v20.x.x 以上</span><br>
+            <span class="cmd">python3 --version</span> <span class="comment"># 3.11.x 以上</span><br>
+            <span class="cmd">git --version</span> <span class="comment"># git version 2.x</span><br>
+            <span class="cmd">npm -v</span>     <span class="comment"># 10.x 以上</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">4 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 5: Step 2 Claude Code -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div style="position:absolute;top:52px;right:80px;font-family:var(--font-mono);font-size:80px;font-weight:900;color:var(--accent);opacity:0.08;line-height:1;letter-spacing:-0.04em;">02</div>
+    <div class="slide-header" style="margin-bottom:24px;">
+      <div class="slide-label">Step 2</div>
+      <div class="slide-title">Claude Code インストール・初期設定<span class="slide-title-line"></span></div>
+    </div>
+    <div class="two-col" style="gap:28px;align-items:stretch;">
+      <div>
+        <div class="code-label">インストール手順</div>
+        <div class="code-block" style="font-size:13px;line-height:2.1;margin-bottom:16px;">
+          <span class="comment"># 1. グローバルインストール</span><br>
+          <span class="cmd">npm install -g @anthropic-ai/claude-code</span><br><br>
+          <span class="comment"># 2. バージョン確認</span><br>
+          <span class="cmd">claude --version</span><br><br>
+          <span class="comment"># 3. 起動 → 初回はAPI Key入力</span><br>
+          <span class="cmd">claude</span><br>
+          <span style="color:#6c7086">  > Enter your Anthropic API key: sk-ant-...</span>
+        </div>
+        <div class="alert alert-caution" style="margin-bottom:0;font-size:13px;">
+          <span>⚠️</span>
+          <span>API Keyは絶対に他人に見せない。<br>チャット・メールへの貼り付け禁止</span>
+        </div>
+      </div>
+      <div>
+        <div class="code-label" style="margin-bottom:8px;">~/.claude/ ディレクトリ構成</div>
+        <div class="file-tree">
+          <span class="dir">~/.claude/</span><br>
+          <span class="tree-line">├── </span><span class="file">CLAUDE.md</span>  <span class="desc">← グローバル指示書（動作ルール）</span><br>
+          <span class="tree-line">├── </span><span class="file">claude.json</span> <span class="desc">← MCP接続設定（機密）</span><br>
+          <span class="tree-line">├── </span><span class="dir">plugins/</span>    <span class="desc">← スキル（拡張機能）</span><br>
+          <span class="tree-line">│   └── </span><span class="dir">marketplaces/</span><br>
+          <span class="tree-line">└── </span><span class="dir">projects/</span>   <span class="desc">← 会話履歴・メモリ</span><br>
+          <span class="tree-line">    └── </span><span class="dir">memory/</span>    <span class="desc">← 永続メモリファイル</span>
+        </div>
+        <div style="margin-top:14px;" class="alert alert-info" style="font-size:13px;">
+          <span>📌</span>
+          <div><strong>CLAUDE.md のコピーが重要</strong><br>
+          <span style="font-size:13px;">グローバルルール・スキル設定が全て記述されている。移植先に合わせて<strong>必ず内容を編集</strong>すること</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">5 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 6: Step 3 MCP設定 -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div style="position:absolute;top:52px;right:80px;font-family:var(--font-mono);font-size:80px;font-weight:900;color:var(--accent);opacity:0.08;line-height:1;letter-spacing:-0.04em;">03</div>
+    <div class="slide-header" style="margin-bottom:20px;">
+      <div class="slide-label">Step 3</div>
+      <div class="slide-title">MCPサーバー 接続設定<span class="slide-title-line"></span></div>
+    </div>
+    <div class="alert alert-caution" style="margin-bottom:20px;font-size:13px;">
+      <span>🔒</span>
+      <span><strong>このファイルには機密情報（APIキー）が含まれます。</strong> Gitに含めない・他者に共有しない・クラウドに平文保存しない</span>
+    </div>
+    <div class="two-col" style="gap:28px;align-items:start;">
+      <div>
+        <div class="code-label">~/.claude/claude.json の構造</div>
+        <div class="code-block" style="font-size:12px;line-height:1.85;">
+<span class="jpunc">{</span><br>
+&nbsp;&nbsp;<span class="jkey">"mcpServers"</span><span class="jpunc">: {</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="jkey">"chatwork"</span><span class="jpunc">: {</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="jkey">"command"</span><span class="jpunc">: </span><span class="jstr">"npx"</span><span class="jpunc">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="jkey">"args"</span><span class="jpunc">: [</span><span class="jstr">"@chatwork/mcp-server"</span><span class="jpunc">],</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="jkey">"env"</span><span class="jpunc">: {</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="jkey">"CHATWORK_API_TOKEN"</span><span class="jpunc">: </span><span class="jstr">"your-token-here"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="jpunc">}</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="jpunc">},</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="jkey">"notion"</span><span class="jpunc">: {</span> <span class="comment">/* 同様の構造 */</span> <span class="jpunc">}</span><br>
+&nbsp;&nbsp;<span class="jpunc">}</span><br>
+<span class="jpunc">}</span>
+        </div>
+      </div>
+      <div>
+        <div class="code-label" style="margin-bottom:10px;">接続サービス一覧</div>
+        <table class="data-table" style="font-size:12px;">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>必要なもの</th>
+              <th>優先度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Gmail / Google Drive</td>
+              <td>OAuth2 認証（ブラウザ承認）</td>
+              <td><span class="tag tag-high">必須</span></td>
+            </tr>
+            <tr>
+              <td>Chatwork</td>
+              <td>APIトークン（設定画面で発行）</td>
+              <td><span class="tag tag-high">必須</span></td>
+            </tr>
+            <tr>
+              <td>Notion</td>
+              <td>Integration Token（notion.so）</td>
+              <td><span class="tag tag-high">必須</span></td>
+            </tr>
+            <tr>
+              <td>Slack</td>
+              <td>Bot Token（OAuth設定）</td>
+              <td><span class="tag tag-mid">推奨</span></td>
+            </tr>
+            <tr>
+              <td>Obsidian</td>
+              <td>直接ファイル書き込みで代替可</td>
+              <td><span class="tag tag-low">任意</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="alert alert-info" style="margin-top:12px;font-size:13px;">
+          <span>📌</span>
+          <span>接続確認は <code style="font-family:var(--font-code);background:#dbeafe;padding:1px 5px;border-radius:3px;">claude</code> 起動後、自然言語でツールを呼び出してテスト</span>
+        </div>
+      </div>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">6 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 7: Step 4 APIキー安全管理 -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div style="position:absolute;top:52px;right:80px;font-family:var(--font-mono);font-size:80px;font-weight:900;color:var(--accent);opacity:0.08;line-height:1;letter-spacing:-0.04em;">04</div>
+    <div class="slide-header" style="margin-bottom:24px;">
+      <div class="slide-label">Step 4</div>
+      <div class="slide-title">APIキー・認証情報の安全な設定<span class="slide-title-line"></span></div>
+    </div>
+    <div class="before-after" style="margin-bottom:20px;">
+      <div class="ba-card before">
+        <div class="ba-label"><span style="font-size:18px">❌</span> NG — やってはいけない</div>
+        <ul class="ba-list">
+          <li>コードファイルやスクリプトに直接書く</li>
+          <li>メール・チャットでAPIキーを送付する</li>
+          <li>GitHubにコミット・公開してしまう</li>
+          <li>クラウドストレージに平文テキストで保存</li>
+          <li>Slackやメモアプリにそのまま貼り付ける</li>
+        </ul>
+      </div>
+      <div class="ba-card after">
+        <div class="ba-label"><span style="font-size:18px">✅</span> OK — 正しい管理方法</div>
+        <ul class="ba-list">
+          <li>.envファイルに記載し、.gitignoreに追加</li>
+          <li>macOSキーチェーンに登録して参照</li>
+          <li>環境変数として設定（export KEY=...）</li>
+          <li>Claude Code GUI のシークレット設定を使用</li>
+          <li>渡す際は1Passwordなどのツール経由で</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="code-label" style="margin-bottom:8px;">必要なAPIキー 一覧</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>サービス</th><th>取得場所</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Anthropic API Key</strong></td><td>console.anthropic.com → API Keys</td><td>Claude Code 本体の動作</td></tr>
+          <tr><td><strong>Chatwork API Token</strong></td><td>chatwork.com → 設定 → API管理</td><td>メッセージ送受信・タスク管理</td></tr>
+          <tr><td><strong>Notion API Token</strong></td><td>notion.so → Settings → Integrations</td><td>ページ作成・データ読み書き</td></tr>
+          <tr><td><strong>Slack Bot Token</strong></td><td>api.slack.com → OAuth & Permissions</td><td>チャンネル投稿・読み取り</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">7 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 8: Step 5 エージェントファイル移植 -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div style="position:absolute;top:52px;right:80px;font-family:var(--font-mono);font-size:80px;font-weight:900;color:var(--accent);opacity:0.08;line-height:1;letter-spacing:-0.04em;">05</div>
+    <div class="slide-header" style="margin-bottom:24px;">
+      <div class="slide-label">Step 5</div>
+      <div class="slide-title">エージェント・プロジェクトファイルの移植<span class="slide-title-line"></span></div>
+    </div>
+    <div class="two-col" style="gap:28px;align-items:start;">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-circle">1</div>
+          <div class="step-text">
+            <strong>GitHubリポジトリをクローン</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="cmd">git clone https://github.com/xxx/cc-company.git</span><br>
+              <span class="cmd">cd cc-company</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">2</div>
+          <div class="step-text">
+            <strong>依存パッケージをインストール</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="cmd">npm install</span>  <span class="comment"># Node.jsプロジェクトの場合</span><br>
+              <span class="cmd">pip install -r requirements.txt</span>  <span class="comment"># Pythonの場合</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">3</div>
+          <div class="step-text">
+            <strong>CLAUDE.md を移植先PCに合わせて編集</strong>
+            <div style="margin-top:5px;font-size:13px;color:var(--text-sub)">会社名・担当者名・絶対パスを書き換える</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">4</div>
+          <div class="step-text">
+            <strong>動作確認テスト</strong>
+            <div class="code-block" style="margin-top:6px;font-size:12px;">
+              <span class="cmd">claude</span>  <span class="comment"># 起動確認</span><br>
+              <span style="color:#6c7086">> 「おはよう」と打って朝ルーティン発火を確認</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="alert alert-caution" style="margin-bottom:16px;">
+          <span>⚠️</span>
+          <div>
+            <strong>絶対パスは必ず書き直す</strong><br>
+            <span style="font-size:13px;">CLAUDE.mdに書かれているパス（例：<code style="font-family:var(--font-code);background:#fef3c7;padding:1px 5px;border-radius:3px;">/Users/kisinomasasi/...</code>）は移植先のユーザー名・ディレクトリに合わせて変更必須</span>
+          </div>
+        </div>
+        <div class="card" style="padding:18px;">
+          <div class="card-title" style="margin-bottom:10px;"><div class="card-title-icon">📋</div>移植後の確認ポイント</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+            <li style="font-size:13px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--positive);font-weight:700;">✓</span><span>CLAUDE.mdが正しい場所に配置されている</span></li>
+            <li style="font-size:13px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--positive);font-weight:700;">✓</span><span>claude.json のMCPサーバーが全て接続済み</span></li>
+            <li style="font-size:13px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--positive);font-weight:700;">✓</span><span>agents/ 配下のCLAUDE.mdが全て読み込まれる</span></li>
+            <li style="font-size:13px;display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--positive);font-weight:700;">✓</span><span>Pythonスクリプトが正常実行できる</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">8 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 9: トラブルシューティング -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-label">Troubleshooting</div>
+      <div class="slide-title">よくあるトラブル Q&amp;A<span class="slide-title-line"></span></div>
+    </div>
+    <div class="trouble-grid">
+      <div class="trouble-card">
+        <div class="trouble-q">
+          <div class="trouble-q-label">🔴 Problem 1</div>
+          <p>MCPサーバーに接続できない<br>（ツール呼び出しがエラーになる）</p>
+        </div>
+        <div class="trouble-a">
+          <div class="trouble-a-label">✅ Solution</div>
+          <p>①&nbsp;APIキー・Tokenの値が正しいか確認<br>②&nbsp;サービス側でIntegration/権限が承認されているか確認<br>③&nbsp;claude.json のパスに誤字がないか確認</p>
+        </div>
+      </div>
+      <div class="trouble-card">
+        <div class="trouble-q">
+          <div class="trouble-q-label">🔴 Problem 2</div>
+          <p>ターミナルで<br><code style="font-family:var(--font-code);font-size:12px;">claude: command not found</code> と出る</p>
+        </div>
+        <div class="trouble-a">
+          <div class="trouble-a-label">✅ Solution</div>
+          <p>①&nbsp;npm global の PATH が通っているか確認<br>②&nbsp;<code style="font-family:var(--font-code);font-size:12px;">export PATH="$PATH:$(npm prefix -g)/bin"</code> を .zshrc に追加<br>③&nbsp;ターミナルを再起動して再試行</p>
+        </div>
+      </div>
+      <div class="trouble-card">
+        <div class="trouble-q">
+          <div class="trouble-q-label">🔴 Problem 3</div>
+          <p>エージェントが指示通りに動かない<br>（別の動作をしてしまう）</p>
+        </div>
+        <div class="trouble-a">
+          <div class="trouble-a-label">✅ Solution</div>
+          <p>①&nbsp;CLAUDE.md の<strong>絶対パス</strong>が移植先と合っているか確認<br>②&nbsp;agents/ 配下のファイルが正しい場所にあるか確認<br>③&nbsp;claude を完全終了して再起動</p>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-info" style="margin-top:16px;font-size:13px;">
+      <span>💬</span>
+      <span>解決しない場合は <strong>KISHINO MASASHI</strong> まで状況・エラーメッセージをそのままスクリーンショットで共有してください</span>
+    </div>
+    <div class="brand-mark">KISHINO MASASHI / Signal Arc</div>
+    <div class="slide-num">9 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SLIDE 10: Checklist -->
+  <!-- ══════════════════════════════ -->
+  <div class="slide slide-checklist">
+    <div class="checklist-bg"></div>
+    <div class="cover-grid"></div>
+    <div class="checklist-content">
+      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.2em;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:14px;">Completion Checklist</div>
+      <div class="checklist-title">移植完了 チェックリスト</div>
+      <div class="checklist-grid">
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">Node.js / Python バージョン確認済み</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">エージェントファイル配置済み</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">Claude Code インストール・起動確認済み</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">CLAUDE.md のパス・内容修正済み</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">MCPサーバー全項目の接続確認済み</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">動作テスト完了（エージェント呼び出し）</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">APIキーの正常動作確認済み</div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('done')">
+          <div class="check-box"></div>
+          <div class="check-text">機密情報の取り扱い説明を実施済み</div>
+        </div>
+      </div>
+      <div class="checklist-footer">
+        完了後は <strong>KISHINO MASASHI</strong> へご報告ください &nbsp;|&nbsp; Signal Arc
+      </div>
+    </div>
+    <div class="slide-num" style="color:rgba(255,255,255,0.4)">10 / 10</div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Top-right action buttons -->
+<div class="top-actions">
+  <button class="action-btn action-btn-pptx" onclick="exportPPTX()">
+    <span class="btn-icon">📊</span> PowerPointに変換
+  </button>
+  <button class="action-btn action-btn-print" onclick="printSlides()">
+    <span class="btn-icon">🖨️</span> 印刷
+  </button>
+</div>
+
+<!-- Navigation -->
+<div class="nav" id="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>‹</button>
+  <div class="nav-dots" id="dots"></div>
+  <div class="nav-label" id="navLabel">1 / 10</div>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">›</button>
+  <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ F</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.getElementById('dots');
+  const navLabel = document.getElementById('navLabel');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let current = 0;
+  const total = slides.length;
+
+  // Build dots
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dots.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dots.children[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, total - 1));
+    slides[current].classList.add('active');
+    dots.children[current].classList.add('active');
+    navLabel.textContent = `${current + 1} / ${total}`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') changeSlide(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp')   changeSlide(-1);
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  function printSlides() {
+    window.print();
+  }
+
+  function exportPPTX() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+    script.onload = () => buildPPTX();
+    document.head.appendChild(script);
+  }
+
+  function buildPPTX() {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE'; // 16:9
+
+    const ACCENT   = '4F46E5';
+    const WHITE    = 'FFFFFF';
+    const TEXTMAIN = '111827';
+    const TEXTSUB  = '6B7280';
+    const POSITIVE = '059669';
+    const CAUTION  = 'D97706';
+    const BGLIGHT  = 'FAFAF8';
+
+    const slideData = [
+      {
+        title: 'AIエージェント仕組み一式',
+        subtitle: 'クライアントPC 移植ガイド',
+        sub2: 'スムーズに動かすための準備・手順・注意点まとめ',
+        type: 'cover'
+      },
+      { title: '何を移植するのか', type: 'content', label: 'Overview' },
+      { title: '移植前に揃えるもの', type: 'content', label: 'Prerequisites' },
+      { title: 'Step 1 — 基盤環境のセットアップ', type: 'content', label: 'Step 1' },
+      { title: 'Step 2 — Claude Code インストール・初期設定', type: 'content', label: 'Step 2' },
+      { title: 'Step 3 — MCPサーバー接続設定', type: 'content', label: 'Step 3' },
+      { title: 'Step 4 — APIキー・認証情報の安全な設定', type: 'content', label: 'Step 4' },
+      { title: 'Step 5 — エージェント・プロジェクトファイルの移植', type: 'content', label: 'Step 5' },
+      { title: 'よくあるトラブル Q&A', type: 'content', label: 'Troubleshooting' },
+      { title: '移植完了 チェックリスト', type: 'checklist', label: 'Checklist' },
+    ];
+
+    const slideContents = [
+      [],
+      ['🤖 Claude Code（AIエージェント本体）', '🔌 MCPサーバー（外部ツール連携）', '📁 エージェントファイル群（指示書）', '🐍 Pythonスクリプト（自動化ツール）', '🔑 APIキー・認証情報', '⚙️ 環境設定ファイル'],
+      ['ソフトウェア: Node.js 20+, Python 3.11+, Git, Claude Code CLI', 'APIキー: Anthropic API Key・各外部サービスAPIキー', 'アクセス権限: Google / Chatwork / Notion / Slack の接続許可'],
+      ['1. Homebrew（Mac）or WSL2（Windows）インストール', '2. Node.js 20 LTS インストール（nvm推奨）', '3. Python 3.11 インストール（pyenvまたは公式）', '4. Git インストール・初期設定（name/email）', '⚠️ WindowsはWSL2環境での作業を強く推奨'],
+      ['npm install -g @anthropic-ai/claude-code', 'claude --version で確認', 'claude で起動 → 初回API Key入力', '~/.claude/ 配下にCLAUDE.md / claude.json / plugins/ が生成される'],
+      ['claude.json の mcpServers にサービスごとの設定を記述', 'Gmail/Google Drive → OAuth認証', 'Chatwork → APIトークン', 'Notion → Integration Token', 'Slack → Bot Token', '⚠️ このファイルは機密情報を含む。Git管理・共有禁止'],
+      ['❌ NG: コードに直書き / メール送付 / GitHubにコミット', '✅ OK: .envファイルに記載 / macOSキーチェーン / 環境変数として設定', '必要なキー: Anthropic / Chatwork / Notion / Slack / Google OAuth'],
+      ['1. GitHubリポジトリをクローン', '2. npm install / pip install -r requirements.txt', '3. CLAUDE.mdの会社名・担当者名・絶対パスを修正', '4. claude で起動・動作確認テスト', '⚠️ 絶対パスは必ず移植先のユーザー名に合わせて書き直す'],
+      ['❓ MCPサーバーに接続できない → APIキー確認・サービス側の権限確認', '❓ claude: command not found → npm global PATHの設定確認', '❓ エージェントが指示通り動かない → CLAUDE.mdのパス・記述ミス確認'],
+      ['Node.js / Python バージョン確認済み', 'Claude Code インストール・起動確認済み', 'MCPサーバー全項目接続確認済み', 'APIキー正常動作確認済み', 'エージェントファイル配置済み', 'CLAUDE.md のパス修正済み', '動作テスト完了', '機密情報の取り扱い説明実施済み'],
+    ];
+
+    slideData.forEach((sd, idx) => {
+      const slide = pptx.addSlide();
+
+      if (sd.type === 'cover' || sd.type === 'checklist') {
+        slide.background = { color: ACCENT };
+        slide.addText(sd.title, { x: 0.8, y: 2.0, w: 10, h: 1.2, fontSize: 40, bold: true, color: WHITE, fontFace: 'Noto Sans JP' });
+        if (sd.subtitle) slide.addText(sd.subtitle, { x: 0.8, y: 3.3, w: 10, h: 0.9, fontSize: 32, bold: true, color: WHITE, fontFace: 'Noto Sans JP' });
+        if (sd.sub2) slide.addText(sd.sub2, { x: 0.8, y: 4.4, w: 10, h: 0.6, fontSize: 16, color: 'CCCCFF', fontFace: 'Noto Sans JP' });
+        slide.addText('KISHINO MASASHI   |   Signal Arc', { x: 0.8, y: 6.7, w: 11, h: 0.3, fontSize: 11, color: 'AAAACC', fontFace: 'IBM Plex Mono' });
+      } else {
+        slide.background = { color: BGLIGHT };
+        if (sd.label) {
+          slide.addText(sd.label.toUpperCase(), { x: 0.8, y: 0.35, w: 10, h: 0.3, fontSize: 10, bold: true, color: ACCENT, charSpacing: 3, fontFace: 'Noto Sans JP' });
+        }
+        slide.addText(sd.title, { x: 0.8, y: 0.65, w: 10, h: 0.75, fontSize: 28, bold: true, color: TEXTMAIN, fontFace: 'Noto Sans JP' });
+        slide.addShape(pptx.ShapeType.rect, { x: 0.8, y: 1.42, w: 0.5, h: 0.07, fill: { color: ACCENT }, line: { color: ACCENT } });
+
+        const bullets = slideContents[idx] || [];
+        if (bullets.length > 0) {
+          const bodyText = bullets.map(b => ({ text: b + '\n', options: { bullet: true, fontSize: 14, color: TEXTMAIN, fontFace: 'Noto Sans JP', paraSpaceAfter: 6 } }));
+          slide.addText(bodyText, { x: 0.8, y: 1.7, w: 11.4, h: 4.8 });
+        }
+      }
+
+      slide.addText(`${idx + 1} / ${slideData.length}`, { x: 11.5, y: 7.1, w: 1.2, h: 0.25, fontSize: 10, color: TEXTSUB, fontFace: 'IBM Plex Mono', align: 'right' });
+      slide.addText('KISHINO MASASHI / Signal Arc', { x: 0.8, y: 7.1, w: 5, h: 0.25, fontSize: 10, color: TEXTSUB, fontFace: 'IBM Plex Mono' });
+    });
+
+    pptx.writeFile({ fileName: 'client-migration-guide.pptx' });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カンペ｜岸野専用｜TJS 4月定例</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7EFE5;--surface:#FDFAF6;--border:#E2D0BC;
+    --primary:#8C4A2F;--accent:#C4622D;--accent2:#D4895A;--accent-pale:#F5DFD0;
+    --positive:#5A7A3A;--positive-bg:#EDF5E6;--caution:#B07020;--caution-bg:#FDF4E0;
+    --text:#2C1A0E;--text-sub:#7A5A40;--text-muted:#A88A70;
+    --font-body:'Noto Sans JP',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-body);background:var(--bg);color:var(--text);padding:32px;max-width:1000px;margin:0 auto;line-height:1.6;}
+  .kanpe-header{background:var(--primary);color:white;padding:18px 24px;border-radius:10px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;}
+  .kanpe-header h1{font-size:20px;font-weight:700;}
+  .kanpe-header .meta{font-family:var(--font-mono);font-size:11px;opacity:0.65;}
+  .topic{margin-bottom:24px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);}
+  .topic-header{background:var(--accent);color:white;padding:12px 20px;font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
+  .topic-header span{font-family:var(--font-mono);font-size:10px;opacity:0.7;}
+  .topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+  .topic-col{padding:14px 16px;border-right:1px solid var(--border);}
+  .topic-col:last-child{border-right:none;}
+  .topic-col h3{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;padding:5px 10px;border-radius:5px;}
+  h3.good{background:var(--positive-bg);color:var(--positive);}
+  h3.bad{background:#FEE2E2;color:#B91C1C;}
+  h3.improve{background:var(--caution-bg);color:var(--caution);}
+  h3.caution{background:#EDE9FE;color:#6D28D9;}
+  .tip{background:rgba(196,98,45,0.08);border:1px solid rgba(196,98,45,0.2);border-radius:8px;padding:10px 14px;margin:8px 0 0;font-size:12px;color:var(--accent);font-weight:500;}
+  .tip::before{content:'💬 話し方のコツ：';font-family:var(--font-mono);font-size:10px;font-weight:700;display:block;margin-bottom:4px;}
+  ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
+  li{font-size:12px;line-height:1.55;padding-left:14px;position:relative;}
+  li::before{content:'•';position:absolute;left:0;color:var(--accent2);}
+  .data{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--accent);}
+  .full-col{grid-column:1 / -1;padding:12px 16px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<div class="kanpe-header">
+  <h1>🗒️ 岸野専用カンペ — TJS 4月定例</h1>
+  <div class="meta">2026年4月25日 / 4月実測（4/1〜4/14）+ 3月確定値</div>
+</div>
+
+<!-- HP全体 -->
+<div class="topic">
+  <div class="topic-header">📊 HP全体（コーポレートサイト）<span>taguchijyuseikatsu.com</span></div>
+  <div class="topic-grid">
+    <div class="topic-col">
+      <h3 class="good">✅ 良い面</h3>
+      <ul>
+        <li>4月セッション <span class="data">221</span>（14日間）。日割り換算で月475ペース。3月765と比べると少ないが季節要因もあり</li>
+        <li>Organic Search が流入の <span class="data">46%</span> を占め、SEO経由の安定した訪問が続いている</li>
+        <li>お問い合わせページが37PVで継続的に閲覧されている</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="bad">⚠️ 悪い面</h3>
+      <ul>
+        <li>直帰率 <span class="data">43.9%</span>（3月39.9%から+4.0pt増加）</li>
+        <li>SNS経由の流入がYouTube以外ほぼゼロ。チャネル多様化が課題</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="improve">🎯 改善した方が良い点</h3>
+      <ul>
+        <li>直帰率の改善：トップページからブログ・施工事例への内部リンク強化</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="caution">⚡ 改善の際の注意点</h3>
+      <ul>
+        <li>4月はまだ途中（14日間）。直帰率の変動は月末まで見てから判断すること。今月は「観察継続」の温度感でOK</li>
+      </ul>
+    </div>
+    <div class="full-col">
+      <div class="tip">「4月は現在進行形なのでまだ何とも言えませんが、3月の数値は良い結果でした。直帰率は少し気になりますが月末まで見守りましょう」というトーンで。</div>
+    </div>
+  </div>
+</div>
+
+<!-- YouTube -->
+<div class="topic">
+  <div class="topic-header">▶️ YouTube（リフォーム百科事典）<span>youtube.com/@home-dr</span></div>
+  <div class="topic-grid">
+    <div class="topic-col">
+      <h3 class="good">✅ 良い面</h3>
+      <ul>
+        <li>4月14日間で <span class="data">20件</span>の流入。全SNSの中で唯一安定して機能している</li>
+        <li>HPリンクが概要欄に設定されているから流入が生まれている。正しい構造が機能している証拠</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="bad">⚠️ 悪い面</h3>
+      <ul>
+        <li>「言葉の百科事典」チャンネルはHP概要欄リンクなし。2チャンネル体制で片方だけしか機能していない</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="improve">🎯 改善した方が良い点</h3>
+      <ul>
+        <li>「言葉の百科事典」概要欄にもHP URLを追加する</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="caution">⚡ 注意点</h3>
+      <ul>
+        <li>「言葉の百科事典」はコンテンツの性格が異なるため、HP誘導の優先度は田口さんに確認してから</li>
+      </ul>
+    </div>
+    <div class="full-col">
+      <div class="tip">「YouTubeだけがちゃんとHPへ人を送ってくれています！リンクを置いている効果がGA4ではっきり出ています」と具体的に評価する。</div>
+    </div>
+  </div>
+</div>
+
+<!-- Voicy -->
+<div class="topic">
+  <div class="topic-header">🎙️ Voicy<span>voicy.jp/channel/959345</span></div>
+  <div class="topic-grid">
+    <div class="topic-col">
+      <h3 class="good">✅ 良い面</h3>
+      <ul>
+        <li>音声コンテンツは継続されており、リスナーとの関係構築には機能している</li>
+        <li>専門家が話す音声コンテンツはVoicyとの相性が良い</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="bad">⚠️ 悪い面</h3>
+      <ul>
+        <li>GA4 Voicy流入 <span class="data">0件</span>（3月・4月ともにゼロ）</li>
+        <li>概要欄・チャンネルページともにHPリンクが存在しない</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="improve">🎯 改善した方が良い点</h3>
+      <ul>
+        <li>各放送の説明欄に taguchijyuseikatsu.com を1行追加</li>
+        <li>チャンネルプロフィールにもHP URLを設定</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="caution">⚡ 注意点</h3>
+      <ul>
+        <li>「やってなかったんですか」というニュアンスにならないよう注意。「入口を作るだけで変わります」という前向きな提案として話す</li>
+      </ul>
+    </div>
+    <div class="full-col">
+      <div class="tip">「Voicyのリスナーさんがせっかく聞いてくださっているのに、HPへの入口がないんです。説明欄に1行URLを書くだけで解決します。今日やってみましょうか？」と具体的に誘う。</div>
+    </div>
+  </div>
+</div>
+
+<!-- note -->
+<div class="topic">
+  <div class="topic-header">📝 note<span>note.com/dear_mint4909</span></div>
+  <div class="topic-grid">
+    <div class="topic-col">
+      <h3 class="good">✅ 良い面</h3>
+      <ul>
+        <li>3月は <span class="data">7件</span> の流入。記事を書いた月は流入につながっている</li>
+        <li>記事内のリンクが機能していることは確認済み</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="bad">⚠️ 悪い面</h3>
+      <ul>
+        <li>4月は <span class="data">0件</span>。記事更新がない月は流入がゼロになる不安定な構造</li>
+        <li>プロフィールページにHPリンクなし。田口さんに興味を持った人がHPを探せない</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="improve">🎯 改善した方が良い点</h3>
+      <ul>
+        <li>noteプロフィール設定 →「ウェブサイト」欄にHP URL追加</li>
+        <li>設定後は記事更新なくても継続的な流入経路になる</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="caution">⚡ 注意点</h3>
+      <ul>
+        <li>プロフィールリンクは補完策。記事も継続的に書いてもらうことが根本的な改善</li>
+      </ul>
+    </div>
+    <div class="full-col">
+      <div class="tip">「3月は記事を書いてくださったので7件来ました。でも4月は0件。プロフィールにリンクを入れておけば、記事を書かない月も流入が続きます。1分でできるので今日設定しましょう」</div>
+    </div>
+  </div>
+</div>
+
+<!-- Instagram -->
+<div class="topic">
+  <div class="topic-header">📸 Instagram<span>instagram.com/tjs.reform/</span></div>
+  <div class="topic-grid">
+    <div class="topic-col">
+      <h3 class="good">✅ 良い面</h3>
+      <ul>
+        <li>リフォーム事例の写真はInstagramとの相性が良く、ビジュアル訴求ができている</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="bad">⚠️ 悪い面</h3>
+      <ul>
+        <li>プロフィールにHP直リンクなし（記事内のみ）</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="improve">🎯 改善した方が良い点</h3>
+      <ul>
+        <li>プロフィール編集 →「ウェブサイト」にHP URL追加</li>
+      </ul>
+    </div>
+    <div class="topic-col">
+      <h3 class="caution">⚡ 注意点</h3>
+      <ul>
+        <li>Voicy・noteの対応後でOK。優先度は中。</li>
+      </ul>
+    </div>
+    <div class="full-col">
+      <div class="tip">「VoicyとnoteのURL設定と合わせて、全SNSにHPへの入口を揃えましょう」というまとめ方で伝えると一度に整理できる。</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

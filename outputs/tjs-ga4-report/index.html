@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GA4 月次レポート｜田口住生活設計室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #F8F0E4;
+  --bg2:       #F2E8D8;
+  --surface:   #FDFAF5;
+  --border:    #DFD0B8;
+  --border2:   #CFC0A8;
+  --primary:   #7A3920;
+  --accent:    #B8532A;
+  --accent2:   #C47848;
+  --accent-bg: #F5DECE;
+  --pos:       #4A7030;
+  --pos-bg:    #EBF5E0;
+  --neg:       #9A2020;
+  --neg-bg:    #FAEAEA;
+  --act:       #7A3920;
+  --act-bg:    #F5DECE;
+  --text:      #281808;
+  --text-sub:  #6A4830;
+  --text-muted:#9A7A60;
+  --serif:     'Noto Serif JP', serif;
+  --sans:      'Noto Sans JP', sans-serif;
+  --mono:      'IBM Plex Mono', monospace;
+  --sidebar-w: 200px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOP HEADER ── */
+.site-header {
+  background: var(--primary);
+  color: white;
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.site-header h1 {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.header-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  opacity: 0.6;
+  letter-spacing: 0.08em;
+}
+
+/* ── LAYOUT ── */
+.layout {
+  display: flex;
+  flex: 1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 24px 0;
+  position: sticky;
+  top: 52px;
+  height: calc(100vh - 52px);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.sidebar-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 20px 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.month-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  color: var(--text-sub);
+}
+.month-btn:hover {
+  background: rgba(184,83,42,0.06);
+  color: var(--accent);
+}
+.month-btn.active {
+  background: var(--surface);
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
+.btn-year {
+  font-family: var(--mono);
+  font-size: 9px;
+  opacity: 0.55;
+}
+.btn-month {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  padding: 40px 48px;
+  max-width: 960px;
+  min-width: 0;
+}
+
+/* ── MONTH HERO ── */
+.month-hero {
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 24px;
+  margin-bottom: 40px;
+}
+.hero-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.hero-period {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+.kpi-card {
+  background: var(--surface);
+  padding: 20px 20px 18px;
+}
+.kpi-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.kpi-value {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.kpi-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.kpi-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 100px;
+  margin-top: 5px;
+}
+.badge-up   { background: var(--pos-bg); color: var(--pos); }
+.badge-down { background: var(--neg-bg); color: var(--neg); }
+.badge-warn { background: var(--act-bg); color: var(--act); }
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 48px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── TREND CHART ── */
+.trend-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 24px 16px;
+  overflow: hidden;
+}
+.trend-svg { width: 100%; display: block; }
+
+/* ── SNS BARS ── */
+.sns-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sns-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 60px 60px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.sns-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+.sns-name span {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+.sns-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-muted);
+}
+.bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+.bar-cur  { background: var(--accent); }
+.bar-prev { background: var(--border2); }
+.sns-val  { font-family: var(--serif); font-size: 22px; font-weight: 900; color: var(--primary); text-align: right; }
+.sns-val.zero { color: var(--neg); }
+.sns-diff { font-family: var(--mono); font-size: 9px; color: var(--text-muted); text-align: right; }
+
+/* ── CHANNELS ── */
+.channels-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.donut-wrap { display: flex; justify-content: center; }
+.channel-list { display: flex; flex-direction: column; gap: 10px; }
+.ch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.ch-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.ch-name { flex: 1; color: var(--text-sub); }
+.ch-pct  { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); width: 40px; text-align: right; }
+.ch-num  { font-family: var(--mono); font-size: 10px; color: var(--text-muted); width: 40px; text-align: right; }
+
+/* ── TOP PAGES ── */
+.pages-table { width: 100%; border-collapse: collapse; }
+.pages-table th {
+  font-family: var(--mono); font-size: 9px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+  padding: 8px 12px; text-align: left;
+  border-bottom: 2px solid var(--border);
+  background: var(--bg);
+}
+.pages-table td {
+  padding: 11px 12px; font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.pages-table tr:last-child td { border-bottom: none; }
+.pages-table tbody tr { background: var(--surface); }
+.pages-table tbody tr:hover { background: var(--bg2); }
+.pg-rank { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+.pg-path { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.pg-bar-wrap { width: 140px; }
+.pg-bar-track { height: 4px; background: var(--bg2); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.pg-bar-fill  { height: 100%; background: var(--accent2); border-radius: 2px; }
+.pg-pv { font-family: var(--serif); font-size: 18px; font-weight: 900; color: var(--primary); }
+
+/* ── INSIGHTS ── */
+.insights-list { display: flex; flex-direction: column; gap: 12px; }
+.insight-card {
+  padding: 16px 18px;
+  border-radius: 10px;
+  border-left: 4px solid;
+}
+.insight-card.positive {
+  background: var(--pos-bg); border-color: var(--pos);
+}
+.insight-card.negative {
+  background: var(--neg-bg); border-color: var(--neg);
+}
+.insight-card.action {
+  background: var(--act-bg); border-color: var(--accent);
+}
+.insight-card.highlight {
+  background: linear-gradient(135deg, #FDF3E8 0%, #FAE8D0 100%);
+  border-color: var(--accent);
+  border-width: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.insight-card.highlight::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+.insight-card.highlight .insight-tag {
+  color: var(--accent);
+  font-size: 12px;
+}
+.insight-tag {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  margin-bottom: 6px;
+}
+.insight-card.positive .insight-tag { color: var(--pos); }
+.insight-card.negative .insight-tag { color: var(--neg); }
+.insight-card.action   .insight-tag { color: var(--act); }
+.insight-text { font-size: 12px; line-height: 1.7; color: var(--text-sub); }
+
+/* ── REACH ── */
+.reach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.reach-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.reach-platform {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.reach-num {
+  font-family: var(--serif); font-size: 36px; font-weight: 900;
+  color: var(--primary); line-height: 1;
+}
+.reach-unit {
+  font-family: var(--sans); font-size: 12px; font-weight: 400;
+  color: var(--text-muted); margin-left: 4px;
+}
+.reach-sub {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 6px;
+}
+.reach-badge {
+  display: inline-block; margin-top: 6px;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 100px;
+  background: var(--pos-bg); color: var(--pos);
+}
+.reach-note {
+  font-size: 11px; color: var(--text-muted); line-height: 1.6;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.reach-gap {
+  background: linear-gradient(135deg, #FDF3E8, #FAE8D0);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.reach-gap-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.reach-gap-label {
+  font-family: var(--mono); font-size: 9px; color: var(--text-muted); text-transform: uppercase;
+}
+.reach-gap-val {
+  font-family: var(--serif); font-size: 24px; font-weight: 900; color: var(--primary);
+}
+.reach-gap-arrow {
+  font-size: 20px; color: var(--border2); flex: 1; text-align: center;
+}
+.reach-gap-desc {
+  font-size: 11px; color: var(--text-sub); line-height: 1.6; flex: 2; min-width: 200px;
+}
+
+/* ── FOOTER ── */
+.main-footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  .sidebar {
+    position: static; height: auto; width: 100%;
+    display: flex; overflow-x: auto; padding: 8px 0;
+    border-right: none; border-bottom: 1px solid var(--border);
+  }
+  .sidebar-label { display: none; }
+  .month-btn {
+    flex-direction: row; align-items: center; gap: 4px;
+    white-space: nowrap; padding: 8px 14px;
+    border-left: none; border-bottom: 3px solid transparent;
+  }
+  .month-btn.active { border-bottom-color: var(--accent); border-left: none; }
+  .main { padding: 20px 16px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .hero-title { font-size: 26px; }
+  .channels-layout { grid-template-columns: 1fr; }
+  .sns-row { grid-template-columns: 100px 1fr 50px 50px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>GA4 月次レポート｜株式会社田口住生活設計室</h1>
+  <div class="header-meta">taguchijyuseikatsu.com · KISHINO MASASHI</div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">ARCHIVE</div>
+    <button class="month-btn" data-ym="2026-04" onclick="selectMonth('2026-04')"><span class="btn-year">2026</span><span class="btn-month">4月</span></button>
+<button class="month-btn" data-ym="2026-03" onclick="selectMonth('2026-03')"><span class="btn-year">2026</span><span class="btn-month">3月</span></button>
+  </nav>
+
+  <main class="main" id="report-main">
+    <!-- JS で描画 -->
+  </main>
+</div>
+
+<script>
+const HISTORY = {"2026-04": {"period": {"label": "今月(04月 15日まで)", "start": "2026-04-01", "end": "2026-04-14"}, "kpi": {"sessions": 221, "users": 158, "events": 1270, "bounce_rate": 43.9}, "sns": {"youtube": 20, "note": 0, "line": 0, "voicy": 0}, "channels": {"Organic Search": 84, "Direct": 69, "Organic Video": 16, "Referral": 7, "Organic Social": 5}, "top_pages": [{"title": "さいたま市のリフォームなら田口住生活設計室『リフォーム百科事典』", "path": "/", "pv": 181}, {"title": "会社紹介 | 株式会社田口住生活設計室", "path": "/company", "pv": 51}, {"title": "お問い合わせ | 株式会社田口住生活設計室", "path": "/contact", "pv": 37}, {"title": "TOTOトイレはタンクあり・タンクなしどちらがいい？ | 株式会社田口住生活設計室", "path": "/blog/1848", "pv": 20}, {"title": "リフォーム工事 | 株式会社田口住生活設計室", "path": "/renovation", "pv": 17}, {"title": "経営理念 | 株式会社田口住生活設計室", "path": "/concept", "pv": 15}, {"title": "耐震診断・補強計画 | 株式会社田口住生活設計室", "path": "/inspection", "pv": 15}, {"title": "ブログ | 株式会社田口住生活設計室", "path": "/blog", "pv": 9}], "reach": {"instagram": {"views": 40000, "skip_rate": 33, "note": "TOTOユニットバス受注停止〜住まい方を問い直す動画（1分50秒・一発撮り）"}, "tiktok": {"views": 23000, "note": "同動画のTikTok転載"}}, "insights": [{"type": "highlight", "tag": "📣 注目｜SNSリーチ 6万超 vs HP流入 5件", "text": "今月は Instagram 40,000件・TikTok 23,000件 の合計63,000件リーチを達成。スキップ率33%（50%以下で優秀）も記録。コンテンツとしては高いパフォーマンスを発揮しています。<br><br>しかしGA4を見ると、同期間のOrganic Social経由のHP流入はわずか5件にとどまっています。SNSでリーチした方がHPへ来られる「入口」が設定されていないことが原因です。Instagramプロフィールの「ウェブサイト」欄にHP URLを追加するだけで、このギャップは大幅に縮まります。"}, {"type": "negative", "tag": "△ Voicy — 2ヶ月連続ゼロ", "text": "Voicyからの流入がゼロの状態が続いています。各放送の説明欄とチャンネルプロフィールにHPのURLが設定されていないことが原因です。説明欄に1行「詳細はこちら → taguchijyuseikatsu.com」を追加するだけで改善できます。"}, {"type": "negative", "tag": "△ note — 記事更新なし月はゼロに", "text": "先月は7件あったnote流入が今月はゼロです。記事を書いていない月は流入がゼロになる構造になっています。noteプロフィールの「ウェブサイト」欄にHP URLを設定すれば、記事更新がない月でも継続的な流入経路が確保できます。"}, {"type": "negative", "tag": "△ 直帰率 +4.0pt 上昇", "text": "直帰率が39.9%から43.9%へ上昇しています。トップページからブログ・施工事例・お問い合わせページへの内部リンクを強化することで改善が見込めます。"}, {"type": "action", "tag": "→ 今月の推奨アクション", "text": "① Voicy：各放送の説明欄に taguchijyuseikatsu.com を追記（5分で完了）<br>② note：プロフィール設定の「ウェブサイト」欄にHP URL追加（1分で完了）<br>③ Instagram：プロフィールにHP直リンク追加"}]}, "2026-03": {"period": {"label": "先月(03月)", "start": "2026-03-01", "end": "2026-03-31"}, "kpi": {"sessions": 765, "users": 482, "events": 5810, "bounce_rate": 39.9}, "sns": {"youtube": 51, "note": 7, "line": 0, "voicy": 0}, "channels": {"Organic Search": 377, "Direct": 278, "Organic Video": 52, "Referral": 42, "Organic Social": 15, "Unassigned": 2}, "top_pages": [{"title": "さいたま市のリフォームなら田口住生活設計室『リフォーム百科事典』", "path": "/", "pv": 760}, {"title": "お問い合わせ | 株式会社田口住生活設計室", "path": "/contact", "pv": 204}, {"title": "ブログ | 株式会社田口住生活設計室", "path": "/blog", "pv": 137}, {"title": "会社紹介 | 株式会社田口住生活設計室", "path": "/company", "pv": 117}, {"title": "リフォーム工事 | 株式会社田口住生活設計室", "path": "/renovation", "pv": 87}, {"title": "耐震診断・補強計画 | 株式会社田口住生活設計室", "path": "/inspection", "pv": 66}, {"title": "TOTOトイレはタンクあり・タンクなしどちらがいい？ | 株式会社田口住生活設計室", "path": "/blog/1848", "pv": 61}, {"title": "職人紹介 | 株式会社田口住生活設計室", "path": "/craftsman", "pv": 51}], "reach": {}, "insights": [{"type": "positive", "tag": "✓ YouTube — 流入が発生", "text": "YouTubeから51件の流入が確認されました。概要欄のリンク設置が機能しています。"}, {"type": "negative", "tag": "△ Voicy — 2ヶ月連続ゼロ", "text": "Voicyからの流入がゼロの状態が続いています。各放送の説明欄とチャンネルプロフィールにHPのURLが設定されていないことが原因です。説明欄に1行「詳細はこちら → taguchijyuseikatsu.com」を追加するだけで改善できます。"}, {"type": "action", "tag": "→ 今月の推奨アクション", "text": "① Voicy：各放送の説明欄に taguchijyuseikatsu.com を追記（5分で完了）<br>③ Instagram：プロフィールにHP直リンク追加"}]}};
+const MONTHS  = ["2026-04", "2026-03"];
+
+const CH_COLORS = [
+  '#B8532A','#C47848','#D4A070','#8C4A2F','#E8C898','#6A8848'
+];
+
+// ── 月選択 ──────────────────────────────────────────
+function selectMonth(ym) {
+  document.querySelectorAll('.month-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.ym === ym)
+  );
+  render(ym);
+}
+
+// ── メイン描画 ──────────────────────────────────────
+function render(ym) {
+  const d = HISTORY[ym];
+  if (!d) return;
+
+  const kpi    = d.kpi     || {};
+  const sns    = d.sns     || {};
+  const chs    = d.channels || {};
+  const pgs    = d.top_pages || [];
+  const per    = d.period  || {};
+  const reach  = d.reach   || {};
+
+  const label  = per.label || formatYM(ym);
+  const start  = per.start || '';
+  const end    = per.end   || '';
+  const isPartial = label.includes('途中') || label.includes('まで');
+
+  // ── prev month data for comparison ──
+  const prevYM  = getPrevYM(ym);
+  const prevD   = HISTORY[prevYM] || {};
+  const prevKPI = prevD.kpi || {};
+  const prevSNS = prevD.sns || {};
+
+  // ── trend data (up to 6 months) ──
+  const trendMonths = MONTHS.slice().reverse().slice(-6);
+  const trendVals   = trendMonths.map(m => (HISTORY[m]?.kpi?.sessions || 0));
+  const maxTrend    = Math.max(...trendVals, 1);
+
+  // ── channels ──
+  const chEntries = Object.entries(chs).sort((a,b) => b[1]-a[1]);
+  const totalCh   = chEntries.reduce((s,[,v]) => s+v, 0) || 1;
+
+  // ── KPI badges ──
+  function diffBadge(cur, prev, reverseGood) {
+    if (!prev || !cur) return '';
+    const diff = cur - prev;
+    const pct  = Math.round(diff / prev * 100);
+    if (diff === 0) return '';
+    const good = reverseGood ? diff < 0 : diff > 0;
+    const cls  = good ? 'badge-up' : 'badge-down';
+    const sign = diff > 0 ? '+' : '';
+    return `<span class="kpi-badge ${cls}">${sign}${pct}%</span>`;
+  }
+
+  // ── top pages max ──
+  const maxPV = pgs.length ? Math.max(...pgs.map(p => p.pv)) : 1;
+
+  // ── SNS rows ──
+  const snsConfig = [
+    { key:'youtube', label:'YouTube',  sub:'リフォーム百科事典' },
+    { key:'note',    label:'note',     sub:'note.com/dear_mint4909' },
+    { key:'voicy',   label:'Voicy',    sub:'voicy.jp/channel/959345' },
+    { key:'line',    label:'LINE',     sub:'LINE公式アカウント' },
+  ];
+  const maxSNS = Math.max(...snsConfig.map(s => Math.max(sns[s.key]||0, prevSNS[s.key]||0)), 1);
+
+  function snsRow(cfg) {
+    const cur  = sns[cfg.key]  || 0;
+    const prev = prevSNS[cfg.key] || 0;
+    const curW  = Math.round(cur  / maxSNS * 100);
+    const prevW = Math.round(prev / maxSNS * 100);
+    const diff  = prev > 0 ? `前月 ${prev}` : '前月 —';
+    return `
+    <div class="sns-row">
+      <div class="sns-name">${cfg.label}<span>${cfg.sub}</span></div>
+      <div class="sns-bar-wrap">
+        <div class="bar-row">今月<div class="bar-track"><div class="bar-fill bar-cur" style="width:${curW}%"></div></div></div>
+        <div class="bar-row">前月<div class="bar-track"><div class="bar-fill bar-prev" style="width:${prevW}%"></div></div></div>
+      </div>
+      <div class="sns-val ${cur===0?'zero':''}">${cur}</div>
+      <div class="sns-diff">${diff}</div>
+    </div>`;
+  }
+
+  // ── donut SVG ──
+  function donutSVG(entries, total) {
+    const cx=80, cy=80, r=60, stroke=22;
+    const C = 2*Math.PI*r;
+    let offset = 0;
+    const arcs = entries.slice(0,6).map(([name,val],i) => {
+      const frac = val/total;
+      const dash = frac*C;
+      const sp = `stroke-dasharray="${dash.toFixed(1)} ${(C-dash).toFixed(1)}" stroke-dashoffset="${(-offset*C).toFixed(1)}"`;
+      offset += frac;
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${CH_COLORS[i]}" stroke-width="${stroke}" ${sp} />`;
+    }).join('');
+    return `<svg viewBox="0 0 160 160" width="160" height="160">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#EDE0CC" stroke-width="${stroke}"/>
+      ${arcs}
+    </svg>`;
+  }
+
+  // ── trend SVG ──
+  function trendSVG(vals, labels) {
+    const W=600, H=100, pad=8;
+    const n = vals.length;
+    const pts = vals.map((v,i) => {
+      const x = pad + i*(W-2*pad)/(n-1);
+      const y = H - pad - (v/maxTrend)*(H-2*pad);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+    const line = `<polyline points="${pts.join(' ')}" fill="none" stroke="#B8532A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const dots = vals.map((v,i) => {
+      const x = pad + i*(W-2*pad)/(n-1);
+      const y = H - pad - (v/maxTrend)*(H-2*pad);
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="#B8532A"/>`;
+    }).join('');
+    const area_pts = [
+      `${pad},H`,
+      ...vals.map((v,i) => {
+        const x = pad + i*(W-2*pad)/(n-1);
+        const y = H - pad - (v/maxTrend)*(H-2*pad);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }),
+      `${(W-pad).toFixed(1)},H`
+    ].join(' ').replace(/H/g, H);
+    const area = `<polygon points="${area_pts}" fill="rgba(184,83,42,0.08)"/>`;
+    const lbls = labels.map((lb,i) => {
+      const x = pad + i*(W-2*pad)/(n-1);
+      return `<text x="${x.toFixed(1)}" y="${H+14}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="#9A7A60">${lb}</text>`;
+    }).join('');
+    const valLbls = vals.map((v,i) => {
+      if (!v) return '';
+      const x = pad + i*(W-2*pad)/(n-1);
+      const y = H - pad - (v/maxTrend)*(H-2*pad) - 8;
+      return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono,monospace" fill="#7A3920" font-weight="600">${v}</text>`;
+    }).join('');
+    return `<svg viewBox="0 0 ${W} ${H+22}" class="trend-svg">
+      ${area}${line}${dots}${lbls}${valLbls}
+    </svg>`;
+  }
+
+  // ── insights ──
+  const insights = (d.insights || []).map(ins => `
+    <div class="insight-card ${ins.type}">
+      <div class="insight-tag">${ins.tag}</div>
+      <div class="insight-text">${ins.text}</div>
+    </div>`).join('');
+
+  // ── render ──
+  document.getElementById('report-main').innerHTML = `
+    <div class="month-hero">
+      <div class="hero-label">GA4 MONTHLY REPORT ${isPartial ? '— PARTIAL' : ''}</div>
+      <div class="hero-title">${formatYMlong(ym)}</div>
+      <div class="hero-period">${start} 〜 ${end}${isPartial ? ' （途中経過）' : ''}</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Sessions</div>
+        <div class="kpi-value">${(kpi.sessions||0).toLocaleString()}</div>
+        ${diffBadge(kpi.sessions, prevKPI.sessions, false)}
+        ${prevKPI.sessions ? `<div class="kpi-sub">前月: ${prevKPI.sessions.toLocaleString()}</div>` : ''}
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Users</div>
+        <div class="kpi-value">${(kpi.users||0).toLocaleString()}</div>
+        ${diffBadge(kpi.users, prevKPI.users, false)}
+        ${prevKPI.users ? `<div class="kpi-sub">前月: ${prevKPI.users.toLocaleString()}</div>` : ''}
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bounce Rate</div>
+        <div class="kpi-value">${kpi.bounce_rate||0}<span style="font-size:16px;font-weight:400">%</span></div>
+        ${diffBadge(kpi.bounce_rate, prevKPI.bounce_rate, true)}
+        ${prevKPI.bounce_rate ? `<div class="kpi-sub">前月: ${prevKPI.bounce_rate}%</div>` : ''}
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Events</div>
+        <div class="kpi-value">${(kpi.events||0).toLocaleString()}</div>
+        <div class="kpi-sub">&nbsp;</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><div class="section-title">Session Trend</div></div>
+      <div class="trend-wrap">
+        ${trendSVG(trendVals, trendMonths.map(formatYMshort))}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><div class="section-title">SNS Channel Referrals</div></div>
+      <div class="sns-grid">
+        ${snsConfig.map(snsRow).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><div class="section-title">Channel Breakdown</div></div>
+      <div class="channels-layout">
+        <div class="donut-wrap">${donutSVG(chEntries, totalCh)}</div>
+        <div class="channel-list">
+          ${chEntries.slice(0,6).map(([name,val],i) => `
+          <div class="ch-row">
+            <span class="ch-dot" style="background:${CH_COLORS[i]}"></span>
+            <span class="ch-name">${name}</span>
+            <span class="ch-pct">${Math.round(val/totalCh*100)}%</span>
+            <span class="ch-num">${val}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><div class="section-title">Top Pages</div></div>
+      <table class="pages-table">
+        <thead><tr>
+          <th style="width:28px">#</th>
+          <th>Page</th>
+          <th style="width:80px">PV</th>
+        </tr></thead>
+        <tbody>
+          ${pgs.map((p,i) => `
+          <tr>
+            <td class="pg-rank">${i+1}</td>
+            <td>
+              <div>${p.name || p.title || p.path}</div>
+              <div class="pg-path">${p.path}</div>
+              <div class="pg-bar-wrap">
+                <div class="pg-bar-track">
+                  <div class="pg-bar-fill" style="width:${Math.round(p.pv/maxPV*100)}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="pg-pv">${p.pv}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    ${Object.keys(reach).length ? `
+    <div class="section">
+      <div class="section-head"><div class="section-title">SNS Reach — GA4外データ</div></div>
+      <div class="reach-grid">
+        ${reach.instagram ? `
+        <div class="reach-card">
+          <div class="reach-platform">Instagram</div>
+          <div class="reach-num">${(reach.instagram.views/10000).toFixed(1)}<span class="reach-unit">万再生</span></div>
+          ${reach.instagram.skip_rate != null
+            ? `<div class="reach-badge">スキップ率 ${reach.instagram.skip_rate}%（優秀）</div>`
+            : ''}
+          ${reach.instagram.note ? `<div class="reach-note">${reach.instagram.note}</div>` : ''}
+        </div>` : ''}
+        ${reach.tiktok ? `
+        <div class="reach-card">
+          <div class="reach-platform">TikTok</div>
+          <div class="reach-num">${(reach.tiktok.views/10000).toFixed(1)}<span class="reach-unit">万再生</span></div>
+          ${reach.tiktok.note ? `<div class="reach-note">${reach.tiktok.note}</div>` : ''}
+        </div>` : ''}
+      </div>
+      <div class="reach-gap">
+        <div class="reach-gap-item">
+          <span class="reach-gap-label">SNS 総リーチ</span>
+          <span class="reach-gap-val">${((Object.values(reach).reduce((s,r)=>s+(r.views||0),0))/10000).toFixed(1)}万</span>
+        </div>
+        <div class="reach-gap-arrow">→</div>
+        <div class="reach-gap-item">
+          <span class="reach-gap-label">HP流入（GA4）</span>
+          <span class="reach-gap-val" style="color:var(--neg)">${chs['Organic Social']||0}</span>
+        </div>
+        <div class="reach-gap-desc">
+          コンテンツとしては十分に機能しているにもかかわらず、HPへの「入口」がないためリーチが流入に変換されていません。Instagramプロフィールへの直リンク設置で改善できます。
+        </div>
+      </div>
+    </div>` : ''}
+
+    ${insights ? `
+    <div class="section">
+      <div class="section-head"><div class="section-title">Insights &amp; 推奨アクション</div></div>
+      <div class="insights-list">${insights}</div>
+    </div>` : ''}
+
+    <footer class="main-footer">
+      <span>田口住生活設計室 GA4レポート｜${formatYMlong(ym)}</span>
+      <span>KISHINO MASASHI</span>
+    </footer>
+  `;
+}
+
+// ── Helpers ──────────────────────────────────────────
+const MN = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+function formatYM(ym) {
+  const [y,m] = ym.split('-');
+  return `${y}年${MN[+m]}`;
+}
+function formatYMlong(ym) {
+  const [y,m] = ym.split('-');
+  return `${y}年 ${MN[+m]}`;
+}
+function formatYMshort(ym) {
+  const [,m] = ym.split('-');
+  return MN[+m];
+}
+function getPrevYM(ym) {
+  const [y,m] = ym.split('-').map(Number);
+  return m === 1
+    ? `${y-1}-12`
+    : `${y}-${String(m-1).padStart(2,'0')}`;
+}
+
+// ── 初期表示 ──────────────────────────────────────────
+if (MONTHS.length) selectMonth(MONTHS[0]);
+</script>
+</body>
+</html>

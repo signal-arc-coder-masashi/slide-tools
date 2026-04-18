@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>無料で使えるオープンソースLLM & ローカルAIツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #FAFAF8;
+    --accent: #4F46E5;
+    --accent-light: #EEF2FF;
+    --positive: #059669;
+    --caution: #D97706;
+    --text-main: #111827;
+    --text-sub: #6B7280;
+    --border: #E5E7EB;
+    --font-heading: 'Noto Sans JP', sans-serif;
+    --font-body: 'Noto Sans JP', sans-serif;
+    --font-code: 'Source Code Pro', monospace;
+    --spacing-slide: 60px 80px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .slideshow {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1280px;
+    height: 720px;
+    padding: 60px 80px;
+    background: var(--primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* COVER */
+  .slide-cover {
+    background: var(--accent);
+    padding: 0;
+    flex-direction: row;
+  }
+
+  .cover-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 80px;
+    gap: 16px;
+  }
+
+  .cover-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-bottom: 8px;
+  }
+
+  .cover-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  .cover-sub {
+    font-size: 20px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 8px;
+  }
+
+  .cover-date {
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .cover-brand {
+    font-family: var(--font-code);
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    letter-spacing: 0.08em;
+  }
+
+  .cover-right {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .cover-icon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 40px;
+  }
+
+  .cover-icon-item {
+    background: rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cover-icon-item .emoji { font-size: 36px; }
+  .cover-icon-item span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    text-align: center;
+  }
+
+  /* SLIDE HEADER */
+  .slide-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .slide-header-bar {
+    width: 6px;
+    height: 36px;
+    background: var(--accent);
+    border-radius: 3px;
+  }
+
+  .slide-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  /* AGENDA */
+  .agenda-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .agenda-item {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 28px;
+    background: var(--accent-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+  }
+
+  .agenda-num {
+    font-family: var(--font-code);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 48px;
+  }
+
+  .agenda-text {
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  /* BEFORE / AFTER */
+  .before-after-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .ba-card {
+    padding: 32px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ba-card.before {
+    background: #FEF3C7;
+    border: 2px solid #D97706;
+  }
+
+  .ba-card.after {
+    background: #ECFDF5;
+    border: 2px solid #059669;
+  }
+
+  .ba-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .before .ba-label { background: #D97706; color: #fff; }
+  .after .ba-label { background: #059669; color: #fff; }
+
+  .ba-card h3 { font-size: 20px; font-weight: 700; color: var(--text-main); }
+
+  .ba-items { display: flex; flex-direction: column; gap: 10px; }
+
+  .ba-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    color: var(--text-main);
+  }
+
+  .ba-item .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  .before .dot { background: #D97706; }
+  .after .dot { background: #059669; }
+
+  .arrow-center {
+    font-size: 40px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* MODEL CARDS */
+  .model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .model-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .model-card:hover { border-color: var(--accent); }
+
+  .model-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .model-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .model-name { font-size: 20px; font-weight: 700; color: var(--text-main); }
+  .model-maker { font-size: 13px; color: var(--text-sub); }
+
+  .model-desc { font-size: 15px; color: var(--text-main); line-height: 1.6; }
+
+  .model-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .tag {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .tag.green { background: #ECFDF5; color: #059669; }
+  .tag.orange { background: #FEF3C7; color: #D97706; }
+
+  /* TOOL CARDS */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+
+  .tool-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .tool-icon {
+    font-size: 42px;
+    line-height: 1;
+  }
+
+  .tool-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .tool-target {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  .tool-desc {
+    font-size: 15px;
+    color: var(--text-main);
+    line-height: 1.65;
+  }
+
+  .tool-point {
+    font-size: 14px;
+    color: var(--text-sub);
+    padding: 10px 14px;
+    background: var(--primary);
+    border-radius: 8px;
+    width: 100%;
+    font-family: var(--font-code);
+  }
+
+  /* SECTION DIVIDER */
+  .slide-section {
+    background: var(--accent);
+  }
+
+  .slide-section .section-label {
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+  }
+
+  .slide-section h2 {
+    font-size: 52px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .slide-section .section-sub {
+    font-size: 20px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 12px;
+  }
+
+  /* SUMMARY */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  .summary-item {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-num {
+    font-family: var(--font-code);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .summary-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .summary-desc {
+    font-size: 14px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  /* SLIDE NUMBER */
+  .slide-num {
+    position: absolute;
+    bottom: 24px;
+    right: 32px;
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+  }
+
+  /* CONTROLS */
+  .controls {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+  }
+
+  .btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: var(--font-body);
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
+  }
+
+  .btn:hover { background: rgba(255,255,255,0.25); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ACTION BUTTONS */
+  .action-btns {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+  }
+
+  .action-btn {
+    background: rgba(79, 70, 229, 0.85);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--font-body);
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .action-btn:hover { background: rgba(79, 70, 229, 1); }
+
+  /* FULLSCREEN */
+  .fullscreen-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+    z-index: 200;
+  }
+
+  @media print {
+    body { background: white; overflow: auto; }
+    .slideshow { width: 100%; height: auto; position: static; }
+    .slide {
+      position: relative;
+      opacity: 1;
+      transform: none;
+      page-break-after: always;
+      width: 100%;
+      height: 720px;
+    }
+    .controls, .action-btns, .progress-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="action-btns">
+  <button class="action-btn" onclick="exportPPTX()">📊 PowerPointに変換</button>
+  <button class="action-btn" onclick="window.print()">🖨️ 印刷</button>
+  <button class="action-btn fullscreen-btn" onclick="toggleFullscreen()">⛶ 全画面</button>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slideshow" id="slideshow">
+
+  <!-- SLIDE 1: 表紙 -->
+  <div class="slide slide-cover active" id="slide-1">
+    <div class="cover-left">
+      <span class="cover-tag">AI活用 入門ガイド</span>
+      <h1 class="cover-title">無料で使える<br>オープンソースLLM<br>& ローカルAIツール</h1>
+      <p class="cover-sub">知っておきたい、AIの新常識</p>
+      <p class="cover-date">2026.04.01</p>
+      <p class="cover-brand">KISHINO MASASHI</p>
+    </div>
+    <div class="cover-right">
+      <div class="cover-icon-grid">
+        <div class="cover-icon-item">
+          <span class="emoji">🦙</span>
+          <span>Llama 3.1</span>
+        </div>
+        <div class="cover-icon-item">
+          <span class="emoji">🌀</span>
+          <span>Mixtral</span>
+        </div>
+        <div class="cover-icon-item">
+          <span class="emoji">💎</span>
+          <span>Gemma 2</span>
+        </div>
+        <div class="cover-icon-item">
+          <span class="emoji">🌸</span>
+          <span>ELYZA</span>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">1 / 7</div>
+  </div>
+
+  <!-- SLIDE 2: アジェンダ -->
+  <div class="slide" id="slide-2">
+    <div class="slide-header">
+      <div class="slide-header-bar"></div>
+      <h2>本日のアジェンダ</h2>
+    </div>
+    <div class="agenda-list">
+      <div class="agenda-item">
+        <span class="agenda-num">01</span>
+        <span class="agenda-text">オープンソースLLMとは？ — クラウドAIとの違い</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-num">02</span>
+        <span class="agenda-text">注目モデル4選 — Llama / Mixtral / Gemma / ELYZA</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-num">03</span>
+        <span class="agenda-text">ローカルで動かすツール3選 — LM Studio / GPT4All / Ollama</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-num">04</span>
+        <span class="agenda-text">まとめ — 今日から始められること</span>
+      </div>
+    </div>
+    <div class="slide-num">2 / 7</div>
+  </div>
+
+  <!-- SLIDE 3: セクション区切り -->
+  <div class="slide slide-section" id="slide-3">
+    <div class="section-label">PART 01</div>
+    <h2>オープンソース<br>LLMとは？</h2>
+    <p class="section-sub">クラウドAIと何が違うのか、整理してみましょう</p>
+    <div class="slide-num" style="color:rgba(255,255,255,0.4)">3 / 7</div>
+  </div>
+
+  <!-- SLIDE 4: Before / After -->
+  <div class="slide" id="slide-4">
+    <div class="slide-header">
+      <div class="slide-header-bar"></div>
+      <h2>クラウドAI vs オープンソースLLM</h2>
+    </div>
+    <div class="before-after-grid">
+      <div class="ba-card before">
+        <span class="ba-label">BEFORE — クラウドAI</span>
+        <h3>便利だけど制約がある</h3>
+        <div class="ba-items">
+          <div class="ba-item"><span class="dot"></span>月額課金・従量課金が発生する</div>
+          <div class="ba-item"><span class="dot"></span>インターネット接続が必須</div>
+          <div class="ba-item"><span class="dot"></span>データが外部サーバーに送信される</div>
+          <div class="ba-item"><span class="dot"></span>利用規約・制限に縛られる</div>
+        </div>
+      </div>
+      <div class="arrow-center">→</div>
+      <div class="ba-card after">
+        <span class="ba-label">AFTER — オープンソースLLM</span>
+        <h3>自由に、無料で、安全に</h3>
+        <div class="ba-items">
+          <div class="ba-item"><span class="dot"></span>完全無料で利用できる</div>
+          <div class="ba-item"><span class="dot"></span>オフライン・ローカル環境で動く</div>
+          <div class="ba-item"><span class="dot"></span>データが外部に出ない（社内利用に最適）</div>
+          <div class="ba-item"><span class="dot"></span>カスタマイズ・商用利用が可能</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">4 / 7</div>
+  </div>
+
+  <!-- SLIDE 5: モデル4選 -->
+  <div class="slide" id="slide-5">
+    <div class="slide-header">
+      <div class="slide-header-bar"></div>
+      <h2>注目のオープンソースモデル 4選</h2>
+    </div>
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="model-card-header">
+          <div class="model-icon">🦙</div>
+          <div>
+            <div class="model-name">Llama 3.1</div>
+            <div class="model-maker">Meta（Facebook）</div>
+          </div>
+        </div>
+        <p class="model-desc">最も強力なオープンソースモデルの1つ。多タスク対応で汎用性が高く、商用利用も可能。</p>
+        <div class="model-tags">
+          <span class="tag green">商用OK</span>
+          <span class="tag">汎用</span>
+          <span class="tag">高性能</span>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <div class="model-icon">🌀</div>
+          <div>
+            <div class="model-name">Mixtral 8x7B</div>
+            <div class="model-maker">Mistral AI</div>
+          </div>
+        </div>
+        <p class="model-desc">GPT-3.5を超える性能を持ち、多言語対応（日本語含む）に優れる。エキスパートミックスチャー構造を採用。</p>
+        <div class="model-tags">
+          <span class="tag green">日本語対応</span>
+          <span class="tag">GPT-3.5超え</span>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <div class="model-icon">💎</div>
+          <div>
+            <div class="model-name">Gemma 2</div>
+            <div class="model-maker">Google</div>
+          </div>
+        </div>
+        <p class="model-desc">軽量ながら高性能なオープンモデル。Googleが提供し、品質と速度のバランスが優秀。</p>
+        <div class="model-tags">
+          <span class="tag">軽量</span>
+          <span class="tag">高速</span>
+          <span class="tag orange">Google製</span>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <div class="model-icon">🌸</div>
+          <div>
+            <div class="model-name">Swallow / ELYZA</div>
+            <div class="model-maker">日本語特化型</div>
+          </div>
+        </div>
+        <p class="model-desc">Llamaをベースにした高性能な日本語モデル。日本語の読み書き・理解が特に得意。</p>
+        <div class="model-tags">
+          <span class="tag green">日本語特化</span>
+          <span class="tag">国産</span>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">5 / 7</div>
+  </div>
+
+  <!-- SLIDE 6: ツール3選 -->
+  <div class="slide" id="slide-6">
+    <div class="slide-header">
+      <div class="slide-header-bar"></div>
+      <h2>ローカルでAIを実行するツール 3選</h2>
+    </div>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-icon">🖥️</div>
+        <div class="tool-name">LM Studio</div>
+        <span class="tool-target">GUIで直感操作</span>
+        <p class="tool-desc">GUIで簡単にLlamaなどをダウンロード・実行できるツール。インストールするだけですぐ使える。</p>
+        <div class="tool-point">→ 初心者におすすめ</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">💬</div>
+        <div class="tool-name">GPT4All</div>
+        <span class="tool-target">チャットアプリ形式</span>
+        <p class="tool-desc">インストールしてすぐにローカルでチャット可能なアプリ。ChatGPTに近い感覚で使える。</p>
+        <div class="tool-point">→ 即チャットしたい人向け</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">⚡</div>
+        <div class="tool-name">Ollama</div>
+        <span class="tool-target">コマンドライン / API</span>
+        <p class="tool-desc">コマンドラインでLLMを簡単にローカル運用できるツール。APIとして他のアプリと連携可能。</p>
+        <div class="tool-point">→ 開発者・自動化向け</div>
+      </div>
+    </div>
+    <div class="slide-num">6 / 7</div>
+  </div>
+
+  <!-- SLIDE 7: まとめ -->
+  <div class="slide" id="slide-7">
+    <div class="slide-header">
+      <div class="slide-header-bar"></div>
+      <h2>まとめ — 今日から始められること</h2>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-num">01</div>
+        <div class="summary-title">まずLM Studioを入れる</div>
+        <div class="summary-desc">GUIで直感的に操作できる。Llama 3.1かGemma 2をダウンロードして動作確認してみよう。</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">02</div>
+        <div class="summary-title">日本語ならELYZAを試す</div>
+        <div class="summary-desc">日本語での作業が多いなら、ELYZA or Swallowを選択。精度の差を体感できる。</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">03</div>
+        <div class="summary-title">Ollamaで自動化へ発展</div>
+        <div class="summary-desc">ローカルLLMに慣れたらOllamaのAPIを活用し、業務ツールとの連携・自動化を検討。</div>
+      </div>
+    </div>
+    <div style="margin-top:32px; padding:20px 28px; background:var(--accent-light); border-radius:12px; border-left:4px solid var(--accent);">
+      <p style="font-size:17px; font-weight:700; color:var(--accent);">💡 キーポイント: ローカルLLMは「無料・オフライン・データ安全」の三拍子。社内AI活用の第一歩として最適です。</p>
+    </div>
+    <div class="slide-num">7 / 7</div>
+  </div>
+
+</div><!-- /slideshow -->
+
+<div class="controls">
+  <button class="btn" id="prevBtn" onclick="changeSlide(-1)" disabled>← 前へ</button>
+  <button class="btn" id="slideCounter">1 / 7</button>
+  <button class="btn" id="nextBtn" onclick="changeSlide(1)">次へ →</button>
+</div>
+
+<script>
+let current = 1;
+const total = 7;
+
+function changeSlide(dir) {
+  const prev = document.getElementById('slide-' + current);
+  prev.classList.remove('active');
+  current = Math.max(1, Math.min(total, current + dir));
+  const next = document.getElementById('slide-' + current);
+  next.classList.add('active');
+  document.getElementById('prevBtn').disabled = current === 1;
+  document.getElementById('nextBtn').disabled = current === total;
+  document.getElementById('slideCounter').textContent = current + ' / ' + total;
+  document.getElementById('progressBar').style.width = ((current / total) * 100) + '%';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') changeSlide(1);
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') changeSlide(-1);
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// Init progress
+document.getElementById('progressBar').style.width = ((1 / total) * 100) + '%';
+
+// PPTX Export
+async function exportPPTX() {
+  const btn = document.querySelector('.action-btn');
+  btn.textContent = '⏳ 変換中...';
+  btn.disabled = true;
+
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+  script.onload = () => buildPPTX(btn);
+  script.onerror = () => { btn.textContent = '📊 PowerPointに変換'; btn.disabled = false; alert('ライブラリ読み込みに失敗しました。インターネット接続を確認してください。'); };
+  document.head.appendChild(script);
+}
+
+function buildPPTX(btn) {
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE';
+  pptx.title = '無料で使えるオープンソースLLM & ローカルAIツール';
+
+  const ACCENT = '4F46E5';
+  const TEXT = '111827';
+  const SUB = '6B7280';
+  const WHITE = 'FFFFFF';
+  const ACCENT_LIGHT = 'EEF2FF';
+
+  const slides = [
+    { title: '無料で使えるオープンソースLLM & ローカルAIツール', sub: '知っておきたい、AIの新常識', bg: ACCENT, titleColor: WHITE },
+    { title: '本日のアジェンダ', sub: '01 オープンソースLLMとは？\n02 注目モデル4選\n03 ローカルツール3選\n04 まとめ', bg: 'FAFAF8', titleColor: TEXT },
+    { title: 'オープンソースLLMとは？', sub: 'PART 01 — クラウドAIとの違いを整理する', bg: ACCENT, titleColor: WHITE },
+    { title: 'クラウドAI vs オープンソースLLM', sub: '月額課金・データ外部送信 → 無料・オフライン・データ安全', bg: 'FAFAF8', titleColor: TEXT },
+    { title: '注目のオープンソースモデル 4選', sub: 'Llama 3.1 / Mixtral 8x7B / Gemma 2 / Swallow・ELYZA', bg: 'FAFAF8', titleColor: TEXT },
+    { title: 'ローカルでAIを実行するツール 3選', sub: 'LM Studio（GUI）/ GPT4All（チャット）/ Ollama（CLI・API）', bg: 'FAFAF8', titleColor: TEXT },
+    { title: 'まとめ — 今日から始められること', sub: '① LM Studioを入れる → ② ELYZAを試す → ③ Ollamaで自動化', bg: 'FAFAF8', titleColor: TEXT },
+  ];
+
+  slides.forEach((s, i) => {
+    const slide = pptx.addSlide();
+    slide.background = { color: s.bg };
+    slide.addText(s.title, { x: 0.8, y: 2.5, w: 10.4, h: 1.2, fontSize: 36, bold: true, color: s.titleColor, fontFace: 'Noto Sans JP' });
+    slide.addText(s.sub, { x: 0.8, y: 3.8, w: 10.4, h: 1.5, fontSize: 18, color: s.titleColor === WHITE ? 'ccccff' : SUB, fontFace: 'Noto Sans JP' });
+    slide.addText(`${i+1} / ${slides.length}`, { x: 11.5, y: 6.8, w: 1, h: 0.3, fontSize: 11, color: s.titleColor === WHITE ? 'ffffff80' : SUB, fontFace: 'Courier New' });
+  });
+
+  pptx.writeFile({ fileName: 'oss-llm-tools.pptx' })
+    .then(() => { btn.textContent = '📊 PowerPointに変換'; btn.disabled = false; })
+    .catch(e => { console.error(e); btn.textContent = '📊 PowerPointに変換'; btn.disabled = false; });
+}
+</script>
+</body>
+</html>

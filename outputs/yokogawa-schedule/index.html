@@ -657,6 +657,111 @@ html, body {
   border: 1px solid var(--border);
 }
 
+/* ===== AGENDA SLIDE ===== */
+.agenda-table {
+  width: 100%;
+  max-width: 780px;
+  border-collapse: collapse;
+}
+.agenda-table th {
+  background: var(--accent);
+  color: white;
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+.agenda-table td {
+  padding: 10px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+.agenda-table tr:nth-child(even) td { background: var(--surface); }
+.agenda-table tr:last-child td { border-bottom: none; }
+.agenda-table td.time-col {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 500;
+  width: 110px;
+}
+.agenda-table td.purpose-col {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  width: 130px;
+}
+
+/* ===== RULES SLIDE ===== */
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 880px;
+}
+.rules-col-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rule-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.rule-item:last-child { border-bottom: none; }
+.rule-icon { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+.rule-ng-section {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(239,83,80,0.07);
+  border-left: 3px solid #EF5350;
+  border-radius: 0 6px 6px 0;
+}
+.rule-ng-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #EF5350;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== ACTION TABLE ===== */
+.action-table {
+  width: 100%;
+  max-width: 780px;
+  border-collapse: collapse;
+  margin-bottom: 14px;
+}
+.action-table th {
+  background: var(--accent);
+  color: white;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+.action-table td {
+  padding: 11px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.action-table tr:nth-child(even) td { background: var(--surface); }
+.action-table tr:last-child td { border-bottom: none; }
+.owner-us { color: var(--accent); font-weight: 600; }
+.owner-them { color: var(--text-muted); }
+.deadline { font-size: 12px; color: var(--text-muted); }
+
 /* ===== BG DECORATION ===== */
 .bg-blob {
   position: absolute;
@@ -792,7 +897,55 @@ html, body {
     </div>
   </div>
 
-  <!-- ========== SLIDE 2: ANNUAL TIMELINE ========== -->
+  <!-- ========== SLIDE 2: AGENDA ========== -->
+  <div class="slide">
+    <div class="tag">2026.04.19 — KICKOFF</div>
+    <div class="slide-h2" style="margin-bottom:4px">本日のアジェンダ</div>
+    <div class="slide-sub">所要時間：約90分</div>
+    <table class="agenda-table">
+      <thead>
+        <tr>
+          <th style="width:110px">時間</th>
+          <th>項目</th>
+          <th style="width:130px">目的</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="time-col">0:00〜0:10</td>
+          <td>挨拶・自己紹介・本日の流れ共有</td>
+          <td class="purpose-col">関係構築・場の設定</td>
+        </tr>
+        <tr>
+          <td class="time-col">0:10〜0:35</td>
+          <td>ヒアリング<br><span style="font-size:11.5px;color:var(--text-muted)">目的・ゴール / コンテンツ方向性 / スケジュール稼働 / 関係者体制</span></td>
+          <td class="purpose-col">方向性の確認</td>
+        </tr>
+        <tr>
+          <td class="time-col">0:35〜0:50</td>
+          <td>撮影・運用スケジュール案の提示</td>
+          <td class="purpose-col">合意形成</td>
+        </tr>
+        <tr>
+          <td class="time-col">0:50〜1:05</td>
+          <td>承認フロー・連絡体制の確認<br><span style="font-size:11.5px;color:var(--text-muted)">誰が・何日前に・どこで確認するか</span></td>
+          <td class="purpose-col">オペレーション設計</td>
+        </tr>
+        <tr>
+          <td class="time-col">1:05〜1:20</td>
+          <td>懸念点・禁止事項の共有<br><span style="font-size:11.5px;color:var(--text-muted)">公職選挙法対応・炎上リスク・運用品質ルール</span></td>
+          <td class="purpose-col">リスク管理</td>
+        </tr>
+        <tr>
+          <td class="time-col">1:20〜1:30</td>
+          <td>次回アクション・宿題の確認</td>
+          <td class="purpose-col">クロージング</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========== SLIDE 3: ANNUAL TIMELINE ========== -->
   <div class="slide">
     <div class="tag">ANNUAL SCHEDULE</div>
     <div class="slide-h2">年間スケジュール概観</div>
@@ -1153,43 +1306,88 @@ html, body {
     </div>
   </div>
 
-  <!-- ========== SLIDE 8: NEXT STEPS ========== -->
+  <!-- ========== SLIDE 9: RULES ========== -->
   <div class="slide">
-    <div class="bg-blob" style="top:-120px;right:-80px;opacity:0.2"></div>
-    <div class="tag">NEXT STEPS</div>
-    <div class="slide-h2" style="margin-bottom:6px">次のステップ</div>
-    <div class="slide-sub">本日のお打ち合わせ後、確認・調整いただきたい内容</div>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <div>
-          <div class="step-title">撮影スケジュールの調整</div>
-          <div class="step-desc">毎月の撮影日を事前に固定化。スマホ撮影のため機材調整は不要。活動スケジュールと連動して設定します</div>
-        </div>
+    <div class="tag">OPERATION RULES</div>
+    <div class="slide-h2" style="margin-bottom:4px">運用の原則 — やること・やらないこと</div>
+    <div class="slide-sub">最初に双方で確認・合意しておく内容</div>
+    <div class="rules-grid">
+      <div>
+        <div class="rules-col-title"><span style="color:var(--accent)">✅</span> やること</div>
+        <div class="rule-item"><span class="rule-icon">✅</span>コンテンツの方向性を最初に1枚で文書化し、双方合意してから動く</div>
+        <div class="rule-item"><span class="rule-icon">✅</span>投稿前の承認フローを明文化（誰が・何日前に・どこで確認するか）</div>
+        <div class="rule-item"><span class="rule-icon">✅</span>会期スケジュールを共有してもらい、撮影可能日を月次で確保</div>
+        <div class="rule-item"><span class="rule-icon">✅</span>「人柄が伝わる場面」をルーティンで撮る（街頭・現場視察・日常ひとこま等）</div>
+        <div class="rule-item"><span class="rule-icon">✅</span>最初の1〜2本はパイロット版として、認識合わせに使う</div>
+        <div class="rule-item"><span class="rule-icon">✅</span>月次レポートに「次月の撮影テーマ案」を含める（先回り提案型の運用）</div>
       </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-title">コンテンツ方針の確認</div>
-          <div class="step-desc">どんな動画を作るか、テーマ・トーン・NGワード・出演NG場面などを共有いただきます</div>
+      <div>
+        <div class="rules-col-title"><span style="color:#EF5350">⚠️</span> やらないこと</div>
+        <div class="rule-ng-section" style="margin-bottom:10px">
+          <div class="rule-ng-label">⚠️ 公職選挙法関連（最重要）</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>選挙期間中（告示〜投票日）の新規投稿・選挙運動的な内容</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>「特定候補者への投票を依頼する」表現（選挙期間外も）</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>支持者の氏名・顔が映る動画の無断使用</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>他候補・対立候補への言及・批判</div>
         </div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <div>
-          <div class="step-title">LINE公式の意向確認</div>
-          <div class="step-desc">ご相談いただいていたLINE運用について、具体的なご要望・開始時期をお聞かせください</div>
-        </div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">4</div>
-        <div>
-          <div class="step-title">中間レビューの日程仮押さえ</div>
-          <div class="step-desc">4ヶ月目後半（2026年6月下旬〜7月上旬）のMTG日程を早めに調整します</div>
+        <div class="rule-ng-section">
+          <div class="rule-ng-label">⚠️ 炎上・運用品質リスク</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>承認前の投稿（どんなに急いでも必ず確認を通す）</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>政治的に敏感なテーマへの断定的な発言</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>発言を切り取って別の意味に見せる演出</div>
+          <div class="rule-item" style="border:none;padding:3px 0"><span class="rule-icon" style="color:#EF5350">✗</span>担当者不在時の連絡断絶（エスカレーション先を初回に決める）</div>
         </div>
       </div>
     </div>
-    <div class="contact-bar">
+  </div>
+
+  <!-- ========== SLIDE 10: NEXT ACTIONS ========== -->
+  <div class="slide">
+    <div class="bg-blob" style="top:-120px;right:-80px;opacity:0.2"></div>
+    <div class="tag">NEXT ACTIONS</div>
+    <div class="slide-h2" style="margin-bottom:4px">次回アクション</div>
+    <div class="slide-sub">本日クロージングで確認・合意するアクション一覧</div>
+    <table class="action-table">
+      <thead>
+        <tr>
+          <th style="width:36px">#</th>
+          <th>アクション</th>
+          <th style="width:130px">担当</th>
+          <th style="width:140px">期限</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;color:var(--accent);text-align:center">1</td>
+          <td>コンテンツ方針シート 初稿送付</td>
+          <td class="owner-us">セカンドパステル</td>
+          <td class="deadline">打合せ後3日以内</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--accent);text-align:center">2</td>
+          <td>議会会期スケジュール 共有</td>
+          <td class="owner-them">事務所側</td>
+          <td class="deadline">当日 or 翌週</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--accent);text-align:center">3</td>
+          <td>窓口担当者・連絡手段の確定</td>
+          <td class="owner-them">事務所側</td>
+          <td class="deadline">当日</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--accent);text-align:center">4</td>
+          <td>試作動画のテーマ案 提示</td>
+          <td class="owner-us">セカンドパステル</td>
+          <td class="deadline">5月頭まで</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding:12px 18px;background:var(--highlight-bg);border:1px solid var(--highlight-border);border-radius:8px;max-width:780px;font-size:12px;color:var(--text-muted);line-height:1.6">
+      📋 <strong style="color:var(--text)">備考：適格請求書登録番号なし</strong><br>
+      消費税処理について先方の経理担当と確認が必要な場合があります。インボイス未登録の旨を事前にお伝えください。
+    </div>
+    <div class="contact-bar" style="margin-top:14px">
       セカンドパステル 岸野奈美江 ／ 090-1609-6901
     </div>
   </div>

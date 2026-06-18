@@ -144,6 +144,29 @@
   .foot-brand{position:absolute;left:76px;bottom:22px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text-sub)}
   .dark .foot-brand{color:rgba(255,255,255,.5)}
 
+  /* ===== Slack card mockup ===== */
+  .slackwrap{display:flex;gap:38px;align-items:flex-start;margin-top:4px}
+  .slackcard{flex:none;width:560px;background:#fff;border:1px solid #E4E6EA;border-left:4px solid var(--positive);border-radius:8px;box-shadow:0 6px 22px rgba(20,30,60,.12);overflow:hidden;font-family:-apple-system,'Noto Sans JP',sans-serif}
+  .slackcard .top{display:flex;gap:10px;padding:14px 18px 4px}
+  .slackcard .ava{flex:none;width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#4F46E5,#312E81);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .slackcard .who{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:#1d1c1d}
+  .slackcard .who .bot{font-size:10px;font-weight:700;background:#E4E6EA;color:#616061;border-radius:4px;padding:1px 5px;letter-spacing:.02em}
+  .slackcard .who .tm{font-size:12px;font-weight:400;color:#8a8f98}
+  .slackcard .body{padding:0 18px 16px 64px;margin-top:-4px}
+  .slackcard .hd{font-size:17px;font-weight:800;color:#1d1c1d;margin:6px 0 10px}
+  .slackcard .vd{font-size:14.5px;color:#1d1c1d;margin-bottom:4px}
+  .slackcard .reason{font-size:13.5px;color:#454547;margin-bottom:12px}
+  .slackcard .axisline{font-size:15px;font-weight:800;color:#1d1c1d;margin:3px 0}
+  .slackcard .div{height:1px;background:#ECEDEF;margin:13px 0}
+  .slackcard .ctx{display:flex;align-items:center;gap:7px;font-size:12px;color:#8a8f98;margin:5px 0}
+  .slackcard .ctx code,.slackcard .mono2{font-family:var(--mono);font-size:11.5px;background:#F3F3F4;color:#454547;border:1px solid #E4E6EA;border-radius:4px;padding:1px 6px}
+  .slackcard .doclink{font-size:14px;color:#1264A3;font-weight:600;margin-top:8px}
+  .annot{flex:1;display:flex;flex-direction:column;gap:14px;padding-top:6px}
+  .annot .a{display:flex;gap:12px;align-items:flex-start}
+  .annot .a .dot{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .annot .a b{font-size:16px;color:var(--accent-deep)}
+  .annot .a p{font-size:13.5px;color:var(--text-sub);line-height:1.5;margin-top:1px}
+
   /* ===== Toolbar / nav ===== */
   .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:50}
   .toolbar button{font-family:var(--font);font-size:13px;font-weight:700;border:none;border-radius:9px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
@@ -314,7 +337,39 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
     <div class="pageno">09</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
-  <!-- 10. やること/やらないこと -->
+  <!-- 10. Slackカードのイメージ -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">What you see</div><h2>#candidate-eval に返るカード（イメージ）</h2><div class="bar"></div></div>
+    <div class="slackwrap">
+      <div class="slackcard">
+        <div class="top">
+          <div class="ava">🤖</div>
+          <div class="who">candidate-eval <span class="bot">APP</span> <span class="tm">17:42</span></div>
+        </div>
+        <div class="body">
+          <div class="hd">🟢 書類評価: 佐藤 花子 — 面接進出推奨</div>
+          <div class="vd"><b>総合判定: 🟢 面接進出推奨</b></div>
+          <div class="reason">両軸とも3.5以上（マッチ 4.0 ／ AI協働 3.5）。</div>
+          <div class="axisline">① 求人マッチング度 …… 4.0 / 5</div>
+          <div class="axisline">② AI協働適性（岸野×ClaudeCode基準）…… 3.5 / 5</div>
+          <div class="div"></div>
+          <div class="ctx">📄 書類選考（AI戦略ディレクター・1次）／ 軸: 求人マッチ度＋AI協働適性（岸野基準）</div>
+          <div class="ctx">🆔 候補者ID(jobmanager結合キー): <code>6174041a-…-b825</code></div>
+          <div class="doclink">📄 書類選考 評価レポートDoc</div>
+        </div>
+      </div>
+      <div class="annot">
+        <div class="a"><div class="dot">A</div><div><b>総合判定が一目で</b><p>🟢推奨／🟡要検討／🔴見送り。色と理由でまず判断。</p></div></div>
+        <div class="a"><div class="dot">B</div><div><b>2軸スコア＋根拠</b><p>スレッド返信に各軸の採点根拠（職経引用つき）と面接確認事項が並ぶ。</p></div></div>
+        <div class="a"><div class="dot">C</div><div><b>候補者ID</b><p>HERP candidacy UUID。jobmanager の行と結合するキー。</p></div></div>
+        <div class="a"><div class="dot">D</div><div><b>評価Docリンク</b><p>クリックで固定体裁の評価レポート。jobmanager J列にも自動で同じリンク。</p></div></div>
+      </div>
+    </div>
+    <div class="note">※ 上は合成サンプルのイメージ。実データの氏名・UUIDは伏せています。</div>
+    <div class="pageno">10</div><div class="foot-brand">candidate-eval 取説</div>
+  </section>
+
+  <!-- 11. やること/やらないこと -->
   <section class="slide">
     <div class="slide-head"><div class="kicker">Principles</div><h2>採点の原則（やること・やらないこと）</h2><div class="bar"></div></div>
     <div class="dd">
@@ -332,10 +387,10 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
       </ul></div>
     </div>
     <div class="note">確認できない事項は evidence に「書類からは確認不能」と明記する。</div>
-    <div class="pageno">10</div><div class="foot-brand">candidate-eval 取説</div>
+    <div class="pageno">11</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
-  <!-- 11. 内部構成（開発者向け） -->
+  <!-- 12. 内部構成（開発者向け） -->
   <section class="slide">
     <div class="slide-head"><div class="kicker">Under the hood</div><h2>内部構成（開発・保守メモ）</h2><div class="bar"></div></div>
     <div class="grid g2">
@@ -344,10 +399,10 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
       <div class="card"><h3>インフラ</h3><p style="font-size:14.5px">launchd 常駐（KeepAlive）／Socket Mode<br>eval-doc GAS：create_doc・upload_jsonl・<b>fetch_drive_file(v2)</b></p></div>
       <div class="card"><h3>認証</h3><p style="font-size:14.5px">Keychain account=candidate-eval-bot。<br>GAS は HMAC 署名。未設定キーは no-op（安全側）。</p></div>
     </div>
-    <div class="pageno">11</div><div class="foot-brand">candidate-eval 取説</div>
+    <div class="pageno">12</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
-  <!-- 12. 明日の拡張 -->
+  <!-- 13. 明日の拡張 -->
   <section class="slide">
     <div class="slide-head"><div class="kicker">Next</div><h2>これからの拡張</h2><div class="bar"></div></div>
     <div class="grid g2">
@@ -357,10 +412,10 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
     <div class="card" style="margin-top:20px;background:var(--accent-light);border-color:var(--mint)">
       <p>共通思想：<span class="hl">岸野＝ものさし</span>を起点に、評価を重ねるほどブレずに賢くなる成長型エージェント群。</p>
     </div>
-    <div class="pageno">12</div><div class="foot-brand">candidate-eval 取説</div>
+    <div class="pageno">13</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
-  <!-- 13. まとめ -->
+  <!-- 14. まとめ -->
   <section class="slide dark">
     <div class="slide-head"><div class="kicker">Summary</div><h2>まとめ</h2><div class="bar"></div></div>
     <div class="takeaway">
@@ -368,14 +423,14 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
       <div class="t"><div class="n">02</div><div><b>使い方は2通り</b><span>#candidate-eval に投下、または I列職経URLを CLI で取得。数十秒で結果カード＋Doc＋J列反映。</span></div></div>
       <div class="t"><div class="n">03</div><div><b>堅実・明確・成長</b><span>根拠つき採点・しきい値判定でブレず、アンカー更新とコホート蓄積で賢くなる。</span></div></div>
     </div>
-    <div class="pageno">13</div><div class="foot-brand">KISHINO MASASHI ／ candidate-eval</div>
+    <div class="pageno">14</div><div class="foot-brand">KISHINO MASASHI ／ candidate-eval</div>
   </section>
 
 </div>
 
 <div class="nav">
   <button onclick="go(-1)">‹</button>
-  <span class="ind" id="ind">1 / 13</span>
+  <span class="ind" id="ind">1 / 14</span>
   <button onclick="go(1)">›</button>
 </div>
 

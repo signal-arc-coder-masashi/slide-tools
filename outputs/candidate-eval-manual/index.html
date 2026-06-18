@@ -118,6 +118,11 @@
   .pipe .chip i{display:block;font-style:normal;font-size:10px;font-weight:600;color:var(--text-sub);margin-top:3px;font-family:var(--mono)}
   .pipe .chip.stage{background:var(--accent-light);border-color:var(--mint)}
   .pipe .a{color:var(--accent);font-size:16px}
+  .glabel{display:flex;align-items:center;gap:11px;margin:20px 0 9px;font-size:16px;font-weight:800;color:var(--accent-deep)}
+  .glabel .b{flex:none;font-family:var(--mono);font-size:11px;font-weight:700;background:var(--accent);color:#fff;border-radius:6px;padding:4px 10px;letter-spacing:.02em}
+  .glabel.g2 .b{background:#312E81}
+  .glabel .to{margin-left:auto;font-weight:800;color:var(--positive);font-size:14px}
+  .glabel.g2 .to{color:var(--accent)}
 
   /* ===== cover / dark ===== */
   .dark{background:linear-gradient(135deg,#4338CA 0%,#1E1B4B 100%);color:#fff;justify-content:center}
@@ -147,27 +152,28 @@
   .dark .foot-brand{color:rgba(255,255,255,.5)}
 
   /* ===== Slack card mockup ===== */
-  .slackwrap{display:flex;gap:38px;align-items:flex-start;margin-top:4px}
-  .slackcard{flex:none;width:560px;background:#fff;border:1px solid #E4E6EA;border-left:4px solid var(--positive);border-radius:8px;box-shadow:0 6px 22px rgba(20,30,60,.12);overflow:hidden;font-family:-apple-system,'Noto Sans JP',sans-serif}
-  .slackcard .top{display:flex;gap:10px;padding:14px 18px 4px}
-  .slackcard .ava{flex:none;width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#4F46E5,#312E81);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
-  .slackcard .who{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:#1d1c1d}
-  .slackcard .who .bot{font-size:10px;font-weight:700;background:#E4E6EA;color:#616061;border-radius:4px;padding:1px 5px;letter-spacing:.02em}
-  .slackcard .who .tm{font-size:12px;font-weight:400;color:#8a8f98}
-  .slackcard .body{padding:0 18px 16px 64px;margin-top:-4px}
-  .slackcard .hd{font-size:17px;font-weight:800;color:#1d1c1d;margin:6px 0 10px}
-  .slackcard .vd{font-size:14.5px;color:#1d1c1d;margin-bottom:4px}
-  .slackcard .reason{font-size:13.5px;color:#454547;margin-bottom:12px}
-  .slackcard .axisline{font-size:15px;font-weight:800;color:#1d1c1d;margin:3px 0}
-  .slackcard .div{height:1px;background:#ECEDEF;margin:13px 0}
-  .slackcard .ctx{display:flex;align-items:center;gap:7px;font-size:12px;color:#8a8f98;margin:5px 0}
-  .slackcard .ctx code,.slackcard .mono2{font-family:var(--mono);font-size:11.5px;background:#F3F3F4;color:#454547;border:1px solid #E4E6EA;border-radius:4px;padding:1px 6px}
-  .slackcard .doclink{font-size:14px;color:#1264A3;font-weight:600;margin-top:8px}
-  .annot{flex:1;display:flex;flex-direction:column;gap:14px;padding-top:6px}
-  .annot .a{display:flex;gap:12px;align-items:flex-start}
-  .annot .a .dot{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
-  .annot .a b{font-size:16px;color:var(--accent-deep)}
-  .annot .a p{font-size:13.5px;color:var(--text-sub);line-height:1.5;margin-top:1px}
+  .slackwrap{display:flex;gap:26px;align-items:flex-start;margin-top:2px;justify-content:center}
+  .cardcol{flex:none;width:516px}
+  .cardcap{font-size:13px;font-weight:700;color:var(--accent-deep);margin:0 0 8px 2px}
+  .cardcap span{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text-sub)}
+  .slackcard{width:100%;background:#fff;border:1px solid #E4E6EA;border-left:4px solid var(--positive);border-radius:8px;box-shadow:0 6px 22px rgba(20,30,60,.12);overflow:hidden;font-family:-apple-system,'Noto Sans JP',sans-serif}
+  .slackcard.ws{border-left-color:#4F46E5}
+  .slackcard .top{display:flex;gap:10px;padding:12px 16px 4px}
+  .slackcard .ava{flex:none;width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#4F46E5,#312E81);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
+  .slackcard .who{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800;color:#1d1c1d}
+  .slackcard .who .bot{font-size:9.5px;font-weight:700;background:#E4E6EA;color:#616061;border-radius:4px;padding:1px 5px}
+  .slackcard .who .tm{font-size:11.5px;font-weight:400;color:#8a8f98}
+  .slackcard .body{padding:0 16px 14px 60px;margin-top:-2px}
+  .slackcard .hd{font-size:15.5px;font-weight:800;color:#1d1c1d;margin:5px 0 9px;line-height:1.3}
+  .slackcard .vd{font-size:13.5px;color:#1d1c1d;margin-bottom:3px}
+  .slackcard .reason{font-size:12.5px;color:#454547;margin-bottom:10px}
+  .slackcard .axisline{font-size:14px;font-weight:800;color:#1d1c1d;margin:3px 0}
+  .slackcard .ax7{font-size:12.5px;color:#1d1c1d;margin:2px 0;display:flex;justify-content:space-between;gap:8px}
+  .slackcard .ax7 b{font-weight:800} .slackcard .ax7 em{font-style:normal;color:#8a8f98;font-family:var(--mono);font-size:11px}
+  .slackcard .div{height:1px;background:#ECEDEF;margin:11px 0}
+  .slackcard .ctx{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#8a8f98;margin:4px 0;line-height:1.4}
+  .slackcard .ctx code{font-family:var(--mono);font-size:11px;background:#F3F3F4;color:#454547;border:1px solid #E4E6EA;border-radius:4px;padding:1px 6px}
+  .slackcard .doclink{font-size:13px;color:#1264A3;font-weight:600;margin-top:7px}
 
   /* ===== Toolbar / nav ===== */
   .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:50}
@@ -227,18 +233,16 @@
 
   <!-- 3. 選考フロー上の位置づけ -->
   <section class="slide">
-    <div class="slide-head"><div class="kicker">Where it fits</div><h2>AI戦略ディレクター 選考フローの中の位置</h2><div class="bar"></div></div>
+    <div class="slide-head"><div class="kicker">Where it fits</div><h2>選考フローと、2つの評価ゲート</h2><div class="bar"></div></div>
     <div class="flow">
-      <div class="step hot"><div class="n">1次</div><b>書類選考</b><span>履歴書・職経<br>＝このBot（岸野）</span></div>
+      <div class="step hot"><div class="n">書類</div><b>書類選考（岸野）</b><span>このBot 評価①<br><b>→ 1次面接に通すか</b></span></div>
       <div class="arr">›</div>
-      <div class="step"><div class="n">2次</div><b>面接＋ワークサンプル</b><span>4.83軸の別評価<br>（彩菜さん）</span></div>
+      <div class="step hot"><div class="n">1次</div><b>1次面接 ＆ ワークサンプル（彩菜）</b><span>このBot 評価②(4.83/7軸)<br><b>→ 2次面接に通すか</b></span></div>
       <div class="arr">›</div>
-      <div class="step"><div class="n">3次</div><b>ジョブグラム＋COO面接</b><span>（陣さん）</span></div>
-      <div class="arr">›</div>
-      <div class="step"><div class="n">4次</div><b>理事長面接</b><span></span></div>
+      <div class="step"><div class="n">2次</div><b>ジョブグラム ＆ 2次面接（陣）</b><span>その先の選考</span></div>
     </div>
     <div class="card" style="margin-top:26px;background:var(--accent-light);border-color:var(--mint)">
-      <p><b>⚠ 軸を混同しない。</b> ワークサンプル(2次)の <b>7軸・pass_bar 4.83</b> は<span class="hl">この書類選考とは別物</span>。書類は下記の2軸で評価する。</p>
+      <p><b>このBotは2つのゲートを評価する。</b> <b>①書類選考</b>＝「<span class="hl">1次面接に通すか</span>」（2軸＋判定）。 <b>②ワークサンプル評価</b>＝1次面接の後、「<span class="hl">2次面接に通すか</span>」（7軸・pass_bar 4.83）。軸も目的も別物。</p>
     </div>
     <div class="pageno">03</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
@@ -281,14 +285,14 @@
 
   <!-- 6. 総合判定ルール -->
   <section class="slide">
-    <div class="slide-head"><div class="kicker">Verdict</div><h2>総合判定はしきい値で決定論的に</h2><div class="bar"></div></div>
+    <div class="slide-head"><div class="kicker">Verdict</div><h2>書類選考の総合判定＝「1次面接に通すか」</h2><div class="bar"></div></div>
     <div class="verdict">
-      <div class="v ok"><div class="lab">🟢 面接進出推奨</div><div class="rule">両軸とも 3.5 以上</div></div>
+      <div class="v ok"><div class="lab">🟢 面接進出推奨</div><div class="rule">両軸とも 3.5 以上<br>＝ 1次面接へ</div></div>
       <div class="v mid"><div class="lab">🟡 要検討</div><div class="rule">合格圏未達だが<br>見送り基準も超え</div></div>
-      <div class="v no"><div class="lab">🔴 見送り</div><div class="rule">いずれかが 2.0 以下</div></div>
+      <div class="v no"><div class="lab">🔴 見送り</div><div class="rule">いずれかが 2.0 以下<br>＝ 1次面接に進めない</div></div>
     </div>
-    <p class="sub" style="margin-top:24px">判定はLLMの気分でなく<span class="hl">固定ルールで算出</span>するので毎回ブレない（しきい値は <span class="mono">RESUME_PASS_BOTH / RESUME_REJECT_ANY</span> で調整可）。</p>
-    <div class="note">例：求人マッチ 4.0 ／ AI協働 3.5 → 🟢 面接進出推奨。判定理由も自動で添える。</div>
+    <p class="sub" style="margin-top:22px">判定はLLMの気分でなく<span class="hl">固定ルールで算出</span>（しきい値 <span class="mono">RESUME_PASS_BOTH / RESUME_REJECT_ANY</span> で調整可）。<b>この判定が決めるのは「1次面接に通すか」だけ。</b> 2次面接に進めるかは、1次面接後のワークサンプル評価(7軸・4.83)が別に判定する。</p>
+    <div class="note">例：求人マッチ 4.0 ／ AI協働 3.5 → 🟢 面接進出推奨（＝1次面接へ）。</div>
     <div class="pageno">06</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
@@ -321,55 +325,81 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
     <div class="pageno">08</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
-  <!-- 9. 出力されるもの -->
+  <!-- 9. 2つの評価ゲートの工程 -->
   <section class="slide">
-    <div class="slide-head"><div class="kicker">Outputs</div><h2>出力される3つのもの</h2><div class="bar"></div></div>
-    <div class="grid g3">
-      <div class="card"><span class="ico">💬</span><h3>Slackカード</h3><p>総合判定（🟢🟡🔴）＋①②スコア＋判定理由。スレッドに採点根拠つきの詳細レポート。</p></div>
-      <div class="card"><span class="ico">📄</span><h3>評価Doc</h3><p>固定体裁のGoogle Doc。軸別根拠・強み・<b>面接で確認すべき点</b>まで。評価レポートフォルダに格納。</p></div>
-      <div class="card"><span class="ico">📊</span><h3>jobmanager J列</h3><p>HERP candidacy ID で行マッチし「AI評価Doc URL」列にリンクを自動反映（#29）。</p></div>
-    </div>
+    <div class="slide-head"><div class="kicker">Pipeline</div><h2>工程：このBotが回す2つの評価ゲート</h2><div class="bar"></div></div>
+
+    <div class="glabel"><span class="b">ゲート①</span>書類選考（岸野）<span class="to">→ 1次面接に通すか</span></div>
     <div class="pipe">
       <span class="chip">入力Slackカード<i>要ユーザー登録</i></span><span class="a">→</span>
-      <span class="chip">職経テキスト</span><span class="a">→</span>
+      <span class="chip">職経テキスト<i>PDF/DOCX・I列</i></span><span class="a">→</span>
       <span class="chip">2軸採点<i>claude</i></span><span class="a">→</span>
-      <span class="chip stage">面接ワークサンプルテスト<i>2次・別評価</i></span><span class="a">→</span>
       <span class="chip">評価Doc</span><span class="a">→</span>
       <span class="chip">J列反映</span><span class="a">→</span>
       <span class="chip">Slackカード</span>
     </div>
+
+    <div class="glabel g2"><span class="b">ゲート②</span>ワークサンプル評価（1次面接の<b>後</b>）<span class="to">→ 2次面接に通すか</span></div>
+    <div class="pipe">
+      <span class="chip stage">1次面接 ＆ ワークサンプル受験<i>候補者が実施</i></span><span class="a">→</span>
+      <span class="chip">受験ログ<i>history.jsonl</i></span><span class="a">→</span>
+      <span class="chip">7軸採点<i>claude・4.83</i></span><span class="a">→</span>
+      <span class="chip">評価Doc</span><span class="a">→</span>
+      <span class="chip">J列反映</span><span class="a">→</span>
+      <span class="chip">Slackカード</span>
+    </div>
+
+    <div class="note">各ゲートとも出力は <b>Slackカード＋評価Doc＋jobmanager J列反映</b>。同じ候補者ID(UUID)で2回評価が残る。書類は2軸、ワークサンプルは7軸(pass_bar 4.83)。</div>
     <div class="pageno">09</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 
-  <!-- 10. Slackカードのイメージ -->
+  <!-- 10. 2つの評価カード -->
   <section class="slide">
-    <div class="slide-head"><div class="kicker">What you see</div><h2>#candidate-eval に返るカード（イメージ）</h2><div class="bar"></div></div>
+    <div class="slide-head"><div class="kicker">What you see</div><h2>#candidate-eval に返る2つの評価カード</h2><div class="bar"></div></div>
     <div class="slackwrap">
-      <div class="slackcard">
-        <div class="top">
-          <div class="ava">🤖</div>
-          <div class="who">candidate-eval <span class="bot">APP</span> <span class="tm">17:42</span></div>
-        </div>
-        <div class="body">
-          <div class="hd">🟢 書類評価: 佐藤 花子 — 面接進出推奨</div>
-          <div class="vd"><b>総合判定: 🟢 面接進出推奨</b></div>
-          <div class="reason">両軸とも3.5以上（マッチ 4.0 ／ AI協働 3.5）。</div>
-          <div class="axisline">① 求人マッチング度 …… 4.0 / 5</div>
-          <div class="axisline">② AI協働適性（岸野×ClaudeCode基準）…… 3.5 / 5</div>
-          <div class="div"></div>
-          <div class="ctx">📄 書類選考（AI戦略ディレクター・1次）／ 軸: 求人マッチ度＋AI協働適性（岸野基準）</div>
-          <div class="ctx">🆔 候補者ID(jobmanager結合キー): <code>6174041a-…-b825</code></div>
-          <div class="doclink">📄 書類選考 評価レポートDoc</div>
+      <!-- 書類選考カード -->
+      <div class="cardcol">
+        <div class="cardcap">① 書類選考カード → 1次面接に通すか<span> ／ PDF・DOCX 投下時</span></div>
+        <div class="slackcard">
+          <div class="top"><div class="ava">🤖</div><div class="who">candidate-eval <span class="bot">APP</span> <span class="tm">17:42</span></div></div>
+          <div class="body">
+            <div class="hd">🟢 書類評価: 佐藤 花子 — 面接進出推奨</div>
+            <div class="vd"><b>総合判定: 🟢 面接進出推奨</b></div>
+            <div class="reason">両軸とも3.5以上（マッチ 4.0 ／ AI協働 3.5）。</div>
+            <div class="axisline">① 求人マッチング度 …… 4.0 / 5</div>
+            <div class="axisline">② AI協働適性（岸野×ClaudeCode基準）…… 3.5 / 5</div>
+            <div class="div"></div>
+            <div class="ctx">📄 書類選考（AI戦略ディレクター・1次）</div>
+            <div class="ctx">🆔 候補者ID: <code>6174041a-…-b825</code></div>
+            <div class="doclink">📄 書類選考 評価レポートDoc</div>
+          </div>
         </div>
       </div>
-      <div class="annot">
-        <div class="a"><div class="dot">A</div><div><b>総合判定が一目で</b><p>🟢推奨／🟡要検討／🔴見送り。色と理由でまず判断。</p></div></div>
-        <div class="a"><div class="dot">B</div><div><b>2軸スコア＋根拠</b><p>スレッド返信に各軸の採点根拠（職経引用つき）と面接確認事項が並ぶ。</p></div></div>
-        <div class="a"><div class="dot">C</div><div><b>候補者ID</b><p>HERP candidacy UUID。jobmanager の行と結合するキー。</p></div></div>
-        <div class="a"><div class="dot">D</div><div><b>評価Docリンク</b><p>クリックで固定体裁の評価レポート。jobmanager J列にも自動で同じリンク。</p></div></div>
+      <!-- ワークサンプル評価カード（④の後） -->
+      <div class="cardcol">
+        <div class="cardcap">② ワークサンプル評価カード → 2次面接に通すか<span> ／ 1次面接後・history.jsonl 投下時</span></div>
+        <div class="slackcard ws">
+          <div class="top"><div class="ava">🤖</div><div class="who">candidate-eval <span class="bot">APP</span> <span class="tm">翌14:08</span></div></div>
+          <div class="body">
+            <div class="hd">🟢 評価: 佐藤 花子 — 4.9 / 5.0 [A]</div>
+            <div class="vd"><b>判定 A</b> — 即戦力。AIネイティブに設計〜実装を回せる</div>
+            <div class="reason">基準アンカー比 +0.07 ／ 合否バー判定: <b>到達</b>（pass_bar 4.83）</div>
+            <div class="ax7"><span>1. 課題理解・要件分解</span><b>5/5 <em>+0</em></b></div>
+            <div class="ax7"><span>2. AI/ツール活用・対話設計</span><b>5/5 <em>+0.5</em></b></div>
+            <div class="ax7"><span>3. 技術的深さ・アーキ判断</span><b>4.5/5 <em>-0.5</em></b></div>
+            <div class="ax7"><span>4. 問題解決・回復力</span><b>5/5 <em>+0.5</em></b></div>
+            <div class="ax7"><span>5. 完遂力・成果物完成度</span><b>5/5 <em>+0</em></b></div>
+            <div class="ax7"><span>6. 自律性・判断</span><b>5/5 <em>+0</em></b></div>
+            <div class="ax7"><span>7. 時間効率</span><b>4.5/5 <em>-0.5</em></b></div>
+            <div class="div"></div>
+            <div class="ctx">⏱ 1h12m ／ 停滞1回 ／ 質問比0.25</div>
+            <div class="ctx">🆔 候補者ID: <code>6174041a-…-b825</code></div>
+            <div class="doclink">📄 評価レポートDoc</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="note">※ 上は合成サンプルのイメージ。実データの氏名・UUIDは伏せています。</div>
+    <div class="note">①書類（2軸＋判定）と ②ワークサンプル（7軸・pass_bar 4.83）は<b>同じbot・同じ候補者ID</b>で出る別カード。どちらも評価Docを生成し jobmanager に反映。※氏名・UUIDは伏せた合成イメージ。</div>
     <div class="pageno">10</div><div class="foot-brand">candidate-eval 取説</div>
   </section>
 

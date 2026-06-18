@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUTUREMIND AI環境構築＆活用研修</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF8F2;
+    --paper:#FFFFFF;
+    --accent:#3A8A5A;
+    --accent-deep:#1F5638;
+    --accent-light:#DCF0E4;
+    --mint:#C8EDD5;
+    --positive:#059669;
+    --caution:#D97706;
+    --caution-light:#FDF1E1;
+    --text:#16301F;
+    --text-sub:#4A7A5A;
+    --border:#C4E2D0;
+    --code-bg:#10261A;
+    --font:'Noto Sans JP',sans-serif;
+    --mono:'Source Code Pro',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#0d1f15;font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
+
+  /* ===== Deck / Slide ===== */
+  .deck{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .slide{
+    position:absolute;width:1280px;height:720px;background:var(--bg);
+    display:none;flex-direction:column;padding:54px 76px;overflow:hidden;
+    transform:scale(var(--fit,1));transform-origin:center center;
+  }
+  .slide.active{display:flex;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:scale(var(--fit,1)) translateY(14px)}to{opacity:1}}
+
+  /* ===== Typography ===== */
+  h1{font-size:42px;font-weight:900;line-height:1.2;letter-spacing:.01em}
+  h2{font-size:38px;font-weight:900;line-height:1.25;color:var(--accent-deep)}
+  .kicker{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  p,li{font-size:18px;line-height:1.7;color:var(--text)}
+  .sub{color:var(--text-sub)}
+  .mono{font-family:var(--mono)}
+
+  .slide-head{margin-bottom:26px}
+  .slide-head .bar{width:46px;height:6px;border-radius:3px;background:var(--accent);margin-top:14px}
+
+  /* ===== Cards / grid ===== */
+  .grid{display:grid;gap:20px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--paper);border:1px solid var(--border);border-radius:16px;padding:24px 26px}
+  .card h3{font-size:20px;font-weight:700;margin-bottom:10px;color:var(--accent-deep)}
+  .card p{font-size:16px;line-height:1.6}
+  .card .ico{font-size:30px;margin-bottom:12px;display:block}
+
+  .pill{display:inline-block;background:var(--accent-light);color:var(--accent-deep);font-weight:700;font-size:14px;padding:5px 14px;border-radius:999px}
+
+  /* number list */
+  .nlist{display:flex;flex-direction:column;gap:16px;margin-top:8px}
+  .nlist .row{display:flex;gap:20px;align-items:flex-start}
+  .nlist .num{flex:none;width:46px;height:46px;border-radius:12px;background:var(--accent);color:#fff;font-family:var(--mono);font-weight:600;font-size:22px;display:flex;align-items:center;justify-content:center}
+  .nlist .row h3{font-size:19px;font-weight:700;margin-bottom:3px}
+  .nlist .row p{font-size:15px;color:var(--text-sub)}
+
+  /* code block */
+  .code{background:var(--code-bg);color:#D8F3E2;font-family:var(--mono);font-size:15px;line-height:1.75;border-radius:14px;padding:20px 24px;white-space:pre;overflow:auto}
+  .code .c{color:#7FB89A}
+  .code .k{color:#9FE3BA}
+
+  /* checklist */
+  .check{display:flex;flex-direction:column;gap:13px;margin-top:4px}
+  .check .item{display:flex;gap:14px;align-items:flex-start;background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:15px 20px}
+  .check .box{flex:none;width:26px;height:26px;border-radius:7px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-size:15px}
+  .check .item p{font-size:16px}
+  .check .item b{color:var(--accent-deep)}
+
+  /* before/after */
+  .ba{display:grid;grid-template-columns:1fr 56px 1fr;align-items:center;gap:8px}
+  .ba .arrow{font-size:34px;color:var(--accent);text-align:center}
+  .ba .before{background:var(--caution-light);border:1px solid #F0D6A8}
+  .ba .after{background:var(--accent-light);border:1px solid var(--border)}
+  .ba .panel{border-radius:16px;padding:24px}
+  .ba .panel .lab{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+  .ba .before .lab{color:var(--caution)}
+  .ba .after .lab{color:var(--positive)}
+  .ba .panel ul{margin-top:12px;padding-left:20px}
+  .ba .panel li{font-size:15px;margin-bottom:7px}
+
+  /* two-col do/dont */
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .dd .col{border-radius:16px;padding:24px 26px}
+  .dd .ng{background:var(--caution-light);border:1px solid #F0D6A8}
+  .dd .ok{background:var(--accent-light);border:1px solid var(--border)}
+  .dd .col h3{font-size:20px;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+  .dd .ng h3{color:var(--caution)}
+  .dd .ok h3{color:var(--positive)}
+  .dd ul{list-style:none}
+  .dd li{font-size:15.5px;line-height:1.5;margin-bottom:11px;padding-left:24px;position:relative}
+  .dd .ng li::before{content:"✕";position:absolute;left:0;color:var(--caution);font-weight:700}
+  .dd .ok li::before{content:"✓";position:absolute;left:0;color:var(--positive);font-weight:700}
+
+  /* ===== Section divider / cover ===== */
+  .dark{background:linear-gradient(135deg,#2E7D52 0%,#163B27 100%);color:#fff;justify-content:center}
+  .dark h1,.dark h2{color:#fff}
+  .dark .sub{color:#C7E8D4}
+  .dark .kicker{color:#A7E3C0}
+  .dark .bar{background:#A7E3C0}
+
+  .cover .brand{font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:#A7E3C0;margin-bottom:30px}
+  .cover h1{font-size:60px;line-height:1.15;margin-bottom:20px}
+  .cover .lead{font-size:21px;color:#D7F0E0;max-width:780px;line-height:1.6}
+  .cover .meta{margin-top:46px;display:flex;gap:40px;flex-wrap:wrap}
+  .cover .meta div span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#8FCBA6;text-transform:uppercase;margin-bottom:5px}
+  .cover .meta div b{font-size:17px;font-weight:700;color:#fff}
+
+  .sectno{font-family:var(--mono);font-size:80px;font-weight:600;color:rgba(255,255,255,.28);line-height:1}
+
+  .takeaway{display:flex;flex-direction:column;gap:22px;margin-top:10px}
+  .takeaway .t{display:flex;gap:22px;align-items:center}
+  .takeaway .n{flex:none;font-family:var(--mono);font-size:38px;font-weight:600;color:#A7E3C0;width:56px}
+  .takeaway .t b{font-size:23px;font-weight:700;color:#fff;display:block;margin-bottom:2px}
+  .takeaway .t span{font-size:16px;color:#C7E8D4}
+
+  .note{margin-top:auto;padding-top:18px;font-size:14px;color:var(--text-sub);border-top:1px dashed var(--border)}
+  .hl{background:linear-gradient(transparent 62%,var(--mint) 62%);font-weight:700;padding:0 2px}
+
+  /* footer */
+  .pageno{position:absolute;right:30px;bottom:22px;font-family:var(--mono);font-size:12px;color:var(--text-sub)}
+  .dark .pageno{color:rgba(255,255,255,.55)}
+  .foot-brand{position:absolute;left:76px;bottom:22px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text-sub)}
+  .dark .foot-brand{color:rgba(255,255,255,.5)}
+
+  /* ===== Toolbar ===== */
+  .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:50}
+  .toolbar button{font-family:var(--font);font-size:13px;font-weight:700;border:none;border-radius:9px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .toolbar button.ghost{background:rgba(255,255,255,.92);color:var(--accent-deep);border:1px solid var(--border)}
+  .toolbar button:hover{filter:brightness(1.07)}
+  .nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:50}
+  .nav button{width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:var(--accent-deep);font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .nav .ind{font-family:var(--mono);font-size:13px;color:#fff;background:rgba(0,0,0,.35);padding:8px 14px;border-radius:999px}
+
+  /* ===== Print ===== */
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    html,body{background:#fff}
+    .toolbar,.nav{display:none!important}
+    .deck{display:block;width:auto;height:auto;overflow:visible}
+    .slide{position:relative;display:flex!important;transform:none!important;
+      width:1280px;height:720px;page-break-after:always;break-after:page;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .slide:last-child{page-break-after:auto}
+    .slide.active{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="ghost" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+  <button onclick="exportPPTX()">📊 PowerPointに変換</button>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 1. COVER -->
+  <section class="slide active dark cover">
+    <div class="brand">FUTUREMIND · AI NATIVE PROGRAM</div>
+    <h1>AI環境構築＆活用研修</h1>
+    <p class="lead">Claude Code を“あなたの相棒”にする半日。<br>インストールから、自分の業務を1つ自動化するところまで。</p>
+    <div class="meta">
+      <div><span>対象</span><b>幹部のみなさま（非エンジニア）</b></div>
+      <div><span>到達点</span><b>初期設定 → 基本操作 → 簡単な業務自動化</b></div>
+      <div><span>チューター</span><b>岸野 昌史</b></div>
+    </div>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 2. AGENDA -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Agenda</div><h2>本日の流れ</h2><div class="bar"></div></div>
+    <div class="nlist">
+      <div class="row"><div class="num">0</div><div><h3>事前準備の確認</h3><p>始める前に揃えておくもの・心構え</p></div></div>
+      <div class="row"><div class="num">1</div><div><h3>Part 1 — セットアップ</h3><p>Claude Code のインストール・ログイン・設定ファイル設置</p></div></div>
+      <div class="row"><div class="num">2</div><div><h3>Part 2 — 基本操作</h3><p>最初の5つの操作と、伝わるお願いのコツ</p></div></div>
+      <div class="row"><div class="num">3</div><div><h3>Part 3 — 業務自動化（ハンズオン）</h3><p>外部ツール接続と、自分の業務を1つ自動化してみる</p></div></div>
+      <div class="row"><div class="num">🔒</div><div><h3>セキュリティと、困ったときの窓口</h3><p>これだけは守る約束ごと</p></div></div>
+    </div>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 3. WHY NOW -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Why now</div><h2>なぜ今、これをやるのか</h2><div class="bar"></div></div>
+    <div class="grid g3" style="margin-bottom:20px">
+      <div class="card"><span class="ico">🏢</span><h3>全社AIマスト利用へ</h3><p>幹部会で決まった方針。まず幹部が率先垂範し、現場へ広げていきます。</p></div>
+      <div class="card"><span class="ico">🌱</span><h3>“自走”が前提</h3><p>手取り足取りではなく、自力で掴む文化。サポート環境は用意し、習熟は自分で。</p></div>
+      <div class="card"><span class="ico">📈</span><h3>評価にも直結</h3><p>AIを使えることが、これからの組織での標準スキルになっていきます。</p></div>
+    </div>
+    <p class="sub" style="font-size:17px">この研修は<span class="hl">自走のための“最初の足場”</span>です。完璧を目指さず、まず触れて、わからないことは聞ける状態をつくります。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 4. GOAL Before/After -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Goal</div><h2>今日のゴール：PCがこう変わる</h2><div class="bar"></div></div>
+    <div class="ba">
+      <div class="panel before">
+        <div class="lab">Before — 今</div>
+        <ul>
+          <li>調べもの・資料作成を全部手で</li>
+          <li>定型作業（集計・転記）に毎週時間</li>
+          <li>「AIが気になるけど何から…」</li>
+        </ul>
+      </div>
+      <div class="arrow">→</div>
+      <div class="panel after">
+        <div class="lab">After — 半日後</div>
+        <ul>
+          <li>Claude Code に日本語で頼める</li>
+          <li>自分の業務を1つ自動化できている</li>
+          <li>つまずいても聞ける先がある</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">※ プログラミング経験はゼロでOK。コードは Claude が書きます。あなたは「何をしたいか」を日本語で伝えるだけです。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 5. 事前準備 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Step 0 · Preparation</div><h2>事前準備：これだけ揃えてください</h2><div class="bar"></div></div>
+    <div class="check">
+      <div class="item"><div class="box">✓</div><p><b>PC</b>：Mac（macOS 13以降）。会社支給の新PCを使います。藤巻さんはWindows、TommyさんはMac。</p></div>
+      <div class="item"><div class="box">✓</div><p><b>ネット接続</b>：通常の社内Wi-Fiで可。VPN環境の方は事前に岸野へ一言。</p></div>
+      <div class="item"><div class="box">✓</div><p><b>会社のClaudeアカウント</b>（Team契約）：ログイン情報を手元に。個人カードは不要です。</p></div>
+      <div class="item"><div class="box">✓</div><p><b>配布キット</b>：<span class="mono">config-kit</span> フォルダ（CLAUDE.md / 設定ファイル / セキュリティ）を受け取っておく。</p></div>
+      <div class="item"><div class="box">✓</div><p><b>心構え</b>：エラーが出ても壊れません。<span class="hl">触って試す</span>のが最短の上達法です。</p></div>
+    </div>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 6. SECTION Part 1 -->
+  <section class="slide dark">
+    <div class="sectno">01</div>
+    <div class="kicker" style="margin-top:18px">Part 1</div>
+    <h1 style="font-size:48px;margin-top:6px">セットアップ</h1>
+    <p class="sub" style="font-size:19px;margin-top:14px;max-width:680px">インストールして、ログインして、設定ファイルを置く。ここまでで“岸野さんと同じ状態”の土台ができます。</p>
+  </section>
+
+  <!-- 7. What is Claude Code -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Concept</div><h2>Claude Code ってなに？（30秒）</h2><div class="bar"></div></div>
+    <div class="grid g2" style="align-items:center">
+      <div>
+        <p style="font-size:20px;line-height:1.8">ひとことで言うと<br><span class="hl" style="font-size:23px">「あなたのPCの中で動く、作業できるAIの相棒」</span></p>
+        <p class="sub" style="margin-top:16px;font-size:16px">チャットAIとの違いは、<b style="color:var(--accent-deep)">ファイルを読んだり・作ったり・調べたり・外部ツールを操作</b>できること。日本語で頼むと、実際の作業までやってくれます。</p>
+      </div>
+      <div class="card" style="background:var(--accent-light);border-color:var(--border)">
+        <h3>例えばこんなお願い</h3>
+        <p style="margin-bottom:9px">💬「このフォルダのCSVを月別に集計して」</p>
+        <p style="margin-bottom:9px">💬「この資料を3行で要約して」</p>
+        <p style="margin-bottom:9px">💬「先週の予定を一覧にして」</p>
+        <p>💬「この作業を毎朝自動でやって」</p>
+      </div>
+    </div>
+    <p class="note">※「ターミナル」という黒い画面で動きます。最初は見慣れませんが、使うコマンドはごく少数です。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 8. Install steps -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Part 1 · Install</div><h2>インストール手順（Mac）</h2><div class="bar"></div></div>
+    <div class="grid g2" style="grid-template-columns:1fr 1.05fr;align-items:start">
+      <div class="nlist">
+        <div class="row"><div class="num">1</div><div><h3>ターミナルを開く</h3><p>「⌘＋スペース」→「ターミナル」と入力して起動</p></div></div>
+        <div class="row"><div class="num">2</div><div><h3>Claude Code を入れる</h3><p>右のコマンドを貼り付けてEnter</p></div></div>
+        <div class="row"><div class="num">3</div><div><h3>起動してログイン</h3><p><span class="mono">claude</span> と打つと初回ログイン画面へ</p></div></div>
+        <div class="row"><div class="num">4</div><div><h3>動作確認</h3><p><span class="mono">/status</span> で設定が読めていればOK</p></div></div>
+      </div>
+      <div class="code"><span class="c"># 1. Claude Code をインストール</span>
+npm i -g <span class="k">@anthropic-ai/claude-code</span>
+
+<span class="c"># 2. 起動（初回はログインが開く）</span>
+claude
+
+<span class="c"># 3. 起動後、画面の中で確認</span>
+/status
+/help   <span class="c">← 使える機能の一覧</span></div>
+    </div>
+    <p class="note">※ <span class="mono">npm</span> が無いと言われたら、配布キットの <span class="mono">INSTALL_macos.md</span> の手順（Homebrew→Node）を先に。詰まったらその場で岸野へ。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 8b. Install Windows -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Part 1 · Install</div><h2>インストール手順（Windows）</h2><div class="bar"></div></div>
+    <div class="grid g2" style="grid-template-columns:1fr 1.05fr;align-items:start">
+      <div class="nlist">
+        <div class="row"><div class="num">1</div><div><h3>PowerShellを開く</h3><p>スタート→「PowerShell」と入力して起動（通常権限でOK）</p></div></div>
+        <div class="row"><div class="num">2</div><div><h3>Node を入れる</h3><p>winget で Node.js を導入（初回のみ）</p></div></div>
+        <div class="row"><div class="num">3</div><div><h3>Claude Code を入れる</h3><p><span class="mono">npm install -g …</span> を実行</p></div></div>
+        <div class="row"><div class="num">4</div><div><h3>起動・ログイン・確認</h3><p><span class="mono">claude</span>→初回ログイン→<span class="mono">/status</span></p></div></div>
+      </div>
+      <div class="code"><span class="c"># 1. Node.js を入れる（初回のみ）</span>
+winget install <span class="k">OpenJS.NodeJS.LTS</span>
+
+<span class="c"># PowerShellを開き直してから ↓</span>
+<span class="c"># 2. Claude Code をインストール</span>
+npm install -g <span class="k">@anthropic-ai/claude-code</span>
+
+<span class="c"># 3. 起動 → 確認</span>
+claude
+/status</div>
+    </div>
+    <p class="note">※ <span class="mono">winget</span> が無い場合は Microsoft Store の「App Installer」を更新。実行エラー時は <span class="mono">Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</span>。詳細は配布キットの <span class="mono">はじめにお読みください_Windows.md</span>。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 9. Config files -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Part 1 · Config</div><h2>設定ファイル3点セットを置く</h2><div class="bar"></div></div>
+    <p class="sub" style="margin-bottom:16px">配布キットの中身を所定の場所にコピーするだけ。これで“岸野さんと同じルール”でClaudeが動きます。</p>
+    <div class="grid g3" style="margin-bottom:18px">
+      <div class="card"><span class="ico">📜</span><h3>CLAUDE.md</h3><p>共通の指示書。日本語で答える・セキュリティを守る等のルール。</p><p class="mono sub" style="font-size:13px;margin-top:8px">→ ~/.claude/CLAUDE.md</p></div>
+      <div class="card"><span class="ico">⚙️</span><h3>settings.local.json</h3><p>許可した操作を溜める箱。最初は空でOK。</p><p class="mono sub" style="font-size:13px;margin-top:8px">→ ~/.claude/</p></div>
+      <div class="card"><span class="ico">🔒</span><h3>SECURITY.md</h3><p>守る約束ごと。中身はCLAUDE.mdに反映済み。一度読む。</p><p class="mono sub" style="font-size:13px;margin-top:8px">→ 読むだけ</p></div>
+    </div>
+    <div class="code"><span class="c"># Mac：配布キットのフォルダで実行するだけ</span>
+mkdir -p ~/.claude/mcp
+cp CLAUDE.md ~/.claude/CLAUDE.md
+cp settings.local.json.example ~/.claude/settings.local.json</div>
+    <p class="note">※ <b>Windows</b> は同じ3ファイルを <span class="mono">%USERPROFILE%\.claude\</span> に <span class="mono">Copy-Item</span> で設置。手順は配布キットの <span class="mono">はじめにお読みください_Windows.md</span> 参照。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 10. SECTION Part 2 -->
+  <section class="slide dark">
+    <div class="sectno">02</div>
+    <div class="kicker" style="margin-top:18px">Part 2</div>
+    <h1 style="font-size:48px;margin-top:6px">基本操作</h1>
+    <p class="sub" style="font-size:19px;margin-top:14px;max-width:680px">覚える操作は5つだけ。あとは日本語で話しかければ大丈夫です。</p>
+  </section>
+
+  <!-- 11. 5 operations -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Part 2 · Basics</div><h2>最初の5つの操作</h2><div class="bar"></div></div>
+    <div class="nlist">
+      <div class="row"><div class="num">1</div><div><h3>起動する</h3><p>作業したいフォルダで <span class="mono">claude</span> と打つ</p></div></div>
+      <div class="row"><div class="num">2</div><div><h3>日本語で頼む</h3><p>「このフォルダの中身を一覧にして」など、普通の言葉でOK</p></div></div>
+      <div class="row"><div class="num">3</div><div><h3>許可を出す</h3><p>操作の前に確認が出る。内容を見て許可／毎回許可を選ぶ</p></div></div>
+      <div class="row"><div class="num">4</div><div><h3>機能を見る</h3><p><span class="mono">/help</span> で使える機能、<span class="mono">/model</span> でAIの賢さ切替</p></div></div>
+      <div class="row"><div class="num">5</div><div><h3>終わる</h3><p><span class="mono">/exit</span> または Ctrl＋C を2回</p></div></div>
+    </div>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 12. Prompt tips -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Part 2 · Tips</div><h2>伝わるお願いのコツ</h2><div class="bar"></div></div>
+    <div class="dd">
+      <div class="col ng">
+        <h3>😵 惜しい例</h3>
+        <ul>
+          <li>「いい感じにまとめて」（基準が無い）</li>
+          <li>「資料作って」（何の・誰向けか不明）</li>
+          <li>一度に10個まとめて頼む</li>
+        </ul>
+      </div>
+      <div class="col ok">
+        <h3>😊 伝わる例</h3>
+        <ul>
+          <li>「この議事録を、結論→決定事項→宿題の3見出しで要約して」</li>
+          <li>「来週の予定を、日付・時間・場所の表にして」</li>
+          <li>1つ頼む → 結果を見て次を頼む</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">コツは<span class="hl">「誰に・何を・どんな形で」を一言添える</span>こと。違ったら「もっと短く」「表で」と追加で直せます。会話できるのが強みです。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 13. SECTION Part 3 -->
+  <section class="slide dark">
+    <div class="sectno">03</div>
+    <div class="kicker" style="margin-top:18px">Part 3 · Hands-on</div>
+    <h1 style="font-size:48px;margin-top:6px">業務を1つ自動化する</h1>
+    <p class="sub" style="font-size:19px;margin-top:14px;max-width:700px">外部ツールにつなぎ、自分の毎週の作業をひとつ、Claudeに任せてみます。</p>
+  </section>
+
+  <!-- 14. MCP + handson -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Part 3 · Connect</div><h2>MCP接続＝外部ツールと繋ぐ</h2><div class="bar"></div></div>
+    <div class="grid g2" style="align-items:start">
+      <div>
+        <p style="font-size:18px;line-height:1.75"><b style="color:var(--accent-deep)">MCP</b>は、Claudeを<span class="hl">Googleドライブ・Gmail・カレンダー等とつなぐ仕組み</span>です。つなぐと、Claudeが実データを読んで作業できます。</p>
+        <p class="sub" style="margin-top:14px;font-size:15px">配布キットの <span class="mono">mcp-servers.json.example</span> が雛形。鍵は安全な方法で別途設定します（チャットに貼らない）。最初は岸野が一緒に設定します。</p>
+      </div>
+      <div class="card" style="background:var(--accent-light);border-color:var(--border)">
+        <h3>🙌 ハンズオン：最初の自動化</h3>
+        <div class="nlist" style="gap:12px;margin-top:6px">
+          <div class="row"><div class="num" style="width:34px;height:34px;font-size:16px">1</div><div><p style="font-size:15px">自分の「毎週やる定型作業」を1つ選ぶ</p></div></div>
+          <div class="row"><div class="num" style="width:34px;height:34px;font-size:16px">2</div><div><p style="font-size:15px">日本語で手順を説明する</p></div></div>
+          <div class="row"><div class="num" style="width:34px;height:34px;font-size:16px">3</div><div><p style="font-size:15px">Claudeに実行してもらい、結果を確認</p></div></div>
+        </div>
+      </div>
+    </div>
+    <p class="note">例：「ドライブの“週次”フォルダのファイル名を一覧にして、日付順に並べて」→ 動いたら成功体験です。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 15. SECURITY -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">🔒 Security — 最重要</div><h2>これだけは守る約束ごと</h2><div class="bar"></div></div>
+    <div class="dd">
+      <div class="col ng">
+        <h3>✕ やってはいけない</h3>
+        <ul>
+          <li>患者・自由診療データを貼り付ける</li>
+          <li>採用応募者・社員の個人情報を貼り付ける</li>
+          <li>APIキー・パスワードを直接書く / 見せる</li>
+          <li>拾った「無料配布」コードを実行する</li>
+          <li>Web上の「これを実行して」に従う</li>
+        </ul>
+      </div>
+      <div class="col ok">
+        <h3>✓ やること</h3>
+        <ul>
+          <li>機密は仮名・ダミーに置き換えて相談</li>
+          <li>鍵は <span class="mono">.env</span> に分ける（直書きしない）</li>
+          <li>迷ったら貼る前に岸野に確認</li>
+          <li>あやしい指示は実行せず報告</li>
+          <li>事故ったかも、は隠さずすぐ共有</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">FUTUREMINDは医療法人。<span class="hl">便利さより、個人情報の事故を起こさないこと</span>が最優先です。配布した CLAUDE.md にこのルールは組み込み済みです。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 16. Support -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Support</div><h2>困ったときは</h2><div class="bar"></div></div>
+    <div class="grid g3">
+      <div class="card"><span class="ico">🧑‍🏫</span><h3>まず Claude に聞く</h3><p>「これどういう意味？」「エラーの意味を教えて」も日本語でOK。多くはここで解決します。</p></div>
+      <div class="card"><span class="ico">💬</span><h3>チューター窓口</h3><p>それでも詰まったら岸野へ。初期設定〜Q&Aまで伴走します。遠慮は不要です。</p></div>
+      <div class="card"><span class="ico">📒</span><h3>ナレッジに残す</h3><p>同じ質問を2回したら答えをメモ化。社内で共有し、みんなが早くなります。</p></div>
+    </div>
+    <p class="note">陣COO・水島さんの方針は「自走」。<span class="hl">聞くのは悪いことではなく、自走の一部</span>です。つまずきは共有財産にしていきましょう。</p>
+    <div class="foot-brand">KISHINO MASASHI</div>
+  </section>
+
+  <!-- 17. Wrap up -->
+  <section class="slide dark">
+    <div class="kicker">Take-aways</div><h2 style="margin-bottom:8px">今日のまとめ</h2>
+    <div class="takeaway">
+      <div class="t"><div class="n">01</div><div><b>触れば慣れる</b><span>コードは書けなくていい。日本語で頼めば動く。まず1つ自動化できた。</span></div></div>
+      <div class="t"><div class="n">02</div><div><b>同じ土台ができた</b><span>CLAUDE.md と設定3点セットで、岸野さんと同じ状態のスタート地点に。</span></div></div>
+      <div class="t"><div class="n">03</div><div><b>安全に・自走で</b><span>機密は渡さない。困ったら聞く・残す。これが評価される使い方。</span></div></div>
+    </div>
+    <p class="sub" style="margin-top:30px;font-size:18px">次のアクション：<b style="color:#fff">今週、自分の業務をもう1つ Claude に頼んでみる。</b>うまくいかなければ岸野まで。</p>
+    <div class="foot-brand">KISHINO MASASHI · FUTUREMIND AI NATIVE PROGRAM</div>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button onclick="go(-1)">‹</button>
+  <span class="ind" id="ind">1 / 18</span>
+  <button onclick="go(1)">›</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function fit(){
+    const s=Math.min(window.innerWidth/1280,window.innerHeight/720);
+    document.documentElement.style.setProperty('--fit',s);
+  }
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    document.getElementById('ind').textContent=(i+1)+' / '+slides.length;
+  }
+  function go(d){show(i+d)}
+  window.addEventListener('resize',fit); fit(); show(0);
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){go(1);e.preventDefault()}
+    if(['ArrowLeft','PageUp'].includes(e.key)){go(-1);e.preventDefault()}
+    if(e.key==='Home')show(0); if(e.key==='End')show(slides.length-1);
+    if(e.key==='f'||e.key==='F'){document.documentElement.requestFullscreen?.()}
+  });
+
+  // ===== PPTX export (text-based, from DOM) =====
+  function exportPPTX(){
+    const run=()=>{
+      const p=new PptxGenJS(); p.defineLayout({name:'W',width:13.333,height:7.5}); p.layout='W';
+      const GREEN='3A8A5A', DEEP='163B27', TEXT='16301F', SUB='4A7A5A';
+      slides.forEach(sl=>{
+        const dark=sl.classList.contains('dark');
+        const s=p.addSlide(); s.background={color:dark?DEEP:'EFF8F2'};
+        const h=sl.querySelector('h1,h2');
+        const title=h?h.innerText.trim():'';
+        // collect bullet-ish text
+        let body=[];
+        sl.querySelectorAll('.card h3, .nlist .row h3, .dd li, .ba li, .check .item p, .takeaway .t b, .cover .lead, .sub').forEach(el=>{
+          const t=el.innerText.trim().replace(/\s+/g,' ');
+          if(t && t.length<160 && !body.includes(t)) body.push(t);
+        });
+        body=body.slice(0,8);
+        if(title) s.addText(title,{x:0.6,y:0.5,w:12,h:1,fontSize:30,bold:true,color:dark?'FFFFFF':DEEP,fontFace:'Noto Sans JP'});
+        if(body.length) s.addText(body.map(t=>({text:t,options:{bullet:true,breakLine:true}})),{x:0.7,y:1.7,w:11.9,h:5,fontSize:15,color:dark?'D7F0E0':TEXT,fontFace:'Noto Sans JP',lineSpacingMultiple:1.25});
+        s.addText('KISHINO MASASHI',{x:0.6,y:7.0,w:6,h:0.3,fontSize:9,color:dark?'8FCBA6':SUB,fontFace:'Source Code Pro'});
+      });
+      p.writeFile({fileName:'FUTUREMIND_AI研修.pptx'});
+    };
+    if(window.PptxGenJS){run();return;}
+    const sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+    sc.onload=run; sc.onerror=()=>alert('PowerPoint変換ライブラリの読み込みに失敗しました（ネット接続をご確認ください）');
+    document.head.appendChild(sc);
+  }
+</script>
+</body>
+</html>

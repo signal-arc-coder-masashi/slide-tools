@@ -113,9 +113,11 @@
   .flow .arr{align-self:center;color:var(--accent);font-size:24px}
 
   /* pipeline chips */
-  .pipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .pipe .chip{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;color:var(--accent-deep)}
-  .pipe .a{color:var(--accent);font-size:18px}
+  .pipe{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px}
+  .pipe .chip{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13.5px;font-weight:700;color:var(--accent-deep);text-align:center;line-height:1.2}
+  .pipe .chip i{display:block;font-style:normal;font-size:10px;font-weight:600;color:var(--text-sub);margin-top:3px;font-family:var(--mono)}
+  .pipe .chip.stage{background:var(--accent-light);border-color:var(--mint)}
+  .pipe .a{color:var(--accent);font-size:16px}
 
   /* ===== cover / dark ===== */
   .dark{background:linear-gradient(135deg,#4338CA 0%,#1E1B4B 100%);color:#fff;justify-content:center}
@@ -328,8 +330,10 @@ python -m bot.resume_eval <span class="k">--drive</span> '&lt;URL&gt;' <span cla
       <div class="card"><span class="ico">📊</span><h3>jobmanager J列</h3><p>HERP candidacy ID で行マッチし「AI評価Doc URL」列にリンクを自動反映（#29）。</p></div>
     </div>
     <div class="pipe">
+      <span class="chip">入力Slackカード<i>要ユーザー登録</i></span><span class="a">→</span>
       <span class="chip">職経テキスト</span><span class="a">→</span>
-      <span class="chip">2軸採点 (claude)</span><span class="a">→</span>
+      <span class="chip">2軸採点<i>claude</i></span><span class="a">→</span>
+      <span class="chip stage">面接ワークサンプルテスト<i>2次・別評価</i></span><span class="a">→</span>
       <span class="chip">評価Doc</span><span class="a">→</span>
       <span class="chip">J列反映</span><span class="a">→</span>
       <span class="chip">Slackカード</span>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUTUREMIND 採用業務自動化 ボットクラスタ全体マップ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF8F2; --paper:#FFFFFF; --accent:#3A8A5A; --accent-deep:#1F5638;
+    --accent-light:#DCF0E4; --mint:#C8EDD5; --positive:#059669; --caution:#D97706;
+    --caution-light:#FDF1E1; --text:#16301F; --text-sub:#4A7A5A; --border:#C4E2D0;
+    --code-bg:#10261A; --font:'Noto Sans JP',sans-serif; --mono:'Source Code Pro',monospace;
+    /* phase accent colors */
+    --c-entry:#2E86C1; --c-screen:#8E44AD; --c-interview:#16A085; --c-offer:#D68910; --c-reject:#C0392B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#0d1f15;font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
+
+  .deck{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .slide{position:absolute;width:1280px;height:720px;background:var(--bg);
+    display:none;flex-direction:column;padding:44px 64px;overflow:hidden;
+    transform:scale(var(--fit,1));transform-origin:center center;}
+  .slide.active{display:flex;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:scale(var(--fit,1)) translateY(14px)}to{opacity:1}}
+
+  h1{font-size:42px;font-weight:900;line-height:1.2;letter-spacing:.01em}
+  h2{font-size:34px;font-weight:900;line-height:1.22;color:var(--accent-deep)}
+  .kicker{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  p,li{font-size:17px;line-height:1.65;color:var(--text)}
+  .sub{color:var(--text-sub)}
+  .mono{font-family:var(--mono)}
+  .slide-head{margin-bottom:18px}
+  .slide-head .bar{width:46px;height:6px;border-radius:3px;background:var(--accent);margin-top:12px}
+
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+  .card h3{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--accent-deep)}
+  .card p{font-size:14.5px;line-height:1.55}
+  .card .ico{font-size:26px;margin-bottom:8px;display:block}
+  .pill{display:inline-block;background:var(--accent-light);color:var(--accent-deep);font-weight:700;font-size:13px;padding:4px 12px;border-radius:999px}
+
+  /* number list */
+  .nlist{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+  .nlist .row{display:flex;gap:16px;align-items:flex-start}
+  .nlist .num{flex:none;width:42px;height:42px;border-radius:11px;background:var(--accent);color:#fff;font-family:var(--mono);font-weight:600;font-size:20px;display:flex;align-items:center;justify-content:center}
+  .nlist .row h3{font-size:17.5px;font-weight:700;margin-bottom:2px}
+  .nlist .row p{font-size:14.5px;color:var(--text-sub)}
+
+  .note{margin-top:auto;padding-top:14px;font-size:13px;color:var(--text-sub);border-top:1px dashed var(--border)}
+  .hl{background:linear-gradient(transparent 62%,var(--mint) 62%);font-weight:700;padding:0 2px}
+
+  /* ===== flow diagram ===== */
+  .flow{display:flex;align-items:stretch;gap:0;margin-top:14px}
+  .flow .step{flex:1;background:var(--paper);border:1px solid var(--border);border-radius:13px;padding:16px 14px;text-align:center;position:relative;display:flex;flex-direction:column;justify-content:center}
+  .flow .step .t{font-size:24px;margin-bottom:6px}
+  .flow .step b{font-size:15px;color:var(--accent-deep);display:block;line-height:1.3}
+  .flow .step span{font-size:12px;color:var(--text-sub);font-family:var(--mono);display:block;margin-top:5px;line-height:1.4}
+  .flow .arr{flex:none;width:34px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent)}
+  .flow .step.hitl{background:var(--accent-light);border-color:var(--accent)}
+
+  /* ===== pipeline (lifecycle) ===== */
+  .pipe{display:flex;gap:8px;margin-top:6px}
+  .pipe .ph{flex:1;border-radius:12px;padding:12px 12px 14px;color:#fff;display:flex;flex-direction:column}
+  .pipe .ph .lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;opacity:.9;margin-bottom:6px}
+  .pipe .ph .ttl{font-size:15px;font-weight:700;margin-bottom:8px}
+  .pipe .ph .bots{display:flex;flex-direction:column;gap:5px}
+  .pipe .ph .bot{background:rgba(255,255,255,.92);color:#16301F;border-radius:7px;padding:5px 8px;font-size:11.5px;line-height:1.3;font-weight:500}
+  .pipe .ph .bot b{font-family:var(--mono);color:var(--accent-deep)}
+
+  /* ===== matrix table ===== */
+  table.mx{width:100%;border-collapse:collapse;margin-top:6px;background:var(--paper);border-radius:12px;overflow:hidden;font-size:13px}
+  table.mx th{background:var(--accent-deep);color:#fff;font-size:12px;font-weight:700;padding:9px 10px;text-align:left;letter-spacing:.02em}
+  table.mx td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4}
+  table.mx tr:last-child td{border-bottom:none}
+  table.mx tr:nth-child(even) td{background:#F4FBF7}
+  table.mx .num{font-family:var(--mono);font-weight:700;color:var(--accent-deep);white-space:nowrap}
+  table.mx .bot{font-family:var(--mono);font-size:12px;color:var(--accent)}
+  table.mx .ch{font-weight:700;white-space:nowrap}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .t-entry{background:#D6EAF8;color:#1A5276}
+  .t-screen{background:#EBDEF0;color:#6C3483}
+  .t-interview{background:#D1F2EB;color:#0E6655}
+  .t-offer{background:#FCF3CF;color:#9A7D0A}
+  .t-reject{background:#FADBD8;color:#922B21}
+  .t-other{background:#E5E8E8;color:#566573}
+
+  /* legend chips */
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .legend .c{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-sub)}
+  .legend .dot{width:12px;height:12px;border-radius:4px}
+
+  /* ===== Section / cover ===== */
+  .dark{background:linear-gradient(135deg,#2E7D52 0%,#163B27 100%);color:#fff;justify-content:center}
+  .dark h1,.dark h2{color:#fff}.dark .sub{color:#C7E8D4}.dark .kicker{color:#A7E3C0}.dark .bar{background:#A7E3C0}
+  .cover .brand{font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:#A7E3C0;margin-bottom:26px}
+  .cover h1{font-size:56px;line-height:1.14;margin-bottom:18px}
+  .cover .lead{font-size:20px;color:#D7F0E0;max-width:840px;line-height:1.6}
+  .cover .meta{margin-top:40px;display:flex;gap:40px;flex-wrap:wrap}
+  .cover .meta div span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#8FCBA6;text-transform:uppercase;margin-bottom:5px}
+  .cover .meta div b{font-size:16px;font-weight:700;color:#fff}
+
+  .takeaway{display:flex;flex-direction:column;gap:18px;margin-top:6px}
+  .takeaway .t{display:flex;gap:20px;align-items:center}
+  .takeaway .n{flex:none;font-family:var(--mono);font-size:34px;font-weight:600;color:#A7E3C0;width:52px}
+  .takeaway .t b{font-size:21px;font-weight:700;color:#fff;display:block;margin-bottom:2px}
+  .takeaway .t span{font-size:15px;color:#C7E8D4}
+
+  .pageno{position:absolute;right:28px;bottom:18px;font-family:var(--mono);font-size:12px;color:var(--text-sub)}
+  .dark .pageno{color:rgba(255,255,255,.55)}
+  .foot-brand{position:absolute;left:64px;bottom:18px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text-sub)}
+  .dark .foot-brand{color:rgba(255,255,255,.5)}
+
+  .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:50}
+  .toolbar button{font-family:var(--font);font-size:13px;font-weight:700;border:none;border-radius:9px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .toolbar button.ghost{background:rgba(255,255,255,.92);color:var(--accent-deep);border:1px solid var(--border)}
+  .toolbar button:hover{filter:brightness(1.07)}
+  .nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:50}
+  .nav button{width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:var(--accent-deep);font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .nav .ind{font-family:var(--mono);font-size:13px;color:#fff;background:rgba(0,0,0,.35);padding:8px 14px;border-radius:999px}
+
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    html,body{background:#fff}
+    .toolbar,.nav{display:none!important}
+    .deck{display:block;width:auto;height:auto;overflow:visible}
+    .slide{position:relative;display:flex!important;transform:none!important;
+      width:1280px;height:720px;page-break-after:always;break-after:page;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .slide:last-child{page-break-after:auto}
+    .slide.active{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="ghost" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+  <button onclick="exportPPTX()">📊 PowerPointに変換</button>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 1. Cover -->
+  <section class="slide active dark cover">
+    <div class="brand">FUTUREMIND · 採用DX / hr-mail-bot</div>
+    <h1>採用業務自動化<br>ボットクラスタ 全体マップ</h1>
+    <p class="lead">採用29項目を「<b>検知 → Slack承認カード → ✅ → 実行</b>」の一本の背骨で自動化する、22体のボット群。何が・どのシートに・どのチャンネルで・どんなアクションを起こしているかを1枚で俯瞰する。</p>
+    <div class="meta">
+      <div><span>System</span><b>apps/hr-mail-bot</b></div>
+      <div><span>Bots</span><b>b1〜b22（+評価クラスタ）</b></div>
+      <div><span>Channels</span><b>#saiyo-* 系 8ch</b></div>
+      <div><span>更新</span><b>2026-06-20</b></div>
+    </div>
+    <div class="foot-brand">KISHINO MASASHI</div>
+    <div class="pageno">01</div>
+  </section>
+
+  <!-- 2. 結論サマリ -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Executive Summary</div><h2>このクラスタは何をしているか</h2><div class="bar"></div></div>
+    <div class="grid g3">
+      <div class="card"><span class="ico">🛰️</span><h3>① 検知する</h3><p>媒体応募メール・HERP通知・SmartHR通知・スプシの未処理行を、各ボット(b*)が常時ポーリングして「いま動くべき1件」を見つける。</p></div>
+      <div class="card"><span class="ico">🪪</span><h3>② 承認をもらう（HITL）</h3><p>実行内容をSlackの<b>承認カード</b>にして該当チャンネルへ投稿。担当者が <b>✅</b> を押すまで外部へは一切送信しない。✏️で文面修正も可。</p></div>
+      <div class="card"><span class="ico">⚙️</span><h3>③ 実行する</h3><p>✅を常駐リスナーが受信し、<span class="mono">commit_one()</span>が HERP / Gmail / SmartHR / カレンダー / スプシ へ実際の操作を反映する。</p></div>
+    </div>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card"><h3>担当者の体験</h3><p>「Slackで流れてくるカードを確認して✅を押すだけ」。判断は人、作業はボットという役割分担。</p></div>
+      <div class="card"><h3>守られている原則</h3><p>全ルート <b>人間の✅必須</b>・<b>冪等（二重実行防止）</b>・<b>production gate（本番/dry切替）</b>。</p></div>
+      <div class="card"><h3>カバー範囲</h3><p>応募受付 → 書類取込 → 評価 → 面接調整 → 内定・入社準備 → お見送り まで採用フロー全段。</p></div>
+    </div>
+    <div class="note">※「29項目」= 管理表『採用業務29項目』タブの自動化対象。本資料はその実装＝ボット群の地図。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">02</div>
+  </section>
+
+  <!-- 3. アーキテクチャ：背骨 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Architecture · 共通の背骨</div><h2>ルート設定駆動エンジン</h2><div class="bar"></div></div>
+    <p class="sub" style="margin-bottom:6px">全業務は <span class="mono">routes.py</span> の <span class="mono">ROUTES</span>(23ルート)に1エントリとして宣言される。各ルートは4つの属性を持つだけ。</p>
+    <div class="grid g4" style="margin-top:6px">
+      <div class="card"><h3>match</h3><p>発火条件（このメール／このスプシ行が対象か）</p></div>
+      <div class="card"><h3>action</h3><p>実行内容（mail / step_change / calendar / upload など）</p></div>
+      <div class="card"><h3>channel</h3><p>承認カードの投稿先 Slackチャンネル</p></div>
+      <div class="card"><h3>production</h3><p>本番フラグ。<b>False</b>なら✅でも dry-run強制（安全側）</p></div>
+    </div>
+    <div class="flow">
+      <div class="step"><div class="t">🛰️</div><b>発火源</b><span>Gmail / HERP / SmartHR / スプシ</span></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="t">🤖</div><b>ポーラー b*.py</b><span>検知・抽出・照合</span></div>
+      <div class="arr">→</div>
+      <div class="step hitl"><div class="t">🪪</div><b>Slack承認カード</b><span>b5_pending に本文保存</span></div>
+      <div class="arr">→</div>
+      <div class="step hitl"><div class="t">✅</div><b>人間が承認</b><span>b5_slack_listener<br>(常駐Socket Mode)</span></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="t">⚙️</div><b>commit_one()</b><span>HERP/Gmail/<br>SmartHR/Calendar</span></div>
+    </div>
+    <div class="note">state.db … <b>b5_pending</b>=承認待ち本文をWYSIWYGで永続化 ／ <b>processed_messages</b>=同じ案件を二度実行しない（冪等）</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">03</div>
+  </section>
+
+  <!-- 4. プロセス構成 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Runtime · 常駐プロセス</div><h2>launchd で動く7プロセス</h2><div class="bar"></div></div>
+    <table class="mx">
+      <tr><th style="width:30%">プロセス（launchd Label）</th><th style="width:22%">スケジュール</th><th>役割・主な中身</th></tr>
+      <tr><td class="mono">com.futuremind.hr-mail-bot</td><td>30分毎</td><td>ポーラー一括実行（run_local.sh）: b1, b3, b4, b6〜b11, b14〜b22</td></tr>
+      <tr><td class="mono">com.futuremind.b5-listener</td><td>常駐</td><td>Slack ✅/✏️/❌ を Socket Mode で受信 → commit 実行</td></tr>
+      <tr><td class="mono">com.futuremind.b5-ng-route</td><td>15分毎</td><td>#13/#14 お見送り・#9/#10/#16/#3 の HERP起点ポーラー</td></tr>
+      <tr><td class="mono">com.futuremind.eval-followup</td><td>平日 08:00</td><td>#25 評価フォロー（HERP評価タブ scrape → 督促）</td></tr>
+      <tr><td class="mono">com.futuremind.onboarding-request</td><td>平日 08:00</td><td>#19 入社準備依頼の起票</td></tr>
+      <tr><td class="mono">com.futuremind.b4-weekly-metrics</td><td>金 17:00</td><td>B4 週次メトリクス</td></tr>
+      <tr><td class="mono">com.cc.candidate-eval-bot</td><td>常駐／随時</td><td>AI習熟度評価ボット（#candidate-eval）→ b21 へハンドオフ</td></tr>
+    </table>
+    <div class="note">#20-P（SmartHR招待日→スプシP列）は <b>GAS 15分トリガー</b>(smarthr_invite_bot.gs)へ一本化済み（Python b2 は停止）。UIスクレイプ依存ボットは月次 dry-run でDOM変化を点検。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">04</div>
+  </section>
+
+  <!-- 5. 採用ライフサイクル全体図 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Lifecycle Map · 候補者の旅で見る</div><h2>採用フロー × どのボットが効くか</h2><div class="bar"></div></div>
+    <div class="pipe">
+      <div class="ph" style="background:var(--c-entry)"><div class="lab">PHASE 1</div><div class="ttl">応募・書類取込</div><div class="bots">
+        <div class="bot"><b>b4</b> 媒体応募→HERP登録</div>
+        <div class="bot"><b>b6</b> 求人BOX 確認返信</div>
+        <div class="bot"><b>b18</b> メール添付 書類取込</div>
+        <div class="bot"><b>b19/20/22</b> 媒体ポータル書類取込</div>
+      </div></div>
+      <div class="ph" style="background:var(--c-screen)"><div class="lab">PHASE 2</div><div class="ttl">書類選考・評価</div><div class="bots">
+        <div class="bot"><b>b3(Jobgram)</b> 受験依頼</div>
+        <div class="bot"><b>b10</b> Jobgram結果→前進</div>
+        <div class="bot"><b>b11</b> 評価依頼セットアップ</div>
+        <div class="bot"><b>eval+b21</b> AI習熟度評価</div>
+        <div class="bot"><b>b9</b> 書類→一次 前進</div>
+      </div></div>
+      <div class="ph" style="background:var(--c-interview)"><div class="lab">PHASE 3</div><div class="ttl">面接調整</div><div class="bots">
+        <div class="bot"><b>b9</b> 1次候補日/確定/登録</div>
+        <div class="bot"><b>b12</b> 評価フォロー督促</div>
+      </div></div>
+      <div class="ph" style="background:var(--c-offer)"><div class="lab">PHASE 4</div><div class="ttl">内定・入社準備</div><div class="bots">
+        <div class="bot"><b>b8</b> オファー面談調整</div>
+        <div class="bot"><b>b16</b> 承諾 初報下書き</div>
+        <div class="bot"><b>b14/b17</b> SmartHR登録/通知</div>
+        <div class="bot"><b>b3consent</b> 承諾書回収</div>
+        <div class="bot"><b>b13/b1/b7</b> 入社準備・案内</div>
+      </div></div>
+      <div class="ph" style="background:var(--c-reject)"><div class="lab">EXIT</div><div class="ttl">お見送り</div><div class="bots">
+        <div class="bot"><b>b5_ng</b> エージェント NG</div>
+        <div class="bot"><b>b15</b> 求人BOX 見送り</div>
+        <div class="bot"><b>b21</b> 評価→お見送り</div>
+      </div></div>
+    </div>
+    <div class="note">同じ <span class="mono">b9</span>/<span class="mono">b8</span> でも「候補日提示」「予定登録」「確定メール」と複数項目を担う。次ページ以降で項目↔シート↔チャンネル↔アクションを一覧化。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">05</div>
+  </section>
+
+  <!-- 6. 紐付け① 応募〜書類 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Mapping ①</div><h2>紐付け：応募 〜 書類取込</h2><div class="bar"></div></div>
+    <table class="mx">
+      <tr><th>項目</th><th>ボット</th><th>発火源</th><th>チャンネル</th><th>アクション / 書込先</th></tr>
+      <tr><td class="num">#2</td><td class="bot">b4</td><td>媒体応募メール(kawasaki@)</td><td><span class="tag t-entry">#saiyo-応募受付*</span></td><td>HERP候補者 新規登録</td></tr>
+      <tr><td class="num">#26</td><td class="bot">b6</td><td>求人BOX新着(kawasaki@)</td><td><span class="tag t-entry">#saiyo-応募受付</span></td><td>確認返信メール送信(From=jinji_saiyo@)</td></tr>
+      <tr><td class="num">#2</td><td class="bot">b18</td><td>recruit@ メール添付PDF</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>HERPファイルタブへ履歴書/職経アップロード</td></tr>
+      <tr><td class="num">#2</td><td class="bot">b19</td><td>コメディカル通知(recruit@)</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>キャリアシートを印刷PDF化→HERP取込</td></tr>
+      <tr><td class="num">#2</td><td class="bot">b20</td><td>Airワーク通知(recruit@)</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>レジュメPDF直DL→HERP取込</td></tr>
+      <tr><td class="num">#2</td><td class="bot">b22</td><td>ジョブメドレー通知(kawasaki@)</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>プロフィールをスクショPDF化→HERP取込</td></tr>
+    </table>
+    <div class="note">取込系(b18〜b22)は <b>氏名でHERP候補者を一意照合</b>。0件/複数一致は誤取込防止のため自動取込せず手動を促す。医師/看護師/臨床検査技師は取込後 entry→書類選考 へ自動前進。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">06</div>
+  </section>
+
+  <!-- 7. 紐付け② 書類選考〜面接 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Mapping ②</div><h2>紐付け：書類選考 〜 面接調整</h2><div class="bar"></div></div>
+    <table class="mx">
+      <tr><th>項目</th><th>ボット</th><th>発火源</th><th>チャンネル</th><th>アクション / 書込先</th></tr>
+      <tr><td class="num">#3</td><td class="bot">b5_ng(jobgram_request)</td><td>HERP候補者</td><td><span class="tag t-entry">#saiyo-応募受付</span></td><td>Jobgram受験依頼メール</td></tr>
+      <tr><td class="num">#3</td><td class="bot">b10</td><td>recruit@ HERP通知(結果URL返信)</td><td><span class="tag t-other">#fm-recruit</span></td><td>jobmanager <b>J列</b>へ結果URL転記＋entry→書類選考 前進</td></tr>
+      <tr><td class="num">#7</td><td class="bot">b11</td><td>HERP候補者</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>HERP 評価依頼セットアップ(複数評価者)</td></tr>
+      <tr><td class="num">#25</td><td class="bot">b12</td><td>平日8:00 HERP評価タブ</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>営業日3/7到達で未提出者へ督促メンション</td></tr>
+      <tr><td class="num">eval</td><td class="bot">candidate-eval → b21</td><td>会話履歴(#candidate-eval)</td><td><span class="tag t-screen">#candidate-eval</span></td><td>AI習熟度採点→Doc→jobmanager <b>J列</b>／🟢で書類→一次前進</td></tr>
+      <tr><td class="num">#9</td><td class="bot">b5_ng(advance_first_interview)</td><td>HERP候補者</td><td><span class="tag t-screen">#saiyo-書類選考</span></td><td>選考ステップ 書類→一次 へ変更</td></tr>
+      <tr><td class="num">#10</td><td class="bot">b5_ng(ok_first_interview)</td><td>HERP候補者</td><td><span class="tag t-interview">#saiyo-一次面接</span></td><td>1次面接 候補日依頼メール</td></tr>
+    </table>
+    <div class="note">評価クラスタは2系統：HERP内の評価依頼/督促(b11/b12) と、AI習熟度評価(candidate-eval bot + b21)。後者は jobmanager <b>J列「AI評価Doc URL」</b>へ書込み、選考前進/お見送りを駆動。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">07</div>
+  </section>
+
+  <!-- 8. 紐付け③ 面接確定〜内定・入社 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Mapping ③</div><h2>紐付け：面接確定 〜 内定・入社準備</h2><div class="bar"></div></div>
+    <table class="mx">
+      <tr><th>項目</th><th>ボット</th><th>発火源</th><th>チャンネル</th><th>アクション / 書込先</th></tr>
+      <tr><td class="num">#11/#12</td><td class="bot">b9</td><td>HERP / 日程確定</td><td><span class="tag t-interview">#saiyo-一次面接</span></td><td>1次面接 カレンダー予定登録 ＋ 確定メール</td></tr>
+      <tr><td class="num">#16</td><td class="bot">b5_ng(ok_offer_meeting)</td><td>HERP候補者</td><td><span class="tag t-offer">#saiyo-オファー</span></td><td>オファー面談 候補日依頼メール</td></tr>
+      <tr><td class="num">#17/#18</td><td class="bot">b8</td><td>HERP / 日程確定</td><td><span class="tag t-offer">#saiyo-オファー</span></td><td>オファー面談 カレンダー登録 ＋ 確定メール</td></tr>
+      <tr><td class="num">#19</td><td class="bot">b16</td><td>recruit@ 承諾メール</td><td><span class="tag t-other">#saiyo-承諾共有ドラフト</span></td><td>#03用 初報テンプレ下書き生成（✏️編集→手動投稿）</td></tr>
+      <tr><td class="num">#22</td><td class="bot">b14</td><td>入職スプシ <b>P列</b> 空行</td><td><span class="tag t-offer">#saiyo-オファー</span></td><td>SmartHR 従業員登録 POST + 招待 PUT</td></tr>
+      <tr><td class="num">#22派生</td><td class="bot">b17</td><td>SmartHR提出通知(recruit@)</td><td><span class="tag t-other">#saiyo-SmartHR登録通知</span></td><td>@大場へ「登録完了」通知（通知のみ）</td></tr>
+      <tr><td class="num">#24</td><td class="bot">b3_consent</td><td>kawasaki@ 署名済PDF返送</td><td><span class="tag t-offer">#saiyo-オファー(警告時)</span></td><td>入職シート <b>K列</b>に承諾書受領日（非HITL）</td></tr>
+      <tr><td class="num">#23</td><td class="bot">b7 / b1</td><td>recruit@ / HERP</td><td><span class="tag t-offer">#saiyo-オファー</span></td><td>入社案内メール ／ 入職シート <b>M列</b> 書類対応依頼</td></tr>
+    </table>
+    <div class="note">#20-P(SmartHR招待日→P列)はGAS化。#19本体の #03投稿と #24 K列記入は「人の手を残す」設計（b16は下書きまで、b3は非HITLで受領日のみ）。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">08</div>
+  </section>
+
+  <!-- 9. 紐付け④ お見送り -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Mapping ④</div><h2>紐付け：お見送り経路</h2><div class="bar"></div></div>
+    <table class="mx">
+      <tr><th>項目</th><th>ボット</th><th>発火源</th><th>チャンネル</th><th>アクション / 書込先</th></tr>
+      <tr><td class="num">#13/#14</td><td class="bot">b5_ng_route</td><td>HERP 全評価者C判定</td><td><span class="tag t-reject">#saiyo-お見送り</span></td><td>AI変換お祈りメール → エージェント送信 ＋ HERP「選考終了→不採用」</td></tr>
+      <tr><td class="num">#27/#28</td><td class="bot">b15</td><td>求人BOX 直応募(追跡分)</td><td><span class="tag t-reject">#saiyo-お見送り</span></td><td>固定テンプレ見送りメール(DD選択) → 送信 ＋ 選考終了</td></tr>
+      <tr><td class="num">eval</td><td class="bot">b21(candidate_eval_reject)</td><td>candidate-eval 🔴判定</td><td><span class="tag t-reject">#saiyo-お見送り</span></td><td>お見送りカード→✅で送信＋選考終了（既存NG経路に合流）</td></tr>
+    </table>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h3>共通の安全弁</h3><p>お見送りは誤送信の影響が大きいため、✅押下に<b>confirmダイアログ</b>を挟む。HERPの選考終了は専用モーダル（終了理由=不採用）で確定し、失敗してもメール送信は覆さない（best-effort）。</p></div>
+      <div class="card"><h3>選考終了の自動化</h3><p>2026-06-18 go-live：お見送り✅後にHERPが自動で「選考終了→不採用」。<span class="mono">step_change_production</span> で本番/dryを別ゲート管理。</p></div>
+    </div>
+    <div class="note">媒体ボード上の「不採用」操作(#27③ media_reject)は対象外で False据え置き。AI習熟度評価(b21)由来のお見送りは route.production が現在 dry（実候補で検証後 True化）。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">09</div>
+  </section>
+
+  <!-- 10. Slackチャンネル設計 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Channels · 投稿先の設計思想</div><h2>Slackチャンネルの役割分担</h2><div class="bar"></div></div>
+    <p class="sub" style="margin-bottom:4px">当初は全カードが <b>#fm-recruit</b> に混在し担当者が迷子になっていた → 採用フェーズ別に分割（フラグONで切替・OFFなら#fm-recruitへ集約しゼロリグレッション）。</p>
+    <div class="grid g4" style="margin-top:8px">
+      <div class="card" style="border-top:4px solid var(--c-entry)"><h3>#saiyo-応募受付</h3><p>#3 Jobgram依頼 / #26 求人BOX確認</p><p class="mono sub" style="font-size:11px">C0B92A6QP8B</p></div>
+      <div class="card" style="border-top:4px solid var(--c-screen)"><h3>#saiyo-書類選考</h3><p>#7 評価依頼 / #9 前進 / #25 督促 / b18〜22 取込</p><p class="mono sub" style="font-size:11px">C0B92ABB7NX</p></div>
+      <div class="card" style="border-top:4px solid var(--c-interview)"><h3>#saiyo-一次面接</h3><p>#10 候補日 / #11 登録 / #12 確定</p><p class="mono sub" style="font-size:11px">C0BA30AJELQ</p></div>
+      <div class="card" style="border-top:4px solid var(--c-offer)"><h3>#saiyo-オファー</h3><p>#16/#17/#18 面談 / #22 SmartHR / #23 入社案内</p><p class="mono sub" style="font-size:11px">C0B8T7Q1GTZ</p></div>
+    </div>
+    <div class="grid g4" style="margin-top:14px">
+      <div class="card" style="border-top:4px solid var(--c-reject)"><h3>#saiyo-お見送り</h3><p>#13/#14 NG / #27/#28 見送り / eval🔴</p><p class="mono sub" style="font-size:11px">C0B9CA8N0PN</p></div>
+      <div class="card"><h3>#saiyo-承諾共有ドラフト</h3><p>#19 承諾初報の下書きカード(b16)</p></div>
+      <div class="card"><h3>#saiyo-SmartHR登録通知</h3><p>提出完了の@大場通知(b17)</p></div>
+      <div class="card"><h3>#candidate-eval</h3><p>AI習熟度評価の会話履歴投下・採点(eval bot)</p></div>
+    </div>
+    <div class="note">最終アウトプットの一部は人手の場へ戻す：b16は <b>#03_入退職者共有部屋</b> への投稿を担当者の手元に残す（自動投稿しない）。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">10</div>
+  </section>
+
+  <!-- 11. 連携先システム -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Integrations · 連携先と書込み先</div><h2>つながっている外部システム</h2><div class="bar"></div></div>
+    <div class="grid g3">
+      <div class="card"><span class="ico">🧩</span><h3>HERP（採用管理）</h3><p>候補者登録 / 選考ステップ変更 / 評価依頼 / ファイルアップロード / 選考終了モーダル。Public API＋Playwright UI自動化(persistent profile)。</p></div>
+      <div class="card"><span class="ico">📧</span><h3>Gmail</h3><p><b>kawasaki@</b>=媒体応募・署名PDF検知 ／ <b>recruit@</b>=jinji_saiyo@グループのスーパーセット監視・送信元。</p></div>
+      <div class="card"><span class="ico">👥</span><h3>SmartHR</h3><p>従業員登録 POST /v1/crews ＋ 招待 PUT。提出通知はメール発火で検知(b17)。招待日転記はGAS。</p></div>
+      <div class="card"><span class="ico">📅</span><h3>Google カレンダー</h3><p>1次面接(b9)・オファー面談(b8)の確定予定を登録。</p></div>
+      <div class="card"><span class="ico">📊</span><h3>スプレッドシート</h3><p><b>採用業務29項目</b>(進捗) ／ <b>入職シート</b>(K=承諾書 / P=招待 / M=書類依頼) ／ <b>jobmanager</b>(C=roster / J=AI評価Doc URL)。書込はGAS経由でreauth回避。</p></div>
+      <div class="card"><span class="ico">🗂️</span><h3>媒体ポータル</h3><p>求人BOX / コメディカル / Airワーク / ジョブメドレー を scrape し書類PDFを取得。</p></div>
+    </div>
+    <div class="note">スプシ書込は「ローカルNode/Python → GAS Web App → Sheets」パターンで RAPT/reauth 失効を回避（FUTUREMIND自動化の標準構成）。</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">11</div>
+  </section>
+
+  <!-- 12. 安全設計 -->
+  <section class="slide">
+    <div class="slide-head"><div class="kicker">Safety · 静かな失敗を防ぐ</div><h2>クラスタを支える安全設計</h2><div class="bar"></div></div>
+    <div class="grid g2">
+      <div class="card"><h3>🪪 HITL（人間の✅必須）</h3><p>全ルートで承認なしには外部送信しない。誤検知してもカードが流れるだけで実害なし。お見送りは confirm 二段。</p></div>
+      <div class="card"><h3>🔁 冪等（二重実行防止）</h3><p>state.db の <span class="mono">processed_messages</span> / bot別マークで、同じ案件を二度処理しない。Slack未達時は processed化せず再送。</p></div>
+      <div class="card"><h3>🚦 production gate</h3><p>routes.py の <span class="mono">production=True/False</span> で本番/dryを切替。切替後は listener 再起動が必須（routesをメモリ保持するため）。</p></div>
+      <div class="card"><h3>🩺 scrape 自動アラート</h3><p>UIスクレイプ依存(HERP/求人BOX/媒体)はDOM変更で静かに止まる → 失敗を <span class="mono">notify_scrape_failure</span> で検知通知（3hに1回へ抑止）。月次dry-runで点検。</p></div>
+    </div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>🔐 認証情報</h3><p>Keychain(service=hr-mail-bot)に Gmail/Slack/HERP/SmartHRトークンを集約。未登録ボットは起動時に明示エラーで停止（誤動作させない）。</p></div>
+      <div class="card"><h3>⚠️ 既知の残リスク</h3><p>#24 ファイル名に氏名が無い返送の取りこぼし／#22 email一意制約(全員jinji_saiyo@)／UIスクレイプ脆弱性。月次ヘルスチェックで監視。</p></div>
+    </div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">12</div>
+  </section>
+
+  <!-- 13. まとめ -->
+  <section class="slide dark">
+    <div class="slide-head"><div class="kicker">Summary</div><h2>このクラスタの本質</h2><div class="bar"></div></div>
+    <div class="takeaway">
+      <div class="t"><div class="n">01</div><div><b>一本の背骨に全業務を載せた</b><span>検知→Slack承認カード→✅→commit。22体のボットが同じ作法で動くから、引き継ぎも増設も routes.py の1エントリで完結する。</span></div></div>
+      <div class="t"><div class="n">02</div><div><b>判断は人・作業はボット</b><span>担当者はSlackで✅を押すだけ。誤送信・誤取込はHITLとproduction gateで二重に防ぐ。</span></div></div>
+      <div class="t"><div class="n">03</div><div><b>採用フロー全段をカバー</b><span>応募受付・書類取込・評価・面接調整・内定/入社準備・お見送りまで、項目↔シート↔チャンネル↔アクションが一枚に紐づく。</span></div></div>
+    </div>
+    <div class="note" style="border-top-color:rgba(255,255,255,.25);color:#C7E8D4">正本: apps/hr-mail-bot/RUNBOOK.md ／ src/routes.py（23ルート）／ 管理表『採用業務29項目』</div>
+    <div class="foot-brand">採用業務自動化 ボットクラスタ</div><div class="pageno">13</div>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button onclick="go(-1)">‹</button>
+  <span class="ind" id="ind">1 / 13</span>
+  <button onclick="go(1)">›</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function fit(){const s=Math.min(window.innerWidth/1280,window.innerHeight/720);document.documentElement.style.setProperty('--fit',s);}
+  function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('active',k===i));document.getElementById('ind').textContent=(i+1)+' / '+slides.length;}
+  function go(d){show(i+d)}
+  window.addEventListener('resize',fit); fit(); show(0);
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){go(1);e.preventDefault()}
+    if(['ArrowLeft','PageUp'].includes(e.key)){go(-1);e.preventDefault()}
+    if(e.key==='Home')show(0); if(e.key==='End')show(slides.length-1);
+    if(e.key==='f'||e.key==='F'){document.documentElement.requestFullscreen?.()}
+  });
+  function exportPPTX(){
+    const run=()=>{
+      const p=new PptxGenJS(); p.defineLayout({name:'W',width:13.333,height:7.5}); p.layout='W';
+      const DEEP='163B27', TEXT='16301F', SUB='4A7A5A';
+      slides.forEach(sl=>{
+        const dark=sl.classList.contains('dark');
+        const s=p.addSlide(); s.background={color:dark?DEEP:'EFF8F2'};
+        const h=sl.querySelector('h1,h2'); const title=h?h.innerText.trim():'';
+        let body=[];
+        sl.querySelectorAll('.card h3, .nlist .row h3, .takeaway .t b, .cover .lead, table.mx td .num, .pipe .ph .ttl').forEach(el=>{
+          const t=el.innerText.trim().replace(/\s+/g,' ');
+          if(t && t.length<160 && !body.includes(t)) body.push(t);
+        });
+        body=body.slice(0,9);
+        if(title) s.addText(title,{x:0.6,y:0.5,w:12,h:1,fontSize:28,bold:true,color:dark?'FFFFFF':DEEP,fontFace:'Noto Sans JP'});
+        if(body.length) s.addText(body.map(t=>({text:t,options:{bullet:true,breakLine:true}})),{x:0.7,y:1.7,w:11.9,h:5,fontSize:14,color:dark?'D7F0E0':TEXT,fontFace:'Noto Sans JP',lineSpacingMultiple:1.2});
+        s.addText('KISHINO MASASHI',{x:0.6,y:7.0,w:6,h:0.3,fontSize:9,color:dark?'8FCBA6':SUB,fontFace:'Source Code Pro'});
+      });
+      p.writeFile({fileName:'FUTUREMIND_採用ボットクラスタ.pptx'});
+    };
+    if(window.PptxGenJS){run();return;}
+    const sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+    sc.onload=run; sc.onerror=()=>alert('PowerPoint変換ライブラリの読み込みに失敗しました');
+    document.head.appendChild(sc);
+  }
+</script>
+</body>
+</html>

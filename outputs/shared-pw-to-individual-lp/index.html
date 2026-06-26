@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>共有パスワード廃止・個別アカウント自動化 — Signal Arc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Signal Arc Design System — Medical Blue / Ice Base */
+      --bg:         #F2F8FE;
+      --bg-1:       #EAF3FC;
+      --bg-2:       #DFF0FB;
+      --bg-3:       #D0E8F8;
+      --surface:    rgba(255,255,255,0.9);
+      --line:       rgba(22,102,190,0.12);
+      --line-accent:rgba(22,102,190,0.22);
+      --t1:         #0A1E3C;
+      --t2:         #4A6B90;
+      --t3:         #7A9BB8;
+      --arc:        #1666BE;
+      --arc-glow:   rgba(22,102,190,0.28);
+      --arc-dim:    #D8EEFF;
+      --warm:       #D97A1A;
+      --ok:         #0A9B88;
+      --danger:     #CC3333;
+
+      --lt-bg:      #FFFFFF;
+      --lt-bg-alt:  #F5FAFF;
+      --lt-t1:      #0A1E3C;
+      --lt-t2:      #4A6B90;
+      --lt-t3:      #7A9BB8;
+      --lt-line:    rgba(22,102,190,0.10);
+      --lt-surface: #D8EEFF;
+      --lt-line-accent: rgba(22,102,190,0.20);
+
+      --teal:       #0A9B88;
+      --brand-d:    #0E4E96;
+      --brand-b:    #4290D8;
+      --brand-s:    #D8EEFF;
+      --brand-l:    #A8D4F8;
+      --shadow:     0 1px 3px rgba(10,30,60,.05), 0 12px 32px -14px rgba(10,30,60,.18);
+      --shadow-lift:0 2px 8px rgba(10,30,60,.08), 0 22px 50px -18px rgba(10,30,60,.26);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--t1);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 400;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 999;
+      pointer-events: none; opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 24px 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(5,5,8,0.92) 0%, transparent 100%);
+      backdrop-filter: blur(4px);
+    }
+    .nav-brand {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 1rem; font-weight: 500;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--t1);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-brand .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--arc); box-shadow: 0 0 8px var(--arc);
+      animation: blink 2.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .nav-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--t3);
+    }
+
+    /* ── LAYOUT ── */
+    section { position: relative; }
+    .inner { max-width: 1280px; margin: 0 auto; }
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem; font-weight: 400;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--arc); margin-bottom: 56px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .section-label::after { content:''; width:48px; height:1px; background:var(--line-accent); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      padding: 160px 56px 100px;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(22,102,190,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,102,190,.04) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 90% 80% at 40% 50%, rgba(0,0,0,0.6) 0%, transparent 75%);
+    }
+    .hero-glow {
+      position: absolute; top: -20%; right: -10%;
+      width: 70vw; height: 70vw;
+      background: radial-gradient(ellipse at center,
+        rgba(22,102,190,.09) 0%, rgba(10,155,136,.06) 40%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      position: relative; z-index: 10;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .hero-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--arc); margin-bottom: 28px;
+      display: flex; align-items: center; gap: 16px;
+      opacity: 0; animation: fadeUp 0.7s 0.3s ease forwards;
+    }
+    .hero-eyebrow::before { content:''; width:28px; height:1px; background:var(--arc); }
+    .hero-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.9rem, 3.5vw, 3rem);
+      font-weight: 900; line-height: 1.6;
+      color: var(--t1); margin-bottom: 32px;
+      word-break: keep-all;
+      opacity: 0; animation: fadeUp 0.8s 0.45s ease forwards;
+    }
+    .hero-title em { font-style: normal; color: var(--arc); font-weight: 700; }
+    .hero-title .strike {
+      text-decoration: line-through; color: var(--t3);
+      text-decoration-color: var(--danger);
+    }
+    .hero-desc {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.85rem; line-height: 2.4; color: var(--t2);
+      max-width: 480px; margin-bottom: 48px;
+      opacity: 0; animation: fadeUp 0.7s 0.6s ease forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 24px; align-items: center;
+      opacity: 0; animation: fadeUp 0.7s 0.75s ease forwards;
+    }
+    .btn-arc {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--arc); color: var(--bg);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      text-decoration: none; padding: 16px 38px; border-radius: 8px;
+      box-shadow: 0 4px 14px var(--arc-glow);
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .btn-arc:hover { background: var(--brand-d); transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+    .hero-year {
+      position: relative;
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px 32px;
+      border-radius: 20px;
+      background: radial-gradient(ellipse 100% 100% at 50% 60%, rgba(22,102,190,0.1) 0%, transparent 70%);
+      border: 1px solid rgba(22,102,190,0.16);
+      overflow: hidden;
+      opacity: 0; animation: fadeIn 1s 0.6s ease forwards;
+    }
+    .hero-year::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(22,102,190,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,102,190,0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      border-radius: 20px;
+    }
+    .hero-year-num {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(8rem, 18vw, 16rem);
+      font-weight: 900; line-height: 0.85;
+      letter-spacing: -0.05em;
+      background: linear-gradient(155deg, #0A1E3C 0%, #1666BE 42%, #CC3333 78%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 4px 20px rgba(22,102,190,0.22));
+      position: relative; z-index: 1;
+    }
+    .hero-year-num span { -webkit-text-fill-color: transparent; }
+    .hero-year-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--t2); margin-top: 20px;
+      position: relative; z-index: 1;
+    }
+    .hero-law-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 1px solid rgba(204,51,51,0.3);
+      background: rgba(204,51,51,0.06);
+      padding: 8px 16px; margin-top: 16px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      color: var(--danger);
+      position: relative; z-index: 1;
+    }
+
+    /* ── STATS ROW ── */
+    .stats-bar {
+      background: var(--bg-2);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 48px 56px;
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--line);
+    }
+    .stat-cell {
+      background: var(--bg-2);
+      padding: 40px 48px;
+    }
+    .stat-n {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 3.4rem; font-weight: 900; line-height: 1;
+      color: var(--t1); margin-bottom: 10px;
+    }
+    .stat-n sub { font-size: 1.2rem; color: var(--arc); vertical-align: baseline; }
+    .stat-n sup { font-size: 1.1rem; color: var(--arc); }
+    .stat-l {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.78rem; color: var(--t2); line-height: 1.7;
+    }
+
+    /* ── SECTION COMMON ── */
+    .pad { padding: 120px 56px; }
+    .pad-sm { padding: 80px 56px; }
+
+    /* ── ANSWER ── */
+    .answer {
+      background: var(--lt-bg-alt);
+      border-bottom: 1px solid var(--lt-line);
+    }
+    .answer .section-label { color: var(--arc); }
+    .answer-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      font-weight: 900; line-height: 1.65;
+      color: var(--lt-t1); margin-bottom: 20px;
+      word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .answer-heading em { color: var(--arc); font-style: normal; font-weight: 900; }
+    .answer-sub {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.85rem; color: var(--lt-t2); line-height: 2.3;
+    }
+    .answer-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .answer-visual {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .tool-chip {
+      display: inline-flex; align-items: center; gap: 12px;
+      border: 1px solid var(--lt-line-accent);
+      background: var(--lt-surface);
+      padding: 14px 24px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.2em;
+      color: var(--lt-t2);
+    }
+    .tool-chip .tc-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--arc); flex-shrink: 0;
+    }
+    .answer-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      color: var(--arc); padding: 0 8px;
+    }
+
+    /* ── STATUS ── */
+    .status { background: var(--lt-bg); }
+    .status .section-label { color: var(--arc); }
+    .status-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--lt-line);
+    }
+    .sc {
+      background: var(--lt-bg-alt);
+      padding: 40px 36px;
+    }
+    .sc-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.57rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--arc); margin-bottom: 20px;
+    }
+    .sc-n {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 2.8rem; font-weight: 900; line-height: 1;
+      color: var(--lt-t1); margin-bottom: 12px;
+    }
+    .sc-n sup { font-size: 1rem; color: var(--arc); }
+    .sc-desc {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.78rem; color: var(--lt-t2); line-height: 2;
+    }
+
+    /* ── PAIN ── */
+    .pain { background: var(--lt-bg-alt); border-top: 1px solid var(--lt-line); }
+    .pain .section-label { color: var(--arc); }
+    .pain-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      font-weight: 900; line-height: 1.7;
+      color: var(--lt-t1); margin-bottom: 48px;
+    }
+    .pain-steps {
+      display: flex; flex-direction: column; gap: 1px;
+      background: var(--lt-line);
+    }
+    .ps {
+      background: var(--lt-bg-alt);
+      padding: 28px 36px;
+      display: flex; align-items: flex-start; gap: 24px;
+    }
+    .ps-n {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 2.2rem; font-weight: 300; line-height: 1;
+      color: rgba(0,0,0,0.1); flex-shrink: 0; width: 48px;
+    }
+    .ps-body {}
+    .ps-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--lt-t1);
+      margin-bottom: 8px;
+    }
+    .ps-desc {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.78rem; color: var(--lt-t2); line-height: 2;
+    }
+
+    /* ── SOLUTION BLOCKQUOTE ── */
+    .solution-bq {
+      background: var(--bg-3);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .bq-card {
+      border-left: 3px solid var(--arc);
+      background: var(--arc-dim);
+      padding: 48px 56px;
+    }
+    .bq-text {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.55rem);
+      font-weight: 900; line-height: 2.1;
+      color: var(--t1);
+    }
+    .bq-text em { color: var(--arc); font-style: normal; font-weight: 700; }
+    .bq-sub {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.8rem; color: var(--t2); line-height: 2;
+      margin-top: 20px;
+    }
+
+    /* ── AUTOMATION ── */
+    .automation { background: var(--bg-1); border-top: 1px solid var(--line); }
+    .auto-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 700; line-height: 1.3;
+      color: var(--t1); margin-bottom: 16px;
+    }
+    .auto-heading em { font-style: normal; color: var(--arc); font-weight: 700; }
+    .auto-sub {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.85rem; color: var(--t2); line-height: 2.2;
+      margin-bottom: 64px; max-width: 640px;
+    }
+    .auto-steps {
+      display: flex; flex-direction: column; gap: 1px;
+      background: var(--line);
+    }
+    .as {
+      background: var(--bg-1);
+      padding: 32px 40px;
+      display: flex; align-items: flex-start; gap: 28px;
+      transition: background 0.3s;
+    }
+    .as:hover { background: var(--bg-2); }
+    .as-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--arc); color: var(--bg);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem; font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .as-num.trigger { background: var(--brand-s); color: var(--arc); border: 1px solid var(--brand-l); }
+    .as-content {}
+    .as-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 1rem; font-weight: 400; color: var(--t1);
+      margin-bottom: 8px;
+    }
+    .as-desc {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.78rem; color: var(--t2); line-height: 2;
+    }
+    .as-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .achip {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.56rem; letter-spacing: 0.14em;
+      color: var(--arc); border: 1px solid var(--line-accent);
+      background: var(--arc-dim); padding: 3px 10px;
+    }
+
+    /* ── AUTH SECTION ── */
+    .auth { background: var(--bg-2); border-top: 1px solid var(--line); }
+    .auth-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: start;
+    }
+    .auth-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 900; line-height: 1.4;
+      color: var(--t1); margin-bottom: 24px;
+    }
+    .auth-heading em { font-style: italic; color: var(--arc); }
+    .auth-body {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.84rem; color: var(--t2); line-height: 2.4;
+    }
+    .auth-compare {
+      display: flex; flex-direction: column; gap: 1px;
+      background: var(--line);
+    }
+    .ac-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px; background: var(--line);
+    }
+    .ac-cell {
+      background: var(--bg-2);
+      padding: 24px 28px;
+    }
+    .ac-cell.header {
+      background: var(--bg-3);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--t3);
+    }
+    .ac-cell.accent { background: var(--arc-dim); }
+    .ac-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem; font-weight: 700; color: var(--t1);
+      margin-bottom: 8px;
+    }
+    .ac-desc {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.75rem; color: var(--t2); line-height: 1.9;
+    }
+    .price-badge {
+      display: inline-block;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 2rem; font-weight: 300; color: var(--arc);
+      border: 1px solid var(--line-accent);
+      background: var(--arc-dim);
+      padding: 8px 20px; margin-top: 16px;
+    }
+
+    /* ── COST ── */
+    .cost { background: var(--bg); border-top: 1px solid var(--line); }
+    .cost-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: start;
+    }
+    .cost-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 900; line-height: 1.2;
+      color: var(--t1); margin-bottom: 20px;
+    }
+    .cost-heading em { font-style: italic; color: var(--ok); }
+    .cost-num {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(4rem, 9vw, 7rem);
+      font-weight: 900; line-height: 1;
+      color: var(--t1); margin-bottom: 12px;
+    }
+    .cost-num sup { font-size: 2rem; color: var(--ok); }
+    .cost-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--ok); margin-bottom: 32px;
+    }
+    .cost-body {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.82rem; color: var(--t2); line-height: 2.3;
+    }
+    .cost-table {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+    }
+    .ct-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+    }
+    .ct-cell {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.76rem; color: var(--t2);
+    }
+    .ct-cell:last-child { border-right: none; }
+    .ct-cell.header {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--t3); background: var(--bg-3);
+    }
+    .ct-cell.arc-col { color: var(--arc); background: var(--arc-dim); }
+    .ct-cell.total { color: var(--t1); font-weight: 400; }
+    .ct-cell.total-arc { color: var(--ok); background: rgba(74,222,128,0.06); font-weight: 500; }
+
+    /* ── COMPARE TABLE ── */
+    .compare { background: var(--lt-bg); border-top: 1px solid var(--lt-line); }
+    .compare .section-label { color: var(--arc); }
+    .compare-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      font-weight: 900; line-height: 1.7;
+      color: var(--lt-t1); margin-bottom: 48px;
+    }
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--lt-bg-alt);
+    }
+    .cmp-table th, .cmp-table td {
+      padding: 18px 24px;
+      border: 1px solid var(--lt-line);
+      text-align: left;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.8rem;
+    }
+    .cmp-table th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase;
+      background: var(--lt-bg);
+      color: var(--lt-t3);
+    }
+    .cmp-table th.arc-th {
+      background: var(--arc-dim);
+      color: var(--arc);
+      border-color: var(--lt-line-accent);
+    }
+    .cmp-table td { color: var(--lt-t2); }
+    .cmp-table td.arc-td { color: var(--lt-t1); background: var(--lt-surface); }
+    .cmp-table .row-label { color: var(--lt-t1); font-weight: 400; }
+    .badge-ok { color: var(--ok); font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; }
+    .badge-ng { color: var(--danger); font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; }
+
+    /* ── NOTE ── */
+    .note { background: var(--bg-1); border-top: 1px solid var(--line); }
+    .note-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px; align-items: start; }
+    .note-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 900; line-height: 1.4;
+      color: var(--t1); position: sticky; top: 120px;
+    }
+    .note-heading em { font-style: italic; color: var(--arc); }
+    .note-body { display: flex; flex-direction: column; gap: 20px; }
+    .note-p {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.84rem; color: var(--t2); line-height: 2.4;
+    }
+    .note-scope {
+      background: var(--bg-2); border: 1px solid var(--line);
+      padding: 28px 32px;
+    }
+    .ns-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--arc); margin-bottom: 16px;
+    }
+    .ns-row {
+      display: flex; align-items: baseline; gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.8rem; color: var(--t2);
+    }
+    .ns-row:last-child { border-bottom: none; }
+    .ns-row .ns-key { color: var(--t1); width: 140px; flex-shrink: 0; }
+
+    /* ── CTA ── */
+    .cta {
+      padding: 140px 56px;
+      background: linear-gradient(135deg, var(--brand-d) 0%, var(--arc) 55%, var(--teal) 100%);
+      text-align: center;
+    }
+    .cta-pre {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: rgba(255,255,255,.7); margin-bottom: 36px;
+      display: inline-flex; align-items: center; gap: 14px;
+    }
+    .cta-pre::before,.cta-pre::after { content:''; width:32px; height:1px; background:rgba(255,255,255,.35); }
+    .cta-heading {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(2.2rem, 5.5vw, 5rem);
+      font-weight: 900; line-height: 1.25;
+      color: #FFFFFF; margin-bottom: 24px;
+    }
+    .cta-heading em { font-style: italic; color: var(--arc); }
+    .cta-sub {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.85rem; color: rgba(255,255,255,.78); line-height: 2;
+      max-width: 520px; margin: 0 auto 52px;
+    }
+    .cta-checklist {
+      display: flex; flex-direction: column; gap: 12px;
+      max-width: 480px; margin: 0 auto 52px;
+      text-align: left;
+    }
+    .cl-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 16px 24px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.82rem; color: #FFFFFF; line-height: 1.8;
+    }
+    .cl-item .cl-mark {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; color: var(--teal);
+      margin-top: 2px; flex-shrink: 0;
+    }
+    .cta-email {
+      display: inline-flex; align-items: center; gap: 16px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+      font-weight: 300; color: #FFFFFF;
+      text-decoration: none; margin-bottom: 48px;
+      transition: color 0.3s;
+    }
+    .cta-email:hover { color: rgba(255,255,255,.75); }
+    .cta-email svg { color: rgba(255,255,255,.6); }
+    .cta-note {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      color: rgba(255,255,255,.45);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 56px;
+      border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .f-brand { font-family:'Noto Sans JP',sans-serif; font-size:0.9rem; font-weight:400; letter-spacing:0.35em; text-transform:uppercase; color:var(--t3); }
+    .f-copy { font-family:'IBM Plex Mono',monospace; font-size:0.55rem; letter-spacing:0.18em; color:var(--t3); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .reveal { opacity:0; transform:translateY(28px); transition: opacity 0.75s ease, transform 0.75s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.22s; }
+    .reveal-delay-3 { transition-delay: 0.34s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      nav { padding: 20px 24px; }
+      .hero { padding: 120px 24px 80px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-year-num { font-size: 6rem; }
+      .pad, .pad-sm { padding: 80px 24px; }
+      .stats-grid, .status-cards { grid-template-columns: 1fr; }
+      .answer-grid, .auth-grid, .cost-grid, .note-grid { grid-template-columns: 1fr; gap: 48px; }
+      .note-heading { position: static; }
+      .ct-row { grid-template-columns: 1fr; }
+      .ct-cell { border-right: none; }
+      .cta { padding: 100px 24px; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="dot"></div>
+    Signal Arc
+  </div>
+  <div class="nav-tag">Case Study — Account Automation</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="inner hero-inner">
+    <div>
+      <div class="hero-eyebrow">Background / 背景</div>
+      <h1 class="hero-title">
+        2027年度、<br>
+        「共有パスワード」は<br>
+        <em>"非対応"</em>になる。
+      </h1>
+      <p class="hero-desc">
+        改正個人情報保護法・文部科学省ガイドラインにより、SaaS共有アカウントの運用は法令違反リスクを帯びる。<br>
+        しかし「管理が大変だから」という理由で、共有は続いている。<br>
+        その構造を、設計で解く。
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-arc">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+          確認しておく
+        </a>
+      </div>
+    </div>
+    <div class="hero-year">
+      <div class="hero-year-num"><span>2</span>027</div>
+      <div class="hero-year-sub">施行・適用期限</div>
+      <div class="hero-law-badge">個人情報保護法 / 文科省GL 準拠</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="inner">
+    <div class="stats-grid">
+      <div class="stat-cell reveal">
+        <div class="stat-n">ボタン<sub>1つ</sub></div>
+        <div class="stat-l">退職・離任のときの作業。<br>全員のパスワード変更&配り直しが不要に</div>
+      </div>
+      <div class="stat-cell reveal reveal-delay-1">
+        <div class="stat-n">¥1,920,000</div>
+        <div class="stat-l">回避できる追加コスト（最大）<br>年・100名にGoogleアカウントを配る場合との比較</div>
+      </div>
+      <div class="stat-cell reveal reveal-delay-2">
+        <div class="stat-n">人ごとに</div>
+        <div class="stat-l">患者情報のアクセス記録。<br>「誰がいつ見たか」をひとりずつ残せる</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANSWER -->
+<section class="answer pad">
+  <div class="inner">
+    <div class="section-label reveal">Solution / 答え</div>
+    <div class="answer-grid">
+      <div>
+        <h2 class="answer-heading reveal">答えは、<em>個別アカウント</em>と、その管理を<em>Slack</em>が肩代わること。</h2>
+        <p class="answer-sub reveal reveal-delay-1">
+          共有をやめるハードルは「管理の手間」だった。<br>
+          その手間を仕組みで消せば、共有をやめられる。<br>
+          Typeform・Slack・各SaaS APIを繋ぎ、<br>
+          人が触るのは「ボタンを押す」だけにする。
+        </p>
+      </div>
+      <div class="answer-visual reveal reveal-delay-2">
+        <div class="tool-chip"><div class="tc-dot"></div>Typeform — 申請フォーム</div>
+        <div class="answer-arrow">↓ 自動連携</div>
+        <div class="tool-chip"><div class="tc-dot"></div>Slack Bot — 承認・操作UI</div>
+        <div class="answer-arrow">↓ API自動実行</div>
+        <div class="tool-chip"><div class="tc-dot"></div>各 SaaS API — アカウント発行</div>
+        <div class="answer-arrow">↓ 自動記録</div>
+        <div class="tool-chip"><div class="tc-dot"></div>Google Sheets — 台帳管理</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATUS -->
+<section class="status pad">
+  <div class="inner">
+    <div class="section-label reveal">Current State / 現状</div>
+    <div class="status-cards">
+      <div class="sc reveal">
+        <div class="sc-tag">01 / Problem</div>
+        <div class="sc-n">87<sup>%</sup></div>
+        <div class="sc-desc">
+          中小規模組織でSaaSを共有アカウントで運用している割合（試算）。<br>
+          ログ追跡・責任特定が不可能な状態。
+        </div>
+      </div>
+      <div class="sc reveal reveal-delay-1">
+        <div class="sc-tag">02 / Cost</div>
+        <div class="sc-n">¥19.8<sup>万/月</sup></div>
+        <div class="sc-desc">
+          複数SaaSの合算ライセンス費用（試算）。<br>
+          個別化することで「使っていないユーザー分」の棚卸しも可能になる。
+        </div>
+      </div>
+      <div class="sc reveal reveal-delay-2">
+        <div class="sc-tag">03 / Effort</div>
+        <div class="sc-n">月12<sup>h</sup></div>
+        <div class="sc-desc">
+          担当者が手動でアカウント管理に費やしている時間（試算）。<br>
+          全自動化で、この時間をゼロに近づける。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain pad">
+  <div class="inner">
+    <div class="section-label reveal">Pain Points / いまのツラさ</div>
+    <h2 class="pain-heading reveal">いまのやり方、ここがツラい</h2>
+    <div class="pain-steps">
+      <div class="ps reveal">
+        <div class="ps-n">01</div>
+        <div class="ps-body">
+          <p class="ps-title">入職者が来るたびに、手作業でアカウントを発行している</p>
+          <p class="ps-desc">メール共有・管理者呼び出し・マニュアル設定。入職のたびに担当者が動く必要がある。</p>
+        </div>
+      </div>
+      <div class="ps reveal reveal-delay-1">
+        <div class="ps-n">02</div>
+        <div class="ps-body">
+          <p class="ps-title">退職者のアカウントが止められず、残り続ける</p>
+          <p class="ps-desc">共有パスワードを変えると全員に影響する。退職者の権限を即時無効化できない構造になっている。</p>
+        </div>
+      </div>
+      <div class="ps reveal reveal-delay-2">
+        <div class="ps-n">03</div>
+        <div class="ps-body">
+          <p class="ps-title">誰が何を使っているか、把握できていない</p>
+          <p class="ps-desc">共有アカウントではログが「誰が」やったかを示さない。監査・コンプライアンス対応が不可能。</p>
+        </div>
+      </div>
+      <div class="ps reveal reveal-delay-3">
+        <div class="ps-n">04</div>
+        <div class="ps-body">
+          <p class="ps-title">「個別化したい」が、管理コストが怖くて踏み出せない</p>
+          <p class="ps-desc">1人ずつ設定・管理・削除……手作業では追いつかない。だから共有のまま使い続けている。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION BLOCKQUOTE -->
+<section class="solution-bq pad-sm">
+  <div class="inner">
+    <div class="bq-card">
+      <p class="bq-text">
+        共有している理由が「管理アカウントを作るのが困難」だったなら、<br>
+        その<em>「困難」を仕組みで代替する</em>ことで、共有はやめられる。
+      </p>
+      <p class="bq-sub">
+        ¥1,538,842 の管理コストを、Slackだけで完結する設計に置き換える。<br>
+        担当者が覚えることは「ボタンを押す」だけ。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOMATION -->
+<section class="automation pad">
+  <div class="inner">
+    <div class="section-label reveal">Automation Flow / 自動化設計</div>
+    <h2 class="auto-heading reveal">アカウント停止も、<em>まるごと自動化する。</em></h2>
+    <p class="auto-sub reveal reveal-delay-1">
+      アカウント発行から停止・権限変更まで、6ステップをBot一本で完結させる。<br>
+      担当者が直接SaaSに触れる必要はない。
+    </p>
+    <div class="auto-steps">
+      <div class="as reveal">
+        <div class="as-num trigger">T</div>
+        <div class="as-content">
+          <p class="as-title">Typeform 申請フォーム送信（トリガー）</p>
+          <p class="as-desc">入職・退職・権限変更の申請をフォームで受け付ける。担当者が直接Slackに入力する方式も選択可能。</p>
+          <div class="as-chips"><span class="achip">Typeform</span><span class="achip">Webhook</span></div>
+        </div>
+      </div>
+      <div class="as reveal reveal-delay-1">
+        <div class="as-num">1</div>
+        <div class="as-content">
+          <p class="as-title">Slack に申請通知 → 承認ボタン表示</p>
+          <p class="as-desc">申請内容を整形してSlackに投稿。管理者がボタン1つで承認・却下を判断する。</p>
+          <div class="as-chips"><span class="achip">Slack Bot</span><span class="achip">Block Kit</span><span class="achip">Interactive</span></div>
+        </div>
+      </div>
+      <div class="as reveal reveal-delay-2">
+        <div class="as-num">2</div>
+        <div class="as-content">
+          <p class="as-title">承認後 → SaaS アカウント自動発行</p>
+          <p class="as-desc">承認ボタン押下と同時にSaaS APIを叩き、アカウントを自動作成。メール送信まで自動化。</p>
+          <div class="as-chips"><span class="achip">SaaS API</span><span class="achip">Node.js</span><span class="achip">Gmail API</span></div>
+        </div>
+      </div>
+      <div class="as reveal reveal-delay-3">
+        <div class="as-num">3</div>
+        <div class="as-content">
+          <p class="as-title">台帳（Google Sheets）に自動記録</p>
+          <p class="as-desc">誰のアカウントをいつ誰が承認したか。ログを自動でスプレッドシートに書き込む。監査対応可能。</p>
+          <div class="as-chips"><span class="achip">Sheets API</span><span class="achip">自動ログ</span></div>
+        </div>
+      </div>
+      <div class="as reveal">
+        <div class="as-num">4</div>
+        <div class="as-content">
+          <p class="as-title">退職時 → 全SaaSアカウント一括停止</p>
+          <p class="as-desc">退職申請が承認されると、連携している全SaaSのアカウントを即時無効化。残存リスクをゼロにする。</p>
+          <div class="as-chips"><span class="achip">一括API</span><span class="achip">即時停止</span><span class="achip">監査ログ</span></div>
+        </div>
+      </div>
+      <div class="as reveal reveal-delay-1">
+        <div class="as-num">5</div>
+        <div class="as-content">
+          <p class="as-title">完了通知 → 申請者・管理者に自動送信</p>
+          <p class="as-desc">処理完了をSlackとメールで申請者・管理者に通知。「いつ終わったか」が全員に可視化される。</p>
+          <div class="as-chips"><span class="achip">Slack通知</span><span class="achip">メール自動送信</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTH -->
+<section class="auth pad">
+  <div class="inner">
+    <div class="section-label reveal">Auth Strategy / 認証設計</div>
+    <div class="auth-grid">
+      <div>
+        <h2 class="auth-heading reveal">
+          これは、認証資産を<br>
+          潰さず<em>"進む"</em>一手。
+        </h2>
+        <p class="auth-body reveal reveal-delay-1">
+          既存のパスワード運用を全廃するのではなく、<br>
+          OTP（ワンタイムパスワード）を重ねることで<br>
+          現行の認証資産を活かしたまま、<br>
+          ガイドライン準拠の多要素認証に移行できる。<br><br>
+          一挙に切り替えるリスクを取らず、<br>
+          段階的に準拠レベルを上げる設計を採用する。
+        </p>
+      </div>
+      <div>
+        <div class="auth-compare reveal reveal-delay-2">
+          <div class="ac-row">
+            <div class="ac-cell header">現行の運用</div>
+            <div class="ac-cell header">提案する移行先</div>
+          </div>
+          <div class="ac-row">
+            <div class="ac-cell">
+              <div class="ac-title">共有PW のみ</div>
+              <div class="ac-desc">誰でもアクセス可能。ログ追跡不可。責任の所在が不明。</div>
+            </div>
+            <div class="ac-cell accent">
+              <div class="ac-title">個別PW + OTP</div>
+              <div class="ac-desc">個人に紐づいた認証。アクセスログが追跡可能。GL準拠。</div>
+            </div>
+          </div>
+          <div class="ac-row">
+            <div class="ac-cell">
+              <div class="ac-title">退職者対応</div>
+              <div class="ac-desc">PW変更 → 全員に影響。即時対応できない。</div>
+            </div>
+            <div class="ac-cell accent">
+              <div class="ac-title">アカウント停止</div>
+              <div class="ac-desc">退職者のみ即時無効化。他ユーザーへの影響ゼロ。</div>
+            </div>
+          </div>
+          <div class="ac-row">
+            <div class="ac-cell">
+              <div class="ac-title">追加コスト</div>
+              <div class="ac-desc">手作業の工数コスト（月12h〜）</div>
+            </div>
+            <div class="ac-cell accent">
+              <div class="ac-title">初期 + ¥1〜/月</div>
+              <div class="ac-desc">OTP認証基盤の追加コスト。Authenticatorアプリ利用で実質¥0も可。</div>
+              <div class="price-badge">¥ 1〜 / 月</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COST -->
+<section class="cost pad">
+  <div class="inner">
+    <div class="section-label reveal">Cost Design / コスト設計</div>
+    <div class="cost-grid">
+      <div>
+        <h2 class="cost-heading reveal">回避できる<br><em>追加コスト（最大）</em></h2>
+        <div class="cost-num reveal reveal-delay-1">¥1,920,000<sup>/年</sup></div>
+        <div class="cost-label reveal reveal-delay-2">100名にGoogleアカウントを配る場合との比較</div>
+        <p class="cost-body reveal reveal-delay-3">
+          「個別の認証」を実現するもう一つの方法は、100名全員にGoogleアカウントを配ること。でもそれには毎年これだけの費用がかかります。<br><br>
+          Slackなら、すでに使っているので追加ゼロ円。¥1,920,000/年の追加コストを回避できる。
+        </p>
+      </div>
+      <div class="cost-table reveal reveal-delay-1">
+        <div class="ct-row">
+          <div class="ct-cell header">比較項目</div>
+          <div class="ct-cell header" style="color:var(--t2)">Googleアカウント方式</div>
+          <div class="ct-cell header arc-col">Slack方式（提案）</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-cell">単価</div>
+          <div class="ct-cell">¥1,600/人/月（Business Standard）</div>
+          <div class="ct-cell arc-col">¥0（既存Slackを活用）</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-cell">対象人数</div>
+          <div class="ct-cell">100名</div>
+          <div class="ct-cell arc-col">100名</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-cell">1か月あたり</div>
+          <div class="ct-cell" style="color:var(--danger)">¥160,000/月</div>
+          <div class="ct-cell arc-col">追加なし</div>
+        </div>
+        <div class="ct-row">
+          <div class="ct-cell total">年間コスト</div>
+          <div class="ct-cell total" style="text-decoration:line-through;color:var(--danger)">¥1,920,000/年</div>
+          <div class="ct-cell total-arc">¥0（追加費用）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE TABLE -->
+<section class="compare pad">
+  <div class="inner">
+    <div class="section-label reveal">Comparison / 比較</div>
+    <h2 class="compare-heading reveal">いまの共有 vs 個別+自動化</h2>
+    <table class="cmp-table reveal reveal-delay-1">
+      <thead>
+        <tr>
+          <th>比較項目</th>
+          <th>いまの共有運用</th>
+          <th class="arc-th">個別アカウント + 自動化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">ガイドライン準拠</td>
+          <td><span class="badge-ng">✗ 非対応</span></td>
+          <td class="arc-td"><span class="badge-ok">✓ 準拠</span></td>
+        </tr>
+        <tr>
+          <td class="row-label">アカウント発行</td>
+          <td>手作業（担当者が毎回）</td>
+          <td class="arc-td">Slackボタン1つ・自動完結</td>
+        </tr>
+        <tr>
+          <td class="row-label">退職時の対応</td>
+          <td>PW変更（全員に影響）</td>
+          <td class="arc-td">対象者のみ即時停止</td>
+        </tr>
+        <tr>
+          <td class="row-label">アクセスログ</td>
+          <td><span class="badge-ng">✗ 追跡不可</span></td>
+          <td class="arc-td"><span class="badge-ok">✓ 個人別ログ取得</span></td>
+        </tr>
+        <tr>
+          <td class="row-label">監査対応</td>
+          <td><span class="badge-ng">✗ 不可</span></td>
+          <td class="arc-td"><span class="badge-ok">✓ 台帳・ログで対応可</span></td>
+        </tr>
+        <tr>
+          <td class="row-label">担当者の月間工数</td>
+          <td>40h〜（試算）</td>
+          <td class="arc-td">5h 以下（試算）</td>
+        </tr>
+        <tr>
+          <td class="row-label">年間コスト</td>
+          <td style="color:var(--danger)">¥1,430,000〜</td>
+          <td class="arc-td"><span class="badge-ok">¥606,789〜</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- NOTE -->
+<section class="note pad">
+  <div class="inner">
+    <div class="section-label reveal">Scope Note / 注記</div>
+    <div class="note-grid">
+      <div>
+        <h2 class="note-heading reveal">ただし、認証は<em>"一部"</em>から。</h2>
+      </div>
+      <div class="note-body">
+        <p class="note-p reveal">
+          すべてのSaaSを一度に個別化・自動化する必要はありません。<br>
+          リスクの高いツール・頻度の高い操作から段階的に移行することで、<br>
+          現場への負荷を最小化しながら準拠レベルを上げていきます。
+        </p>
+        <div class="note-scope reveal reveal-delay-1">
+          <div class="ns-title">スコープと優先順位の目安</div>
+          <div class="ns-row">
+            <span class="ns-key">Phase 1（即着手）</span>
+            <span>最重要SaaS（採用管理・人事系）の個別化 + Slack Bot構築</span>
+          </div>
+          <div class="ns-row">
+            <span class="ns-key">Phase 2（〜3ヶ月）</span>
+            <span>OTP認証の導入・全SaaS API連携の拡張</span>
+          </div>
+          <div class="ns-row">
+            <span class="ns-key">Phase 3（〜6ヶ月）</span>
+            <span>台帳・監査ログの整備・定期レポート自動化</span>
+          </div>
+          <div class="ns-row">
+            <span class="ns-key">対象外</span>
+            <span>ローカルインストール型ツール・外部委託先のSaaSアカウント（別途検討）</span>
+          </div>
+        </div>
+        <p class="note-p reveal reveal-delay-2">
+          ガイドラインが求めるのは「全部一度に完璧に」ではなく、<br>
+          「リスクを認識し、計画的に改善していること」です。<br>
+          Phased移行は、準拠の観点でも正しいアプローチです。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="cta">
+  <div class="inner">
+    <p class="cta-pre reveal">Next Step</p>
+    <h2 class="cta-heading reveal">
+      進めるために、<br><em>確認しておく。</em>
+    </h2>
+    <p class="cta-sub reveal reveal-delay-1">
+      まず現状の整理から始めます。<br>
+      「どのSaaSを使っているか」「現在の管理体制」を<br>
+      一緒に棚卸しするところから、動きます。
+    </p>
+    <div class="cta-checklist reveal reveal-delay-2">
+      <div class="cl-item">
+        <span class="cl-mark">→</span>
+        現在使用しているSaaSと共有状況の確認
+      </div>
+      <div class="cl-item">
+        <span class="cl-mark">→</span>
+        担当者の管理工数・現状の課題のヒアリング
+      </div>
+      <div class="cl-item">
+        <span class="cl-mark">→</span>
+        Phase設計・コスト試算の提示
+      </div>
+      <div class="cl-item">
+        <span class="cl-mark">→</span>
+        PoC（最小構成）からの着手判断
+      </div>
+    </div>
+    <a href="mailto:rdr@responsedesignresearch.com" class="cta-email reveal reveal-delay-3">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      rdr@responsedesignresearch.com
+    </a>
+    <br>
+    <p class="cta-note reveal">Signal Arc — KISHINO MASASHI / AI導入設計・業務自動化</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-brand">Signal Arc</div>
+  <div class="f-copy">&copy; 2026 Signal Arc / KISHINO MASASHI. All rights reserved.</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
